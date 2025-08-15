@@ -98,6 +98,7 @@ func (s PeopleService) GetByUserID(
 func (s PeopleService) CountForOrganizationID(
 	ctx context.Context,
 	organizationID gid.GID,
+	filter *coredata.PeopleFilter,
 ) (int, error) {
 	var count int
 
@@ -105,7 +106,7 @@ func (s PeopleService) CountForOrganizationID(
 		ctx,
 		func(conn pg.Conn) (err error) {
 			peoples := coredata.Peoples{}
-			count, err = peoples.CountByOrganizationID(ctx, conn, s.svc.scope, organizationID)
+			count, err = peoples.CountByOrganizationID(ctx, conn, s.svc.scope, organizationID, filter)
 			if err != nil {
 				return fmt.Errorf("cannot count peoples: %w", err)
 			}
@@ -125,6 +126,7 @@ func (s PeopleService) ListForOrganizationID(
 	ctx context.Context,
 	organizationID gid.GID,
 	cursor *page.Cursor[coredata.PeopleOrderField],
+	filter *coredata.PeopleFilter,
 ) (*page.Page[*coredata.People, coredata.PeopleOrderField], error) {
 	var peoples coredata.Peoples
 
@@ -137,6 +139,7 @@ func (s PeopleService) ListForOrganizationID(
 				s.svc.scope,
 				organizationID,
 				cursor,
+				filter,
 			)
 		},
 	)

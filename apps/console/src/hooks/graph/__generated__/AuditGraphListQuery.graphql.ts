@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<421ff1807db813d87849e15e60fc958e>>
+ * @generated SignedSource<<145565eb150c67f2f1b3c70fe6f6e748>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -58,7 +58,14 @@ v4 = [
     "name": "first",
     "value": 10
   }
-];
+],
+v5 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "name",
+  "storageKey": null
+};
 return {
   "fragment": {
     "argumentDefinitions": (v0/*: any*/),
@@ -137,6 +144,7 @@ return {
                         "plural": false,
                         "selections": [
                           (v3/*: any*/),
+                          (v5/*: any*/),
                           {
                             "alias": null,
                             "args": null,
@@ -186,13 +194,7 @@ return {
                             "plural": false,
                             "selections": [
                               (v3/*: any*/),
-                              {
-                                "alias": null,
-                                "args": null,
-                                "kind": "ScalarField",
-                                "name": "name",
-                                "storageKey": null
-                              }
+                              (v5/*: any*/)
                             ],
                             "storageKey": null
                           },
@@ -292,12 +294,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "1c53759e5b25eb390345fee12e536896",
+    "cacheID": "d96d2332efb5f43e2dcb09669173ad7e",
     "id": null,
     "metadata": {},
     "name": "AuditGraphListQuery",
     "operationKind": "query",
-    "text": "query AuditGraphListQuery(\n  $organizationId: ID!\n) {\n  node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      ...AuditsPageFragment\n    }\n    id\n  }\n}\n\nfragment AuditsPageFragment on Organization {\n  audits(first: 10) {\n    edges {\n      node {\n        id\n        validFrom\n        validUntil\n        report {\n          id\n          filename\n        }\n        state\n        framework {\n          id\n          name\n        }\n        createdAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
+    "text": "query AuditGraphListQuery(\n  $organizationId: ID!\n) {\n  node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      ...AuditsPageFragment\n    }\n    id\n  }\n}\n\nfragment AuditsPageFragment on Organization {\n  audits(first: 10) {\n    edges {\n      node {\n        id\n        name\n        validFrom\n        validUntil\n        report {\n          id\n          filename\n        }\n        state\n        framework {\n          id\n          name\n        }\n        createdAt\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();

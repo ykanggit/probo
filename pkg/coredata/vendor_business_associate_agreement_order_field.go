@@ -12,33 +12,30 @@
 // OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 // PERFORMANCE OF THIS SOFTWARE.
 
-package types
+package coredata
 
-import (
-	"errors"
-	"io"
-	"strconv"
-
-	"github.com/99designs/gqlgen/graphql"
-	"github.com/getprobo/probo/pkg/page"
+type (
+	VendorBusinessAssociateAgreementOrderField string
 )
 
-func MarshalCursorKeyScalar(ck page.CursorKey) graphql.Marshaler {
-	return graphql.WriterFunc(func(w io.Writer) {
-		_, _ = w.Write([]byte(strconv.Quote(ck.String())))
-	})
+const (
+	VendorBusinessAssociateAgreementOrderFieldValidFrom VendorBusinessAssociateAgreementOrderField = "VALID_FROM"
+	VendorBusinessAssociateAgreementOrderFieldCreatedAt VendorBusinessAssociateAgreementOrderField = "CREATED_AT"
+)
+
+func (p VendorBusinessAssociateAgreementOrderField) Column() string {
+	return string(p)
 }
 
-func UnmarshalCursorKeyScalar(v interface{}) (page.CursorKey, error) {
-	s, ok := v.(string)
-	if !ok {
-		return page.CursorKeyNil, errors.New("must be a string")
-	}
+func (p VendorBusinessAssociateAgreementOrderField) String() string {
+	return string(p)
+}
 
-	ck, err := page.ParseCursorKey(s)
-	if err != nil {
-		return page.CursorKeyNil, err
-	}
+func (p VendorBusinessAssociateAgreementOrderField) MarshalText() ([]byte, error) {
+	return []byte(p.String()), nil
+}
 
-	return ck, nil
+func (p *VendorBusinessAssociateAgreementOrderField) UnmarshalText(text []byte) error {
+	*p = VendorBusinessAssociateAgreementOrderField(text)
+	return nil
 }

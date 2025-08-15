@@ -826,3 +826,114 @@ RETURNING
 
 	return nil
 }
+
+func (c *Controls) CountByAuditID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	auditID gid.GID,
+	filter *ControlFilter,
+) (int, error) {
+	q := `
+WITH ctrl AS (
+		SELECT
+			c.id,
+			c.tenant_id,
+			c.search_vector
+		FROM
+			controls c
+		INNER JOIN
+			controls_audits ca ON c.id = ca.control_id
+		WHERE
+			ca.audit_id = @audit_id
+	)
+	SELECT
+		COUNT(id)
+	FROM
+		ctrl
+	WHERE %s
+		AND %s
+	`
+	q = fmt.Sprintf(q, scope.SQLFragment(), filter.SQLFragment())
+
+	args := pgx.NamedArgs{"audit_id": auditID}
+	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, filter.SQLArguments())
+
+	row := conn.QueryRow(ctx, q, args)
+
+	var count int
+	if err := row.Scan(&count); err != nil {
+		return 0, fmt.Errorf("cannot scan count: %w", err)
+	}
+
+	return count, nil
+}
+
+func (c *Controls) LoadByAuditID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	auditID gid.GID,
+	cursor *page.Cursor[ControlOrderField],
+	filter *ControlFilter,
+) error {
+	q := `
+WITH ctrl AS (
+	SELECT
+		c.id,
+		c.section_title,
+		c.framework_id,
+		c.tenant_id,
+		c.name,
+		c.description,
+		c.status,
+		c.exclusion_justification,
+		c.created_at,
+		c.updated_at,
+		c.search_vector
+	FROM
+		controls c
+	INNER JOIN
+		controls_audits ca ON c.id = ca.control_id
+	WHERE
+		ca.audit_id = @audit_id
+)
+SELECT
+	id,
+	section_title,
+	framework_id,
+    tenant_id,
+	name,
+	description,
+	status,
+	exclusion_justification,
+	created_at,
+	updated_at
+FROM
+	ctrl
+WHERE %s
+	AND %s
+	AND %s
+`
+	q = fmt.Sprintf(q, scope.SQLFragment(), filter.SQLFragment(), cursor.SQLFragment())
+
+	args := pgx.NamedArgs{"audit_id": auditID}
+	maps.Copy(args, scope.SQLArguments())
+	maps.Copy(args, filter.SQLArguments())
+	maps.Copy(args, cursor.SQLArguments())
+
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query controls: %w", err)
+	}
+
+	controls, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[Control])
+	if err != nil {
+		return fmt.Errorf("cannot collect controls: %w", err)
+	}
+
+	*c = controls
+
+	return nil
+}

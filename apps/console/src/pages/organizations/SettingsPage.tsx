@@ -32,6 +32,9 @@ import clsx from "clsx";
 import { useMutationWithToasts } from "/hooks/useMutationWithToasts";
 import { useOrganizationId } from "/hooks/useOrganizationId";
 import { InviteUserDialog } from "/components/organizations/InviteUserDialog";
+import { useDeleteOrganizationMutation } from "/hooks/graph/OrganizationGraph";
+import { useNavigate } from "react-router";
+import { DeleteOrganizationDialog } from "/components/organizations/DeleteOrganizationDialog";
 
 type Props = {
   queryRef: PreloadedQuery<OrganizationGraph_ViewQuery>;
@@ -89,22 +92,16 @@ const updateOrganizationMutation = graphql`
   }
 `;
 
-const deleteOrganizationMutation = graphql`
-  mutation SettingsPage_DeleteMutation($input: DeleteOrganizationInput!) {
-    deleteOrganization(input: $input) {
-      success
-    }
-  }
-`;
+
 
 export default function SettingsPage({ queryRef }: Props) {
   const { __ } = useTranslate();
+  const navigate = useNavigate();
   const organizationKey = usePreloadedQuery(
     organizationViewQuery,
     queryRef
   ).node;
   const { toast } = useToast();
-  const confirm = useConfirm();
   const organization = useFragment<SettingsPageFragment$key>(
     organizationFragment,
     organizationKey
@@ -112,13 +109,7 @@ export default function SettingsPage({ queryRef }: Props) {
   const [updateOrganization, isUpdating] = useMutation(
     updateOrganizationMutation
   );
-  const [deleteOrganization, isDeleting] = useMutationWithToasts(
-    deleteOrganizationMutation,
-    {
-      successMessage: __("Organization deleted successfully"),
-      errorMessage: __("Failed to delete organization"),
-    }
-  );
+  const [deleteOrganization, isDeleting] = useDeleteOrganizationMutation();
   const users = organization.users.edges.map((edge) => edge.node);
 
   const updateOrganizationName = useDebounceCallback((name: string) => {
@@ -176,26 +167,17 @@ export default function SettingsPage({ queryRef }: Props) {
   };
 
   const handleDeleteOrganization = () => {
-    confirm(
-      () => {
-        return deleteOrganization({
-          variables: {
-            input: {
-              organizationId: organization.id,
-            },
-          },
-          onSuccess: () => {
-            // Redirect to organizations page after successful deletion
-            window.location.href = "/";
-          },
-        });
+    return deleteOrganization({
+      variables: {
+        input: {
+          organizationId: organization.id,
+        },
+        connections: [],
       },
-      {
-        message: __(
-          "Are you sure you want to delete this organization? This action cannot be undone and will permanently delete all data associated with this organization."
-        ),
-      }
-    );
+      onSuccess: () => {
+        navigate("/", { replace: true });
+      },
+    });
   };
 
   return (
@@ -321,36 +303,33 @@ export default function SettingsPage({ queryRef }: Props) {
         </Card>
       </div>
 
-      {/* Dangerous Actions */}
       <div className="space-y-4">
-        <h2 className="text-base font-medium text-red-600">{__("Dangerous Actions")}</h2>
-        <Card padded className="border-red-200 bg-red-50">
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-sm font-medium text-red-800">{__("Delete Organization")}</h3>
-              <p className="text-sm text-red-600 mt-1">
-                {__("Once you delete an organization, there is no going back. Please be certain.")}
-              </p>
-            </div>
+        <h2 className="text-base font-medium text-red-600">{__("Danger Zone")}</h2>
+        <Card padded className="border-red-200 flex items-center gap-3">
+          <div className="mr-auto">
+            <h3 className="text-base font-semibold text-red-700">
+              {__("Delete Organization")}
+            </h3>
+            <p className="text-sm text-txt-tertiary">
+              {__("Permanently delete this organization and all its data.")}{" "}
+              <span className="text-sm text-red-600 font-medium">
+                {__("This action cannot be undone.")}
+              </span>
+            </p>
+          </div>
+          <DeleteOrganizationDialog
+            organizationName={organization.name}
+            onConfirm={handleDeleteOrganization}
+            isDeleting={isDeleting}
+          >
             <Button
               variant="danger"
-              onClick={handleDeleteOrganization}
+              icon={IconTrashCan}
               disabled={isDeleting}
-              className="w-full sm:w-auto"
             >
-              {isDeleting ? (
-                <>
-                  <Spinner size={16} className="mr-2" />
-                  {__("Deleting...")}
-                </>
-              ) : (
-                <>
-                  <IconTrashCan className="mr-2" />
-                  {__("Delete Organization")}
-                </>
-              )}
+              {isDeleting ? __("Deleting...") : __("Delete Organization")}
             </Button>
-          </div>
+          </DeleteOrganizationDialog>
         </Card>
       </div>
     </div>

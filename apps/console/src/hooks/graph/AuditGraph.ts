@@ -20,6 +20,7 @@ export const auditNodeQuery = graphql`
     node(id: $auditId) {
       ... on Audit {
         id
+        name
         validFrom
         validUntil
         report {
@@ -56,6 +57,7 @@ export const createAuditMutation = graphql`
       auditEdge @prependEdge(connections: $connections) {
         node {
           id
+          name
           validFrom
           validUntil
           report {
@@ -79,6 +81,7 @@ export const updateAuditMutation = graphql`
     updateAudit(input: $input) {
       audit {
         id
+        name
         validFrom
         validUntil
         report {
@@ -148,6 +151,7 @@ export const useCreateAudit = (connectionId: string) => {
   return (input: {
     organizationId: string;
     frameworkId: string;
+    name?: string;
     validFrom?: string;
     validUntil?: string;
     reportKey?: string;
@@ -165,6 +169,7 @@ export const useCreateAudit = (connectionId: string) => {
         input: {
           organizationId: input.organizationId,
           frameworkId: input.frameworkId,
+          name: input.name,
           validFrom: input.validFrom,
           validUntil: input.validUntil,
           reportKey: input.reportKey,
@@ -182,6 +187,7 @@ export const useUpdateAudit = () => {
 
   return (input: {
     id: string;
+    name?: string;
     validFrom?: string;
     validUntil?: string;
     state?: string;

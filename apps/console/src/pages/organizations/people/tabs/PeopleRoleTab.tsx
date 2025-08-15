@@ -47,6 +47,8 @@ export default function PeopleRoleTab() {
           fullName: people.fullName!,
           primaryEmailAddress: people.primaryEmailAddress!,
           additionalEmailAddresses: people.additionalEmailAddresses ?? [],
+          contractStartDate: people.contractStartDate,
+          contractEndDate: people.contractEndDate,
         },
       },
       onCompleted: () => {

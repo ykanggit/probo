@@ -15,8 +15,17 @@
 package types
 
 import (
-	sharedTypes "github.com/getprobo/probo/pkg/server/api/types"
+	"github.com/getprobo/probo/pkg/coredata"
 )
 
-var MarshalGIDScalar = sharedTypes.MarshalGIDScalar
-var UnmarshalGIDScalar = sharedTypes.UnmarshalGIDScalar
+func NewVendorBusinessAssociateAgreement(v *coredata.VendorBusinessAssociateAgreement, file *coredata.File) *VendorBusinessAssociateAgreement {
+	return &VendorBusinessAssociateAgreement{
+		ID:         v.ID,
+		ValidFrom:  v.ValidFrom,
+		ValidUntil: v.ValidUntil,
+		FileName:   file.FileName,
+		FileSize:   file.FileSize,
+		CreatedAt:  v.CreatedAt,
+		UpdatedAt:  v.UpdatedAt,
+	}
+}

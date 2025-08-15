@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<95d2adf687d1cae6938863ba004db9a8>>
+ * @generated SignedSource<<dec38386ca0015f6c77121c2740fa406>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -16,6 +16,15 @@ export type FrameworkGraphControlNodeQuery$variables = {
 };
 export type FrameworkGraphControlNodeQuery$data = {
   readonly node: {
+    readonly audits?: {
+      readonly __id: string;
+      readonly edges: ReadonlyArray<{
+        readonly node: {
+          readonly id: string;
+          readonly " $fragmentSpreads": FragmentRefs<"LinkedAuditsCardFragment">;
+        };
+      }>;
+    };
     readonly description?: string;
     readonly documents?: {
       readonly __id: string;
@@ -162,7 +171,21 @@ v12 = [
     "name": "first",
     "value": 100
   }
-];
+],
+v13 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "state",
+  "storageKey": null
+},
+v14 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "createdAt",
+  "storageKey": null
+};
 return {
   "fragment": {
     "argumentDefinitions": (v0/*: any*/),
@@ -277,6 +300,49 @@ return {
                   (v11/*: any*/)
                 ],
                 "storageKey": null
+              },
+              {
+                "alias": "audits",
+                "args": null,
+                "concreteType": "AuditConnection",
+                "kind": "LinkedField",
+                "name": "__FrameworkGraphControl_audits_connection",
+                "plural": false,
+                "selections": [
+                  {
+                    "alias": null,
+                    "args": null,
+                    "concreteType": "AuditEdge",
+                    "kind": "LinkedField",
+                    "name": "edges",
+                    "plural": true,
+                    "selections": [
+                      {
+                        "alias": null,
+                        "args": null,
+                        "concreteType": "Audit",
+                        "kind": "LinkedField",
+                        "name": "node",
+                        "plural": false,
+                        "selections": [
+                          (v2/*: any*/),
+                          {
+                            "args": null,
+                            "kind": "FragmentSpread",
+                            "name": "LinkedAuditsCardFragment"
+                          },
+                          (v8/*: any*/)
+                        ],
+                        "storageKey": null
+                      },
+                      (v9/*: any*/)
+                    ],
+                    "storageKey": null
+                  },
+                  (v10/*: any*/),
+                  (v11/*: any*/)
+                ],
+                "storageKey": null
               }
             ],
             "type": "Control",
@@ -339,13 +405,7 @@ return {
                         "selections": [
                           (v2/*: any*/),
                           (v3/*: any*/),
-                          {
-                            "alias": null,
-                            "args": null,
-                            "kind": "ScalarField",
-                            "name": "state",
-                            "storageKey": null
-                          },
+                          (v13/*: any*/),
                           (v8/*: any*/)
                         ],
                         "storageKey": null
@@ -400,13 +460,7 @@ return {
                             "name": "title",
                             "storageKey": null
                           },
-                          {
-                            "alias": null,
-                            "args": null,
-                            "kind": "ScalarField",
-                            "name": "createdAt",
-                            "storageKey": null
-                          },
+                          (v14/*: any*/),
                           {
                             "alias": null,
                             "args": null,
@@ -476,6 +530,83 @@ return {
                 "key": "FrameworkGraphControl_documents",
                 "kind": "LinkedHandle",
                 "name": "documents"
+              },
+              {
+                "alias": null,
+                "args": (v12/*: any*/),
+                "concreteType": "AuditConnection",
+                "kind": "LinkedField",
+                "name": "audits",
+                "plural": false,
+                "selections": [
+                  {
+                    "alias": null,
+                    "args": null,
+                    "concreteType": "AuditEdge",
+                    "kind": "LinkedField",
+                    "name": "edges",
+                    "plural": true,
+                    "selections": [
+                      {
+                        "alias": null,
+                        "args": null,
+                        "concreteType": "Audit",
+                        "kind": "LinkedField",
+                        "name": "node",
+                        "plural": false,
+                        "selections": [
+                          (v2/*: any*/),
+                          (v3/*: any*/),
+                          (v14/*: any*/),
+                          (v13/*: any*/),
+                          {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
+                            "name": "validFrom",
+                            "storageKey": null
+                          },
+                          {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
+                            "name": "validUntil",
+                            "storageKey": null
+                          },
+                          {
+                            "alias": null,
+                            "args": null,
+                            "concreteType": "Framework",
+                            "kind": "LinkedField",
+                            "name": "framework",
+                            "plural": false,
+                            "selections": [
+                              (v2/*: any*/),
+                              (v3/*: any*/)
+                            ],
+                            "storageKey": null
+                          },
+                          (v8/*: any*/)
+                        ],
+                        "storageKey": null
+                      },
+                      (v9/*: any*/)
+                    ],
+                    "storageKey": null
+                  },
+                  (v10/*: any*/),
+                  (v11/*: any*/)
+                ],
+                "storageKey": "audits(first:100)"
+              },
+              {
+                "alias": null,
+                "args": (v12/*: any*/),
+                "filters": null,
+                "handle": "connection",
+                "key": "FrameworkGraphControl_audits",
+                "kind": "LinkedHandle",
+                "name": "audits"
               }
             ],
             "type": "Control",
@@ -487,7 +618,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "ed223aa33ef15ba2e170e8aeae990f8e",
+    "cacheID": "20a0b80a6b0d796951c7f8c6eca41d3c",
     "id": null,
     "metadata": {
       "connection": [
@@ -508,16 +639,25 @@ return {
             "node",
             "documents"
           ]
+        },
+        {
+          "count": null,
+          "cursor": null,
+          "direction": "forward",
+          "path": [
+            "node",
+            "audits"
+          ]
         }
       ]
     },
     "name": "FrameworkGraphControlNodeQuery",
     "operationKind": "query",
-    "text": "query FrameworkGraphControlNodeQuery(\n  $controlId: ID!\n) {\n  node(id: $controlId) {\n    __typename\n    ... on Control {\n      id\n      name\n      sectionTitle\n      description\n      status\n      exclusionJustification\n      ...FrameworkControlDialogFragment\n      measures(first: 100) {\n        edges {\n          node {\n            id\n            ...LinkedMeasuresCardFragment\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n      documents(first: 100) {\n        edges {\n          node {\n            id\n            ...LinkedDocumentsCardFragment\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n    id\n  }\n}\n\nfragment FrameworkControlDialogFragment on Control {\n  id\n  name\n  description\n  sectionTitle\n  status\n  exclusionJustification\n}\n\nfragment LinkedDocumentsCardFragment on Document {\n  id\n  title\n  createdAt\n  documentType\n  versions(first: 1) {\n    edges {\n      node {\n        id\n        status\n      }\n    }\n  }\n}\n\nfragment LinkedMeasuresCardFragment on Measure {\n  id\n  name\n  state\n}\n"
+    "text": "query FrameworkGraphControlNodeQuery(\n  $controlId: ID!\n) {\n  node(id: $controlId) {\n    __typename\n    ... on Control {\n      id\n      name\n      sectionTitle\n      description\n      status\n      exclusionJustification\n      ...FrameworkControlDialogFragment\n      measures(first: 100) {\n        edges {\n          node {\n            id\n            ...LinkedMeasuresCardFragment\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n      documents(first: 100) {\n        edges {\n          node {\n            id\n            ...LinkedDocumentsCardFragment\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n      audits(first: 100) {\n        edges {\n          node {\n            id\n            ...LinkedAuditsCardFragment\n            __typename\n          }\n          cursor\n        }\n        pageInfo {\n          endCursor\n          hasNextPage\n        }\n      }\n    }\n    id\n  }\n}\n\nfragment FrameworkControlDialogFragment on Control {\n  id\n  name\n  description\n  sectionTitle\n  status\n  exclusionJustification\n}\n\nfragment LinkedAuditsCardFragment on Audit {\n  id\n  name\n  createdAt\n  state\n  validFrom\n  validUntil\n  framework {\n    id\n    name\n  }\n}\n\nfragment LinkedDocumentsCardFragment on Document {\n  id\n  title\n  createdAt\n  documentType\n  versions(first: 1) {\n    edges {\n      node {\n        id\n        status\n      }\n    }\n  }\n}\n\nfragment LinkedMeasuresCardFragment on Measure {\n  id\n  name\n  state\n}\n"
   }
 };
 })();
 
-(node as any).hash = "d5c8f5ce17bd227c83fec31d63a82262";
+(node as any).hash = "ac5240126dfbf4882ba2b111e865045d";
 
 export default node;

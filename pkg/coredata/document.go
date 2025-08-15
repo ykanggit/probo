@@ -250,6 +250,25 @@ DELETE FROM documents WHERE %s AND id = @document_id
 	return err
 }
 
+func (p Document) DeleteByOrganizationID(
+	ctx context.Context,
+	conn pg.Conn,
+	scope Scoper,
+	organizationID gid.GID,
+) error {
+	q := `
+DELETE FROM documents WHERE %s AND organization_id = @organization_id
+`
+
+	q = fmt.Sprintf(q, scope.SQLFragment())
+
+	args := pgx.StrictNamedArgs{"organization_id": organizationID}
+	maps.Copy(args, scope.SQLArguments())
+
+	_, err := conn.Exec(ctx, q, args)
+	return err
+}
+
 func (p *Document) Update(
 	ctx context.Context,
 	conn pg.Conn,
@@ -300,7 +319,9 @@ func (p *Documents) CountByControlID(
 WITH plcs AS (
 	SELECT
 		p.id,
-		p.tenant_id
+		p.tenant_id,
+		p.search_vector,
+		p.show_on_trust_center
 	FROM
 		documents p
 	INNER JOIN
@@ -409,7 +430,9 @@ func (p *Documents) CountByRiskID(
 WITH plcs AS (
 	SELECT
 		p.id,
-		p.tenant_id
+		p.tenant_id,
+		p.search_vector,
+		p.show_on_trust_center
 	FROM
 		documents p
 	INNER JOIN
@@ -460,7 +483,8 @@ WITH plcs AS (
 		p.current_published_version,
 		p.show_on_trust_center,
 		p.created_at,
-		p.updated_at
+		p.updated_at,
+		p.search_vector
 	FROM
 		documents p
 	INNER JOIN

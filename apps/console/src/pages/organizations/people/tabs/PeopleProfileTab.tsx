@@ -1,5 +1,5 @@
 import z from "zod";
-import { peopleRoles } from "@probo/helpers";
+import { peopleRoles, formatDatetime } from "@probo/helpers";
 import { useOutletContext } from "react-router";
 import type { PeopleGraphNodeQuery$data } from "/hooks/graph/__generated__/PeopleGraphNodeQuery.graphql";
 import { useTranslate } from "@probo/i18n";
@@ -7,7 +7,7 @@ import { useFormWithSchema } from "/hooks/useFormWithSchema";
 import { useMutationWithToasts } from "/hooks/useMutationWithToasts";
 import type { PeopleGraphUpdateMutation } from "/hooks/graph/__generated__/PeopleGraphUpdateMutation.graphql";
 import { updatePeopleMutation } from "/hooks/graph/PeopleGraph";
-import { Button, Card, Field } from "@probo/ui";
+import { Button, Card, Field, Input } from "@probo/ui";
 import { EmailsField } from "/components/form/EmailsField";
 
 const schema = z.object({
@@ -20,6 +20,8 @@ const schema = z.object({
     z.array(z.string().email())
   ),
   kind: z.enum(peopleRoles),
+  contractStartDate: z.string().optional().nullable(),
+  contractEndDate: z.string().optional().nullable(),
 });
 
 export default function PeopleProfileTab() {
@@ -35,6 +37,8 @@ export default function PeopleProfileTab() {
         primaryEmailAddress: people.primaryEmailAddress,
         position: people.position,
         additionalEmailAddresses: [...(people.additionalEmailAddresses ?? [])],
+        contractStartDate: people.contractStartDate?.split('T')[0] || "",
+        contractEndDate: people.contractEndDate?.split('T')[0] || "",
       },
     });
   const [mutate, isMutating] = useMutationWithToasts<PeopleGraphUpdateMutation>(
@@ -46,18 +50,19 @@ export default function PeopleProfileTab() {
   );
 
   const onSubmit = handleSubmit((data) => {
+    const input = {
+      id: people.id!,
+      fullName: data.fullName,
+      primaryEmailAddress: data.primaryEmailAddress,
+      position: data.position,
+      additionalEmailAddresses: data.additionalEmailAddresses,
+      kind: people.kind,
+      contractStartDate: formatDatetime(data.contractStartDate) ?? null,
+      contractEndDate: formatDatetime(data.contractEndDate) ?? null,
+    };
+
     mutate({
-      variables: {
-        input: {
-          id: people.id!,
-          fullName: data.fullName,
-          primaryEmailAddress: data.primaryEmailAddress,
-          position: data.position,
-          additionalEmailAddresses: data.additionalEmailAddresses,
-          // TODO : make these field optional in the query (server side)
-          kind: people.kind,
-        },
-      },
+      variables: { input },
       onCompleted: () => {
         reset(data);
       },
@@ -80,6 +85,12 @@ export default function PeopleProfileTab() {
           type="email"
         />
         <EmailsField control={control} register={register} />
+        <Field label={__("Contract start date")}>
+          <Input {...register("contractStartDate")} type="date" />
+        </Field>
+        <Field label={__("Contract end date")}>
+          <Input {...register("contractEndDate")} type="date" />
+        </Field>
       </Card>
       <div className="flex justify-end">
         {formState.isDirty && (

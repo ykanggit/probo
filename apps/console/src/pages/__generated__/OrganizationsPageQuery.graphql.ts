@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<91cc89e5e07572ab16c7bc9b8443fcd6>>
+ * @generated SignedSource<<70d28036f17c3b03dcfecce6abd5b476>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -13,6 +13,7 @@ export type OrganizationsPageQuery$variables = Record<PropertyKey, never>;
 export type OrganizationsPageQuery$data = {
   readonly viewer: {
     readonly organizations: {
+      readonly __id: string;
       readonly edges: ReadonlyArray<{
         readonly node: {
           readonly id: string;
@@ -36,60 +37,103 @@ var v0 = {
   "name": "id",
   "storageKey": null
 },
-v1 = {
-  "alias": null,
-  "args": [
-    {
-      "kind": "Literal",
-      "name": "first",
-      "value": 25
-    }
-  ],
-  "concreteType": "OrganizationConnection",
-  "kind": "LinkedField",
-  "name": "organizations",
-  "plural": false,
-  "selections": [
-    {
-      "alias": null,
-      "args": null,
-      "concreteType": "OrganizationEdge",
-      "kind": "LinkedField",
-      "name": "edges",
-      "plural": true,
-      "selections": [
-        {
-          "alias": null,
-          "args": null,
-          "concreteType": "Organization",
-          "kind": "LinkedField",
-          "name": "node",
-          "plural": false,
-          "selections": [
-            (v0/*: any*/),
-            {
-              "alias": null,
-              "args": null,
-              "kind": "ScalarField",
-              "name": "name",
-              "storageKey": null
-            },
-            {
-              "alias": null,
-              "args": null,
-              "kind": "ScalarField",
-              "name": "logoUrl",
-              "storageKey": null
-            }
-          ],
-          "storageKey": null
-        }
-      ],
-      "storageKey": null
-    }
-  ],
-  "storageKey": "organizations(first:25)"
-};
+v1 = [
+  {
+    "alias": null,
+    "args": null,
+    "concreteType": "OrganizationEdge",
+    "kind": "LinkedField",
+    "name": "edges",
+    "plural": true,
+    "selections": [
+      {
+        "alias": null,
+        "args": null,
+        "concreteType": "Organization",
+        "kind": "LinkedField",
+        "name": "node",
+        "plural": false,
+        "selections": [
+          (v0/*: any*/),
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "name",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "logoUrl",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "__typename",
+            "storageKey": null
+          }
+        ],
+        "storageKey": null
+      },
+      {
+        "alias": null,
+        "args": null,
+        "kind": "ScalarField",
+        "name": "cursor",
+        "storageKey": null
+      }
+    ],
+    "storageKey": null
+  },
+  {
+    "alias": null,
+    "args": null,
+    "concreteType": "PageInfo",
+    "kind": "LinkedField",
+    "name": "pageInfo",
+    "plural": false,
+    "selections": [
+      {
+        "alias": null,
+        "args": null,
+        "kind": "ScalarField",
+        "name": "endCursor",
+        "storageKey": null
+      },
+      {
+        "alias": null,
+        "args": null,
+        "kind": "ScalarField",
+        "name": "hasNextPage",
+        "storageKey": null
+      }
+    ],
+    "storageKey": null
+  },
+  {
+    "kind": "ClientExtension",
+    "selections": [
+      {
+        "alias": null,
+        "args": null,
+        "kind": "ScalarField",
+        "name": "__id",
+        "storageKey": null
+      }
+    ]
+  }
+],
+v2 = [
+  {
+    "kind": "Literal",
+    "name": "first",
+    "value": 25
+  }
+];
 return {
   "fragment": {
     "argumentDefinitions": [],
@@ -105,7 +149,16 @@ return {
         "name": "viewer",
         "plural": false,
         "selections": [
-          (v1/*: any*/)
+          {
+            "alias": "organizations",
+            "args": null,
+            "concreteType": "OrganizationConnection",
+            "kind": "LinkedField",
+            "name": "__OrganizationsPage_organizations_connection",
+            "plural": false,
+            "selections": (v1/*: any*/),
+            "storageKey": null
+          }
         ],
         "storageKey": null
       }
@@ -127,7 +180,25 @@ return {
         "name": "viewer",
         "plural": false,
         "selections": [
-          (v1/*: any*/),
+          {
+            "alias": null,
+            "args": (v2/*: any*/),
+            "concreteType": "OrganizationConnection",
+            "kind": "LinkedField",
+            "name": "organizations",
+            "plural": false,
+            "selections": (v1/*: any*/),
+            "storageKey": "organizations(first:25)"
+          },
+          {
+            "alias": null,
+            "args": (v2/*: any*/),
+            "filters": null,
+            "handle": "connection",
+            "key": "OrganizationsPage_organizations",
+            "kind": "LinkedHandle",
+            "name": "organizations"
+          },
           (v0/*: any*/)
         ],
         "storageKey": null
@@ -135,16 +206,28 @@ return {
     ]
   },
   "params": {
-    "cacheID": "e771f8e44e9f9224d9cbe0f271b096ed",
+    "cacheID": "ddaafef96749a932a0cee5286a3c2bbd",
     "id": null,
-    "metadata": {},
+    "metadata": {
+      "connection": [
+        {
+          "count": null,
+          "cursor": null,
+          "direction": "forward",
+          "path": [
+            "viewer",
+            "organizations"
+          ]
+        }
+      ]
+    },
     "name": "OrganizationsPageQuery",
     "operationKind": "query",
-    "text": "query OrganizationsPageQuery {\n  viewer {\n    organizations(first: 25) {\n      edges {\n        node {\n          id\n          name\n          logoUrl\n        }\n      }\n    }\n    id\n  }\n}\n"
+    "text": "query OrganizationsPageQuery {\n  viewer {\n    organizations(first: 25) {\n      edges {\n        node {\n          id\n          name\n          logoUrl\n          __typename\n        }\n        cursor\n      }\n      pageInfo {\n        endCursor\n        hasNextPage\n      }\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "457b1b8b28355830d77458bab7af23f2";
+(node as any).hash = "122ab4331082ffe892fa7fe48692d961";
 
 export default node;

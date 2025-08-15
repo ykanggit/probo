@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<1ec11120f71d4bc3040bcdd2665904c0>>
+ * @generated SignedSource<<c6717878cc2ffa24d0d56aab35c431c7>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -58,6 +58,14 @@ v4 = [
     "kind": "Literal",
     "name": "first",
     "value": 50
+  },
+  {
+    "kind": "Literal",
+    "name": "orderBy",
+    "value": {
+      "direction": "ASC",
+      "field": "FULL_NAME"
+    }
   }
 ];
 return {
@@ -174,6 +182,20 @@ return {
                             "name": "additionalEmailAddresses",
                             "storageKey": null
                           },
+                          {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
+                            "name": "contractStartDate",
+                            "storageKey": null
+                          },
+                          {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
+                            "name": "contractEndDate",
+                            "storageKey": null
+                          },
                           (v3/*: any*/)
                         ],
                         "storageKey": null
@@ -240,13 +262,14 @@ return {
                     ]
                   }
                 ],
-                "storageKey": "peoples(first:50)"
+                "storageKey": "peoples(first:50,orderBy:{\"direction\":\"ASC\",\"field\":\"FULL_NAME\"})"
               },
               {
                 "alias": null,
                 "args": (v4/*: any*/),
                 "filters": [
-                  "orderBy"
+                  "orderBy",
+                  "filter"
                 ],
                 "handle": "connection",
                 "key": "PeopleGraphPaginatedQuery_peoples",
@@ -263,12 +286,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "1139d090f54b12e62e08f0a1970c9af0",
+    "cacheID": "dca6a1202b168afd54cac8484cf6fadd",
     "id": null,
     "metadata": {},
     "name": "PeopleGraphPaginatedQuery",
     "operationKind": "query",
-    "text": "query PeopleGraphPaginatedQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      id\n      ...PeopleGraphPaginatedFragment\n    }\n    id\n  }\n}\n\nfragment PeopleGraphPaginatedFragment on Organization {\n  peoples(first: 50) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        kind\n        position\n        additionalEmailAddresses\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
+    "text": "query PeopleGraphPaginatedQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    ... on Organization {\n      id\n      ...PeopleGraphPaginatedFragment\n    }\n    id\n  }\n}\n\nfragment PeopleGraphPaginatedFragment on Organization {\n  peoples(first: 50, orderBy: {direction: ASC, field: FULL_NAME}) {\n    edges {\n      node {\n        id\n        fullName\n        primaryEmailAddress\n        kind\n        position\n        additionalEmailAddresses\n        contractStartDate\n        contractEndDate\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();

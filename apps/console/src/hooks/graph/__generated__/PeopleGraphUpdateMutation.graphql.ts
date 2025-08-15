@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<18d62863109c347d5fcf7b5701a9c57b>>
+ * @generated SignedSource<<a91a49863ad5c692ae869d3bcc0584cb>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -27,6 +27,8 @@ export type PeopleGraphUpdateMutation$data = {
   readonly updatePeople: {
     readonly people: {
       readonly additionalEmailAddresses: ReadonlyArray<string>;
+      readonly contractEndDate: any | null | undefined;
+      readonly contractStartDate: any | null | undefined;
       readonly fullName: string;
       readonly id: string;
       readonly kind: PeopleKind;
@@ -112,6 +114,20 @@ v1 = [
             "kind": "ScalarField",
             "name": "additionalEmailAddresses",
             "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "contractStartDate",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "contractEndDate",
+            "storageKey": null
           }
         ],
         "storageKey": null
@@ -138,16 +154,16 @@ return {
     "selections": (v1/*: any*/)
   },
   "params": {
-    "cacheID": "814551d1fb24548c41d417342625071f",
+    "cacheID": "23c51259f3ff117441f9c6e11de5ba5a",
     "id": null,
     "metadata": {},
     "name": "PeopleGraphUpdateMutation",
     "operationKind": "mutation",
-    "text": "mutation PeopleGraphUpdateMutation(\n  $input: UpdatePeopleInput!\n) {\n  updatePeople(input: $input) {\n    people {\n      id\n      fullName\n      primaryEmailAddress\n      position\n      kind\n      additionalEmailAddresses\n    }\n  }\n}\n"
+    "text": "mutation PeopleGraphUpdateMutation(\n  $input: UpdatePeopleInput!\n) {\n  updatePeople(input: $input) {\n    people {\n      id\n      fullName\n      primaryEmailAddress\n      position\n      kind\n      additionalEmailAddresses\n      contractStartDate\n      contractEndDate\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "ecc5666046434d5c8e80eaab0e508c11";
+(node as any).hash = "fc0946729d6a2729aa1b7c9b2dfbdf7a";
 
 export default node;

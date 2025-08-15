@@ -30,6 +30,7 @@ type (
 
 		Resolver any
 		ParentID gid.GID
+		Filters  *coredata.PeopleFilter
 	}
 )
 
@@ -37,6 +38,7 @@ func NewPeopleConnection(
 	p *page.Page[*coredata.People, coredata.PeopleOrderField],
 	parentType any,
 	parentID gid.GID,
+	filters *coredata.PeopleFilter,
 ) *PeopleConnection {
 	var edges = make([]*PeopleEdge, len(p.Data))
 
@@ -50,6 +52,7 @@ func NewPeopleConnection(
 
 		Resolver: parentType,
 		ParentID: parentID,
+		Filters:  filters,
 	}
 }
 

@@ -12,11 +12,42 @@
 // OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 // PERFORMANCE OF THIS SOFTWARE.
 
-package types
+package coredata
 
 import (
-	sharedTypes "github.com/getprobo/probo/pkg/server/api/types"
+	"time"
+
+	"github.com/jackc/pgx/v5"
 )
 
-var MarshalGIDScalar = sharedTypes.MarshalGIDScalar
-var UnmarshalGIDScalar = sharedTypes.UnmarshalGIDScalar
+type (
+	PeopleFilter struct {
+		excludeContractEnded *bool
+		currentDate          time.Time
+	}
+)
+
+func NewPeopleFilter(excludeContractEnded *bool) *PeopleFilter {
+	return &PeopleFilter{
+		excludeContractEnded: excludeContractEnded,
+		currentDate:          time.Now(),
+	}
+}
+
+func (f *PeopleFilter) SQLArguments() pgx.StrictNamedArgs {
+	return pgx.StrictNamedArgs{
+		"exclude_contract_ended": f.excludeContractEnded,
+		"current_date":           f.currentDate,
+	}
+}
+
+func (f *PeopleFilter) SQLFragment() string {
+	return `
+(
+	CASE
+		WHEN @exclude_contract_ended::boolean IS NOT NULL AND @exclude_contract_ended::boolean = true THEN
+			(contract_end_date IS NULL OR contract_end_date >= @current_date::date)
+		ELSE TRUE
+	END
+)`
+}

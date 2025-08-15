@@ -195,8 +195,8 @@ WHERE
 
 func (o *Organization) Delete(
 	ctx context.Context,
-	scope Scoper,
 	conn pg.Conn,
+	scope Scoper,
 ) error {
 	q := `
 DELETE FROM organizations
@@ -207,10 +207,7 @@ WHERE
 
 	q = fmt.Sprintf(q, scope.SQLFragment())
 
-	args := pgx.StrictNamedArgs{
-		"id": o.ID,
-	}
-
+	args := pgx.StrictNamedArgs{"id": o.ID}
 	maps.Copy(args, scope.SQLArguments())
 
 	_, err := conn.Exec(ctx, q, args)

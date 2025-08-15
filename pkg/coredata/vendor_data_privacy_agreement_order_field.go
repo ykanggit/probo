@@ -12,33 +12,30 @@
 // OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 // PERFORMANCE OF THIS SOFTWARE.
 
-package types
+package coredata
 
-import (
-	"errors"
-	"io"
-	"strconv"
-
-	"github.com/99designs/gqlgen/graphql"
-	"github.com/getprobo/probo/pkg/gid"
+type (
+	VendorDataPrivacyAgreementOrderField string
 )
 
-func MarshalGIDScalar(id gid.GID) graphql.Marshaler {
-	return graphql.WriterFunc(func(w io.Writer) {
-		w.Write([]byte(strconv.Quote(id.String())))
-	})
+const (
+	VendorDataPrivacyAgreementOrderFieldValidFrom VendorDataPrivacyAgreementOrderField = "VALID_FROM"
+	VendorDataPrivacyAgreementOrderFieldCreatedAt VendorDataPrivacyAgreementOrderField = "CREATED_AT"
+)
+
+func (p VendorDataPrivacyAgreementOrderField) Column() string {
+	return string(p)
 }
 
-func UnmarshalGIDScalar(v interface{}) (gid.GID, error) {
-	s, ok := v.(string)
-	if !ok {
-		return gid.Nil, errors.New("must be a string")
-	}
+func (p VendorDataPrivacyAgreementOrderField) String() string {
+	return string(p)
+}
 
-	id, err := gid.ParseGID(s)
-	if err != nil {
-		return gid.Nil, err
-	}
+func (p VendorDataPrivacyAgreementOrderField) MarshalText() ([]byte, error) {
+	return []byte(p.String()), nil
+}
 
-	return id, nil
+func (p *VendorDataPrivacyAgreementOrderField) UnmarshalText(text []byte) error {
+	*p = VendorDataPrivacyAgreementOrderField(text)
+	return nil
 }

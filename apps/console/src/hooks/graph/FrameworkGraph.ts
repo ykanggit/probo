@@ -120,6 +120,16 @@ export const frameworkControlNodeQuery = graphql`
             }
           }
         }
+        audits(first: 100)
+          @connection(key: "FrameworkGraphControl_audits") {
+          __id
+          edges {
+            node {
+              id
+              ...LinkedAuditsCardFragment
+            }
+          }
+        }
       }
     }
   }

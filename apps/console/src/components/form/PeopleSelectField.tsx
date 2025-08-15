@@ -38,7 +38,7 @@ function PeopleSelectWithQuery(
 ) {
   const { __ } = useTranslate();
   const { name, organizationId, control } = props;
-  const people = usePeople(organizationId);
+  const people = usePeople(organizationId, { excludeContractEnded: true });
 
   return (
     <>

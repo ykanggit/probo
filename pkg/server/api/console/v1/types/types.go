@@ -62,6 +62,7 @@ type AssignTaskPayload struct {
 
 type Audit struct {
 	ID                gid.GID             `json:"id"`
+	Name              *string             `json:"name,omitempty"`
 	Organization      *Organization       `json:"organization"`
 	Framework         *Framework          `json:"framework"`
 	ValidFrom         *time.Time          `json:"validFrom,omitempty"`
@@ -69,6 +70,7 @@ type Audit struct {
 	Report            *Report             `json:"report,omitempty"`
 	ReportURL         *string             `json:"reportUrl,omitempty"`
 	State             coredata.AuditState `json:"state"`
+	Controls          *ControlConnection  `json:"controls"`
 	ShowOnTrustCenter bool                `json:"showOnTrustCenter"`
 	CreatedAt         time.Time           `json:"createdAt"`
 	UpdatedAt         time.Time           `json:"updatedAt"`
@@ -153,6 +155,7 @@ type Control struct {
 	Framework              *Framework             `json:"framework"`
 	Measures               *MeasureConnection     `json:"measures"`
 	Documents              *DocumentConnection    `json:"documents"`
+	Audits                 *AuditConnection       `json:"audits"`
 	CreatedAt              time.Time              `json:"createdAt"`
 	UpdatedAt              time.Time              `json:"updatedAt"`
 }
@@ -187,6 +190,7 @@ type CreateAssetPayload struct {
 type CreateAuditInput struct {
 	OrganizationID gid.GID              `json:"organizationId"`
 	FrameworkID    gid.GID              `json:"frameworkId"`
+	Name           *string              `json:"name,omitempty"`
 	ValidFrom      *time.Time           `json:"validFrom,omitempty"`
 	ValidUntil     *time.Time           `json:"validUntil,omitempty"`
 	State          *coredata.AuditState `json:"state,omitempty"`
@@ -194,6 +198,16 @@ type CreateAuditInput struct {
 
 type CreateAuditPayload struct {
 	AuditEdge *AuditEdge `json:"auditEdge"`
+}
+
+type CreateControlAuditMappingInput struct {
+	ControlID gid.GID `json:"controlId"`
+	AuditID   gid.GID `json:"auditId"`
+}
+
+type CreateControlAuditMappingPayload struct {
+	ControlEdge *ControlEdge `json:"controlEdge"`
+	AuditEdge   *AuditEdge   `json:"auditEdge"`
 }
 
 type CreateControlDocumentMappingInput struct {
@@ -381,6 +395,18 @@ type CreateTrustCenterAccessPayload struct {
 	TrustCenterAccessEdge *TrustCenterAccessEdge `json:"trustCenterAccessEdge"`
 }
 
+type CreateVendorContactInput struct {
+	VendorID gid.GID `json:"vendorId"`
+	FullName *string `json:"fullName,omitempty"`
+	Email    *string `json:"email,omitempty"`
+	Phone    *string `json:"phone,omitempty"`
+	Role     *string `json:"role,omitempty"`
+}
+
+type CreateVendorContactPayload struct {
+	VendorContactEdge *VendorContactEdge `json:"vendorContactEdge"`
+}
+
 type CreateVendorInput struct {
 	OrganizationID                gid.GID                  `json:"organizationId"`
 	Name                          string                   `json:"name"`
@@ -463,6 +489,16 @@ type DeleteAuditReportPayload struct {
 	Audit *Audit `json:"audit"`
 }
 
+type DeleteControlAuditMappingInput struct {
+	ControlID gid.GID `json:"controlId"`
+	AuditID   gid.GID `json:"auditId"`
+}
+
+type DeleteControlAuditMappingPayload struct {
+	DeletedControlID gid.GID `json:"deletedControlId"`
+	DeletedAuditID   gid.GID `json:"deletedAuditId"`
+}
+
 type DeleteControlDocumentMappingInput struct {
 	ControlID  gid.GID `json:"controlId"`
 	DocumentID gid.GID `json:"documentId"`
@@ -507,6 +543,14 @@ type DeleteDocumentPayload struct {
 	DeletedDocumentID gid.GID `json:"deletedDocumentId"`
 }
 
+type DeleteDraftDocumentVersionInput struct {
+	DocumentVersionID gid.GID `json:"documentVersionId"`
+}
+
+type DeleteDraftDocumentVersionPayload struct {
+	DeletedDocumentVersionID gid.GID `json:"deletedDocumentVersionId"`
+}
+
 type DeleteEvidenceInput struct {
 	EvidenceID gid.GID `json:"evidenceId"`
 }
@@ -537,7 +581,7 @@ type DeleteOrganizationInput struct {
 }
 
 type DeleteOrganizationPayload struct {
-	Success bool `json:"success"`
+	DeletedOrganizationID gid.GID `json:"deletedOrganizationId"`
 }
 
 type DeletePeopleInput struct {
@@ -592,12 +636,36 @@ type DeleteTrustCenterAccessPayload struct {
 	DeletedTrustCenterAccessID gid.GID `json:"deletedTrustCenterAccessId"`
 }
 
+type DeleteVendorBusinessAssociateAgreementInput struct {
+	VendorID gid.GID `json:"vendorId"`
+}
+
+type DeleteVendorBusinessAssociateAgreementPayload struct {
+	DeletedVendorID gid.GID `json:"deletedVendorId"`
+}
+
 type DeleteVendorComplianceReportInput struct {
 	ReportID gid.GID `json:"reportId"`
 }
 
 type DeleteVendorComplianceReportPayload struct {
 	DeletedVendorComplianceReportID gid.GID `json:"deletedVendorComplianceReportId"`
+}
+
+type DeleteVendorContactInput struct {
+	VendorContactID gid.GID `json:"vendorContactId"`
+}
+
+type DeleteVendorContactPayload struct {
+	DeletedVendorContactID gid.GID `json:"deletedVendorContactId"`
+}
+
+type DeleteVendorDataPrivacyAgreementInput struct {
+	VendorID gid.GID `json:"vendorId"`
+}
+
+type DeleteVendorDataPrivacyAgreementPayload struct {
+	DeletedVendorID gid.GID `json:"deletedVendorId"`
 }
 
 type DeleteVendorInput struct {
@@ -923,6 +991,10 @@ type PeopleEdge struct {
 	Node   *People        `json:"node"`
 }
 
+type PeopleFilter struct {
+	ExcludeContractEnded *bool `json:"excludeContractEnded,omitempty"`
+}
+
 type PublishDocumentVersionInput struct {
 	DocumentID gid.GID `json:"documentId"`
 	Changelog  *string `json:"changelog,omitempty"`
@@ -1123,6 +1195,7 @@ type UpdateAssetPayload struct {
 
 type UpdateAuditInput struct {
 	ID                gid.GID              `json:"id"`
+	Name              *string              `json:"name,omitempty"`
 	ValidFrom         *time.Time           `json:"validFrom,omitempty"`
 	ValidUntil        *time.Time           `json:"validUntil,omitempty"`
 	State             *coredata.AuditState `json:"state,omitempty"`
@@ -1275,6 +1348,38 @@ type UpdateTrustCenterPayload struct {
 	TrustCenter *TrustCenter `json:"trustCenter"`
 }
 
+type UpdateVendorBusinessAssociateAgreementInput struct {
+	VendorID   gid.GID    `json:"vendorId"`
+	ValidFrom  *time.Time `json:"validFrom,omitempty"`
+	ValidUntil *time.Time `json:"validUntil,omitempty"`
+}
+
+type UpdateVendorBusinessAssociateAgreementPayload struct {
+	VendorBusinessAssociateAgreement *VendorBusinessAssociateAgreement `json:"vendorBusinessAssociateAgreement"`
+}
+
+type UpdateVendorContactInput struct {
+	ID       gid.GID `json:"id"`
+	FullName *string `json:"fullName,omitempty"`
+	Email    *string `json:"email,omitempty"`
+	Phone    *string `json:"phone,omitempty"`
+	Role     *string `json:"role,omitempty"`
+}
+
+type UpdateVendorContactPayload struct {
+	VendorContact *VendorContact `json:"vendorContact"`
+}
+
+type UpdateVendorDataPrivacyAgreementInput struct {
+	VendorID   gid.GID    `json:"vendorId"`
+	ValidFrom  *time.Time `json:"validFrom,omitempty"`
+	ValidUntil *time.Time `json:"validUntil,omitempty"`
+}
+
+type UpdateVendorDataPrivacyAgreementPayload struct {
+	VendorDataPrivacyAgreement *VendorDataPrivacyAgreement `json:"vendorDataPrivacyAgreement"`
+}
+
 type UpdateVendorInput struct {
 	ID                            gid.GID                  `json:"id"`
 	Name                          *string                  `json:"name,omitempty"`
@@ -1329,6 +1434,18 @@ type UploadTaskEvidencePayload struct {
 	EvidenceEdge *EvidenceEdge `json:"evidenceEdge"`
 }
 
+type UploadVendorBusinessAssociateAgreementInput struct {
+	VendorID   gid.GID        `json:"vendorId"`
+	ValidFrom  *time.Time     `json:"validFrom,omitempty"`
+	ValidUntil *time.Time     `json:"validUntil,omitempty"`
+	FileName   string         `json:"fileName"`
+	File       graphql.Upload `json:"file"`
+}
+
+type UploadVendorBusinessAssociateAgreementPayload struct {
+	VendorBusinessAssociateAgreement *VendorBusinessAssociateAgreement `json:"vendorBusinessAssociateAgreement"`
+}
+
 type UploadVendorComplianceReportInput struct {
 	VendorID   gid.GID        `json:"vendorId"`
 	ReportDate time.Time      `json:"reportDate"`
@@ -1339,6 +1456,18 @@ type UploadVendorComplianceReportInput struct {
 
 type UploadVendorComplianceReportPayload struct {
 	VendorComplianceReportEdge *VendorComplianceReportEdge `json:"vendorComplianceReportEdge"`
+}
+
+type UploadVendorDataPrivacyAgreementInput struct {
+	VendorID   gid.GID        `json:"vendorId"`
+	ValidFrom  *time.Time     `json:"validFrom,omitempty"`
+	ValidUntil *time.Time     `json:"validUntil,omitempty"`
+	FileName   string         `json:"fileName"`
+	File       graphql.Upload `json:"file"`
+}
+
+type UploadVendorDataPrivacyAgreementPayload struct {
+	VendorDataPrivacyAgreement *VendorDataPrivacyAgreement `json:"vendorDataPrivacyAgreement"`
 }
 
 type User struct {
@@ -1370,6 +1499,9 @@ type Vendor struct {
 	Description                   *string                           `json:"description,omitempty"`
 	Organization                  *Organization                     `json:"organization"`
 	ComplianceReports             *VendorComplianceReportConnection `json:"complianceReports"`
+	BusinessAssociateAgreement    *VendorBusinessAssociateAgreement `json:"businessAssociateAgreement,omitempty"`
+	DataPrivacyAgreement          *VendorDataPrivacyAgreement       `json:"dataPrivacyAgreement,omitempty"`
+	Contacts                      *VendorContactConnection          `json:"contacts"`
 	RiskAssessments               *VendorRiskAssessmentConnection   `json:"riskAssessments"`
 	BusinessOwner                 *People                           `json:"businessOwner,omitempty"`
 	SecurityOwner                 *People                           `json:"securityOwner,omitempty"`
@@ -1393,6 +1525,21 @@ type Vendor struct {
 
 func (Vendor) IsNode()             {}
 func (this Vendor) GetID() gid.GID { return this.ID }
+
+type VendorBusinessAssociateAgreement struct {
+	ID         gid.GID    `json:"id"`
+	Vendor     *Vendor    `json:"vendor"`
+	ValidFrom  *time.Time `json:"validFrom,omitempty"`
+	ValidUntil *time.Time `json:"validUntil,omitempty"`
+	FileName   string     `json:"fileName"`
+	FileURL    string     `json:"fileUrl"`
+	FileSize   int        `json:"fileSize"`
+	CreatedAt  time.Time  `json:"createdAt"`
+	UpdatedAt  time.Time  `json:"updatedAt"`
+}
+
+func (VendorBusinessAssociateAgreement) IsNode()             {}
+func (this VendorBusinessAssociateAgreement) GetID() gid.GID { return this.ID }
 
 type VendorComplianceReport struct {
 	ID         gid.GID    `json:"id"`
@@ -1418,6 +1565,45 @@ type VendorComplianceReportEdge struct {
 	Cursor page.CursorKey          `json:"cursor"`
 	Node   *VendorComplianceReport `json:"node"`
 }
+
+type VendorContact struct {
+	ID        gid.GID   `json:"id"`
+	Vendor    *Vendor   `json:"vendor"`
+	FullName  *string   `json:"fullName,omitempty"`
+	Email     *string   `json:"email,omitempty"`
+	Phone     *string   `json:"phone,omitempty"`
+	Role      *string   `json:"role,omitempty"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+func (VendorContact) IsNode()             {}
+func (this VendorContact) GetID() gid.GID { return this.ID }
+
+type VendorContactConnection struct {
+	Edges    []*VendorContactEdge `json:"edges"`
+	PageInfo *PageInfo            `json:"pageInfo"`
+}
+
+type VendorContactEdge struct {
+	Cursor page.CursorKey `json:"cursor"`
+	Node   *VendorContact `json:"node"`
+}
+
+type VendorDataPrivacyAgreement struct {
+	ID         gid.GID    `json:"id"`
+	Vendor     *Vendor    `json:"vendor"`
+	ValidFrom  *time.Time `json:"validFrom,omitempty"`
+	ValidUntil *time.Time `json:"validUntil,omitempty"`
+	FileName   string     `json:"fileName"`
+	FileURL    string     `json:"fileUrl"`
+	FileSize   int        `json:"fileSize"`
+	CreatedAt  time.Time  `json:"createdAt"`
+	UpdatedAt  time.Time  `json:"updatedAt"`
+}
+
+func (VendorDataPrivacyAgreement) IsNode()             {}
+func (this VendorDataPrivacyAgreement) GetID() gid.GID { return this.ID }
 
 type VendorEdge struct {
 	Cursor page.CursorKey `json:"cursor"`

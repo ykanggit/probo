@@ -18,6 +18,8 @@ import (
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/page"
 	"github.com/getprobo/probo/pkg/server/api/console/v1/types"
+	"github.com/getprobo/probo/pkg/server/graphql/types/cursor"
+	gid1 "github.com/getprobo/probo/pkg/server/graphql/types/gid"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -72,8 +74,11 @@ type ResolverRoot interface {
 	TrustCenter() TrustCenterResolver
 	User() UserResolver
 	Vendor() VendorResolver
+	VendorBusinessAssociateAgreement() VendorBusinessAssociateAgreementResolver
 	VendorComplianceReport() VendorComplianceReportResolver
 	VendorConnection() VendorConnectionResolver
+	VendorContact() VendorContactResolver
+	VendorDataPrivacyAgreement() VendorDataPrivacyAgreementResolver
 	VendorRiskAssessment() VendorRiskAssessmentResolver
 	Viewer() ViewerResolver
 }
@@ -116,9 +121,11 @@ type ComplexityRoot struct {
 	}
 
 	Audit struct {
+		Controls          func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy, filter *types.ControlFilter) int
 		CreatedAt         func(childComplexity int) int
 		Framework         func(childComplexity int) int
 		ID                func(childComplexity int) int
+		Name              func(childComplexity int) int
 		Organization      func(childComplexity int) int
 		Report            func(childComplexity int) int
 		ReportURL         func(childComplexity int) int
@@ -176,6 +183,7 @@ type ComplexityRoot struct {
 	}
 
 	Control struct {
+		Audits                 func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.AuditOrderBy) int
 		CreatedAt              func(childComplexity int) int
 		Description            func(childComplexity int) int
 		Documents              func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentOrderBy, filter *types.DocumentFilter) int
@@ -206,6 +214,11 @@ type ComplexityRoot struct {
 
 	CreateAuditPayload struct {
 		AuditEdge func(childComplexity int) int
+	}
+
+	CreateControlAuditMappingPayload struct {
+		AuditEdge   func(childComplexity int) int
+		ControlEdge func(childComplexity int) int
 	}
 
 	CreateControlDocumentMappingPayload struct {
@@ -277,6 +290,10 @@ type ComplexityRoot struct {
 		TrustCenterAccessEdge func(childComplexity int) int
 	}
 
+	CreateVendorContactPayload struct {
+		VendorContactEdge func(childComplexity int) int
+	}
+
 	CreateVendorPayload struct {
 		VendorEdge func(childComplexity int) int
 	}
@@ -319,6 +336,11 @@ type ComplexityRoot struct {
 		Audit func(childComplexity int) int
 	}
 
+	DeleteControlAuditMappingPayload struct {
+		DeletedAuditID   func(childComplexity int) int
+		DeletedControlID func(childComplexity int) int
+	}
+
 	DeleteControlDocumentMappingPayload struct {
 		DeletedControlID  func(childComplexity int) int
 		DeletedDocumentID func(childComplexity int) int
@@ -341,6 +363,10 @@ type ComplexityRoot struct {
 		DeletedDocumentID func(childComplexity int) int
 	}
 
+	DeleteDraftDocumentVersionPayload struct {
+		DeletedDocumentVersionID func(childComplexity int) int
+	}
+
 	DeleteEvidencePayload struct {
 		DeletedEvidenceID func(childComplexity int) int
 	}
@@ -355,7 +381,7 @@ type ComplexityRoot struct {
 	}
 
 	DeleteOrganizationPayload struct {
-		Success func(childComplexity int) int
+		DeletedOrganizationID func(childComplexity int) int
 	}
 
 	DeletePeoplePayload struct {
@@ -384,8 +410,20 @@ type ComplexityRoot struct {
 		DeletedTrustCenterAccessID func(childComplexity int) int
 	}
 
+	DeleteVendorBusinessAssociateAgreementPayload struct {
+		DeletedVendorID func(childComplexity int) int
+	}
+
 	DeleteVendorComplianceReportPayload struct {
 		DeletedVendorComplianceReportID func(childComplexity int) int
+	}
+
+	DeleteVendorContactPayload struct {
+		DeletedVendorContactID func(childComplexity int) int
+	}
+
+	DeleteVendorDataPrivacyAgreementPayload struct {
+		DeletedVendorID func(childComplexity int) int
 	}
 
 	DeleteVendorPayload struct {
@@ -579,83 +617,95 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		AssessVendor                          func(childComplexity int, input types.AssessVendorInput) int
-		AssignTask                            func(childComplexity int, input types.AssignTaskInput) int
-		BulkPublishDocumentVersions           func(childComplexity int, input types.BulkPublishDocumentVersionsInput) int
-		BulkRequestSignatures                 func(childComplexity int, input types.BulkRequestSignaturesInput) int
-		CancelSignatureRequest                func(childComplexity int, input types.CancelSignatureRequestInput) int
-		ConfirmEmail                          func(childComplexity int, input types.ConfirmEmailInput) int
-		CreateAsset                           func(childComplexity int, input types.CreateAssetInput) int
-		CreateAudit                           func(childComplexity int, input types.CreateAuditInput) int
-		CreateControl                         func(childComplexity int, input types.CreateControlInput) int
-		CreateControlDocumentMapping          func(childComplexity int, input types.CreateControlDocumentMappingInput) int
-		CreateControlMeasureMapping           func(childComplexity int, input types.CreateControlMeasureMappingInput) int
-		CreateDatum                           func(childComplexity int, input types.CreateDatumInput) int
-		CreateDocument                        func(childComplexity int, input types.CreateDocumentInput) int
-		CreateDraftDocumentVersion            func(childComplexity int, input types.CreateDraftDocumentVersionInput) int
-		CreateFramework                       func(childComplexity int, input types.CreateFrameworkInput) int
-		CreateMeasure                         func(childComplexity int, input types.CreateMeasureInput) int
-		CreateOrganization                    func(childComplexity int, input types.CreateOrganizationInput) int
-		CreatePeople                          func(childComplexity int, input types.CreatePeopleInput) int
-		CreateRisk                            func(childComplexity int, input types.CreateRiskInput) int
-		CreateRiskDocumentMapping             func(childComplexity int, input types.CreateRiskDocumentMappingInput) int
-		CreateRiskMeasureMapping              func(childComplexity int, input types.CreateRiskMeasureMappingInput) int
-		CreateTask                            func(childComplexity int, input types.CreateTaskInput) int
-		CreateTrustCenterAccess               func(childComplexity int, input types.CreateTrustCenterAccessInput) int
-		CreateVendor                          func(childComplexity int, input types.CreateVendorInput) int
-		CreateVendorRiskAssessment            func(childComplexity int, input types.CreateVendorRiskAssessmentInput) int
-		DeleteAsset                           func(childComplexity int, input types.DeleteAssetInput) int
-		DeleteAudit                           func(childComplexity int, input types.DeleteAuditInput) int
-		DeleteAuditReport                     func(childComplexity int, input types.DeleteAuditReportInput) int
-		DeleteControl                         func(childComplexity int, input types.DeleteControlInput) int
-		DeleteControlDocumentMapping          func(childComplexity int, input types.DeleteControlDocumentMappingInput) int
-		DeleteControlMeasureMapping           func(childComplexity int, input types.DeleteControlMeasureMappingInput) int
-		DeleteDatum                           func(childComplexity int, input types.DeleteDatumInput) int
-		DeleteDocument                        func(childComplexity int, input types.DeleteDocumentInput) int
-		DeleteEvidence                        func(childComplexity int, input types.DeleteEvidenceInput) int
-		DeleteFramework                       func(childComplexity int, input types.DeleteFrameworkInput) int
-		DeleteMeasure                         func(childComplexity int, input types.DeleteMeasureInput) int
-		DeleteOrganization                    func(childComplexity int, input types.DeleteOrganizationInput) int
-		DeletePeople                          func(childComplexity int, input types.DeletePeopleInput) int
-		DeleteRisk                            func(childComplexity int, input types.DeleteRiskInput) int
-		DeleteRiskDocumentMapping             func(childComplexity int, input types.DeleteRiskDocumentMappingInput) int
-		DeleteRiskMeasureMapping              func(childComplexity int, input types.DeleteRiskMeasureMappingInput) int
-		DeleteTask                            func(childComplexity int, input types.DeleteTaskInput) int
-		DeleteTrustCenterAccess               func(childComplexity int, input types.DeleteTrustCenterAccessInput) int
-		DeleteVendor                          func(childComplexity int, input types.DeleteVendorInput) int
-		DeleteVendorComplianceReport          func(childComplexity int, input types.DeleteVendorComplianceReportInput) int
-		ExportDocumentVersionPDF              func(childComplexity int, input types.ExportDocumentVersionPDFInput) int
-		ExportMeasures                        func(childComplexity int, input types.ExportMeasuresInput) int
-		FulfillEvidence                       func(childComplexity int, input types.FulfillEvidenceInput) int
-		GenerateDocumentChangelog             func(childComplexity int, input types.GenerateDocumentChangelogInput) int
-		GenerateFrameworkStateOfApplicability func(childComplexity int, input types.GenerateFrameworkStateOfApplicabilityInput) int
-		ImportFramework                       func(childComplexity int, input types.ImportFrameworkInput) int
-		ImportMeasure                         func(childComplexity int, input types.ImportMeasureInput) int
-		InviteUser                            func(childComplexity int, input types.InviteUserInput) int
-		PublishDocumentVersion                func(childComplexity int, input types.PublishDocumentVersionInput) int
-		RemoveUser                            func(childComplexity int, input types.RemoveUserInput) int
-		RequestEvidence                       func(childComplexity int, input types.RequestEvidenceInput) int
-		RequestSignature                      func(childComplexity int, input types.RequestSignatureInput) int
-		SendSigningNotifications              func(childComplexity int, input types.SendSigningNotificationsInput) int
-		UnassignTask                          func(childComplexity int, input types.UnassignTaskInput) int
-		UpdateAsset                           func(childComplexity int, input types.UpdateAssetInput) int
-		UpdateAudit                           func(childComplexity int, input types.UpdateAuditInput) int
-		UpdateControl                         func(childComplexity int, input types.UpdateControlInput) int
-		UpdateDatum                           func(childComplexity int, input types.UpdateDatumInput) int
-		UpdateDocument                        func(childComplexity int, input types.UpdateDocumentInput) int
-		UpdateDocumentVersion                 func(childComplexity int, input types.UpdateDocumentVersionInput) int
-		UpdateFramework                       func(childComplexity int, input types.UpdateFrameworkInput) int
-		UpdateMeasure                         func(childComplexity int, input types.UpdateMeasureInput) int
-		UpdateOrganization                    func(childComplexity int, input types.UpdateOrganizationInput) int
-		UpdatePeople                          func(childComplexity int, input types.UpdatePeopleInput) int
-		UpdateRisk                            func(childComplexity int, input types.UpdateRiskInput) int
-		UpdateTask                            func(childComplexity int, input types.UpdateTaskInput) int
-		UpdateTrustCenter                     func(childComplexity int, input types.UpdateTrustCenterInput) int
-		UpdateVendor                          func(childComplexity int, input types.UpdateVendorInput) int
-		UploadAuditReport                     func(childComplexity int, input types.UploadAuditReportInput) int
-		UploadMeasureEvidence                 func(childComplexity int, input types.UploadMeasureEvidenceInput) int
-		UploadTaskEvidence                    func(childComplexity int, input types.UploadTaskEvidenceInput) int
-		UploadVendorComplianceReport          func(childComplexity int, input types.UploadVendorComplianceReportInput) int
+		AssessVendor                           func(childComplexity int, input types.AssessVendorInput) int
+		AssignTask                             func(childComplexity int, input types.AssignTaskInput) int
+		BulkPublishDocumentVersions            func(childComplexity int, input types.BulkPublishDocumentVersionsInput) int
+		BulkRequestSignatures                  func(childComplexity int, input types.BulkRequestSignaturesInput) int
+		CancelSignatureRequest                 func(childComplexity int, input types.CancelSignatureRequestInput) int
+		ConfirmEmail                           func(childComplexity int, input types.ConfirmEmailInput) int
+		CreateAsset                            func(childComplexity int, input types.CreateAssetInput) int
+		CreateAudit                            func(childComplexity int, input types.CreateAuditInput) int
+		CreateControl                          func(childComplexity int, input types.CreateControlInput) int
+		CreateControlAuditMapping              func(childComplexity int, input types.CreateControlAuditMappingInput) int
+		CreateControlDocumentMapping           func(childComplexity int, input types.CreateControlDocumentMappingInput) int
+		CreateControlMeasureMapping            func(childComplexity int, input types.CreateControlMeasureMappingInput) int
+		CreateDatum                            func(childComplexity int, input types.CreateDatumInput) int
+		CreateDocument                         func(childComplexity int, input types.CreateDocumentInput) int
+		CreateDraftDocumentVersion             func(childComplexity int, input types.CreateDraftDocumentVersionInput) int
+		CreateFramework                        func(childComplexity int, input types.CreateFrameworkInput) int
+		CreateMeasure                          func(childComplexity int, input types.CreateMeasureInput) int
+		CreateOrganization                     func(childComplexity int, input types.CreateOrganizationInput) int
+		CreatePeople                           func(childComplexity int, input types.CreatePeopleInput) int
+		CreateRisk                             func(childComplexity int, input types.CreateRiskInput) int
+		CreateRiskDocumentMapping              func(childComplexity int, input types.CreateRiskDocumentMappingInput) int
+		CreateRiskMeasureMapping               func(childComplexity int, input types.CreateRiskMeasureMappingInput) int
+		CreateTask                             func(childComplexity int, input types.CreateTaskInput) int
+		CreateTrustCenterAccess                func(childComplexity int, input types.CreateTrustCenterAccessInput) int
+		CreateVendor                           func(childComplexity int, input types.CreateVendorInput) int
+		CreateVendorContact                    func(childComplexity int, input types.CreateVendorContactInput) int
+		CreateVendorRiskAssessment             func(childComplexity int, input types.CreateVendorRiskAssessmentInput) int
+		DeleteAsset                            func(childComplexity int, input types.DeleteAssetInput) int
+		DeleteAudit                            func(childComplexity int, input types.DeleteAuditInput) int
+		DeleteAuditReport                      func(childComplexity int, input types.DeleteAuditReportInput) int
+		DeleteControl                          func(childComplexity int, input types.DeleteControlInput) int
+		DeleteControlAuditMapping              func(childComplexity int, input types.DeleteControlAuditMappingInput) int
+		DeleteControlDocumentMapping           func(childComplexity int, input types.DeleteControlDocumentMappingInput) int
+		DeleteControlMeasureMapping            func(childComplexity int, input types.DeleteControlMeasureMappingInput) int
+		DeleteDatum                            func(childComplexity int, input types.DeleteDatumInput) int
+		DeleteDocument                         func(childComplexity int, input types.DeleteDocumentInput) int
+		DeleteDraftDocumentVersion             func(childComplexity int, input types.DeleteDraftDocumentVersionInput) int
+		DeleteEvidence                         func(childComplexity int, input types.DeleteEvidenceInput) int
+		DeleteFramework                        func(childComplexity int, input types.DeleteFrameworkInput) int
+		DeleteMeasure                          func(childComplexity int, input types.DeleteMeasureInput) int
+		DeleteOrganization                     func(childComplexity int, input types.DeleteOrganizationInput) int
+		DeletePeople                           func(childComplexity int, input types.DeletePeopleInput) int
+		DeleteRisk                             func(childComplexity int, input types.DeleteRiskInput) int
+		DeleteRiskDocumentMapping              func(childComplexity int, input types.DeleteRiskDocumentMappingInput) int
+		DeleteRiskMeasureMapping               func(childComplexity int, input types.DeleteRiskMeasureMappingInput) int
+		DeleteTask                             func(childComplexity int, input types.DeleteTaskInput) int
+		DeleteTrustCenterAccess                func(childComplexity int, input types.DeleteTrustCenterAccessInput) int
+		DeleteVendor                           func(childComplexity int, input types.DeleteVendorInput) int
+		DeleteVendorBusinessAssociateAgreement func(childComplexity int, input types.DeleteVendorBusinessAssociateAgreementInput) int
+		DeleteVendorComplianceReport           func(childComplexity int, input types.DeleteVendorComplianceReportInput) int
+		DeleteVendorContact                    func(childComplexity int, input types.DeleteVendorContactInput) int
+		DeleteVendorDataPrivacyAgreement       func(childComplexity int, input types.DeleteVendorDataPrivacyAgreementInput) int
+		ExportDocumentVersionPDF               func(childComplexity int, input types.ExportDocumentVersionPDFInput) int
+		ExportMeasures                         func(childComplexity int, input types.ExportMeasuresInput) int
+		FulfillEvidence                        func(childComplexity int, input types.FulfillEvidenceInput) int
+		GenerateDocumentChangelog              func(childComplexity int, input types.GenerateDocumentChangelogInput) int
+		GenerateFrameworkStateOfApplicability  func(childComplexity int, input types.GenerateFrameworkStateOfApplicabilityInput) int
+		ImportFramework                        func(childComplexity int, input types.ImportFrameworkInput) int
+		ImportMeasure                          func(childComplexity int, input types.ImportMeasureInput) int
+		InviteUser                             func(childComplexity int, input types.InviteUserInput) int
+		PublishDocumentVersion                 func(childComplexity int, input types.PublishDocumentVersionInput) int
+		RemoveUser                             func(childComplexity int, input types.RemoveUserInput) int
+		RequestEvidence                        func(childComplexity int, input types.RequestEvidenceInput) int
+		RequestSignature                       func(childComplexity int, input types.RequestSignatureInput) int
+		SendSigningNotifications               func(childComplexity int, input types.SendSigningNotificationsInput) int
+		UnassignTask                           func(childComplexity int, input types.UnassignTaskInput) int
+		UpdateAsset                            func(childComplexity int, input types.UpdateAssetInput) int
+		UpdateAudit                            func(childComplexity int, input types.UpdateAuditInput) int
+		UpdateControl                          func(childComplexity int, input types.UpdateControlInput) int
+		UpdateDatum                            func(childComplexity int, input types.UpdateDatumInput) int
+		UpdateDocument                         func(childComplexity int, input types.UpdateDocumentInput) int
+		UpdateDocumentVersion                  func(childComplexity int, input types.UpdateDocumentVersionInput) int
+		UpdateFramework                        func(childComplexity int, input types.UpdateFrameworkInput) int
+		UpdateMeasure                          func(childComplexity int, input types.UpdateMeasureInput) int
+		UpdateOrganization                     func(childComplexity int, input types.UpdateOrganizationInput) int
+		UpdatePeople                           func(childComplexity int, input types.UpdatePeopleInput) int
+		UpdateRisk                             func(childComplexity int, input types.UpdateRiskInput) int
+		UpdateTask                             func(childComplexity int, input types.UpdateTaskInput) int
+		UpdateTrustCenter                      func(childComplexity int, input types.UpdateTrustCenterInput) int
+		UpdateVendor                           func(childComplexity int, input types.UpdateVendorInput) int
+		UpdateVendorBusinessAssociateAgreement func(childComplexity int, input types.UpdateVendorBusinessAssociateAgreementInput) int
+		UpdateVendorContact                    func(childComplexity int, input types.UpdateVendorContactInput) int
+		UpdateVendorDataPrivacyAgreement       func(childComplexity int, input types.UpdateVendorDataPrivacyAgreementInput) int
+		UploadAuditReport                      func(childComplexity int, input types.UploadAuditReportInput) int
+		UploadMeasureEvidence                  func(childComplexity int, input types.UploadMeasureEvidenceInput) int
+		UploadTaskEvidence                     func(childComplexity int, input types.UploadTaskEvidenceInput) int
+		UploadVendorBusinessAssociateAgreement func(childComplexity int, input types.UploadVendorBusinessAssociateAgreementInput) int
+		UploadVendorComplianceReport           func(childComplexity int, input types.UploadVendorComplianceReportInput) int
+		UploadVendorDataPrivacyAgreement       func(childComplexity int, input types.UploadVendorDataPrivacyAgreementInput) int
 	}
 
 	Organization struct {
@@ -674,7 +724,7 @@ type ComplexityRoot struct {
 		MailingAddress          func(childComplexity int) int
 		Measures                func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy, filter *types.MeasureFilter) int
 		Name                    func(childComplexity int) int
-		Peoples                 func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PeopleOrderBy) int
+		Peoples                 func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PeopleOrderBy, filter *types.PeopleFilter) int
 		Risks                   func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy, filter *types.RiskFilter) int
 		SecurityComplianceEmail func(childComplexity int) int
 		Tasks                   func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.TaskOrderBy) int
@@ -926,6 +976,18 @@ type ComplexityRoot struct {
 		TrustCenter func(childComplexity int) int
 	}
 
+	UpdateVendorBusinessAssociateAgreementPayload struct {
+		VendorBusinessAssociateAgreement func(childComplexity int) int
+	}
+
+	UpdateVendorContactPayload struct {
+		VendorContact func(childComplexity int) int
+	}
+
+	UpdateVendorDataPrivacyAgreementPayload struct {
+		VendorDataPrivacyAgreement func(childComplexity int) int
+	}
+
 	UpdateVendorPayload struct {
 		Vendor func(childComplexity int) int
 	}
@@ -942,8 +1004,16 @@ type ComplexityRoot struct {
 		EvidenceEdge func(childComplexity int) int
 	}
 
+	UploadVendorBusinessAssociateAgreementPayload struct {
+		VendorBusinessAssociateAgreement func(childComplexity int) int
+	}
+
 	UploadVendorComplianceReportPayload struct {
 		VendorComplianceReportEdge func(childComplexity int) int
+	}
+
+	UploadVendorDataPrivacyAgreementPayload struct {
+		VendorDataPrivacyAgreement func(childComplexity int) int
 	}
 
 	User struct {
@@ -966,12 +1036,15 @@ type ComplexityRoot struct {
 	}
 
 	Vendor struct {
+		BusinessAssociateAgreement    func(childComplexity int) int
 		BusinessAssociateAgreementURL func(childComplexity int) int
 		BusinessOwner                 func(childComplexity int) int
 		Category                      func(childComplexity int) int
 		Certifications                func(childComplexity int) int
 		ComplianceReports             func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorComplianceReportOrderBy) int
+		Contacts                      func(childComplexity int, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorContactOrderBy) int
 		CreatedAt                     func(childComplexity int) int
+		DataPrivacyAgreement          func(childComplexity int) int
 		DataProcessingAgreementURL    func(childComplexity int) int
 		Description                   func(childComplexity int) int
 		HeadquarterAddress            func(childComplexity int) int
@@ -991,6 +1064,18 @@ type ComplexityRoot struct {
 		TrustPageURL                  func(childComplexity int) int
 		UpdatedAt                     func(childComplexity int) int
 		WebsiteURL                    func(childComplexity int) int
+	}
+
+	VendorBusinessAssociateAgreement struct {
+		CreatedAt  func(childComplexity int) int
+		FileName   func(childComplexity int) int
+		FileSize   func(childComplexity int) int
+		FileURL    func(childComplexity int) int
+		ID         func(childComplexity int) int
+		UpdatedAt  func(childComplexity int) int
+		ValidFrom  func(childComplexity int) int
+		ValidUntil func(childComplexity int) int
+		Vendor     func(childComplexity int) int
 	}
 
 	VendorComplianceReport struct {
@@ -1019,6 +1104,39 @@ type ComplexityRoot struct {
 		Edges      func(childComplexity int) int
 		PageInfo   func(childComplexity int) int
 		TotalCount func(childComplexity int) int
+	}
+
+	VendorContact struct {
+		CreatedAt func(childComplexity int) int
+		Email     func(childComplexity int) int
+		FullName  func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Phone     func(childComplexity int) int
+		Role      func(childComplexity int) int
+		UpdatedAt func(childComplexity int) int
+		Vendor    func(childComplexity int) int
+	}
+
+	VendorContactConnection struct {
+		Edges    func(childComplexity int) int
+		PageInfo func(childComplexity int) int
+	}
+
+	VendorContactEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
+	VendorDataPrivacyAgreement struct {
+		CreatedAt  func(childComplexity int) int
+		FileName   func(childComplexity int) int
+		FileSize   func(childComplexity int) int
+		FileURL    func(childComplexity int) int
+		ID         func(childComplexity int) int
+		UpdatedAt  func(childComplexity int) int
+		ValidFrom  func(childComplexity int) int
+		ValidUntil func(childComplexity int) int
+		Vendor     func(childComplexity int) int
 	}
 
 	VendorEdge struct {
@@ -1073,6 +1191,8 @@ type AuditResolver interface {
 
 	Report(ctx context.Context, obj *types.Audit) (*types.Report, error)
 	ReportURL(ctx context.Context, obj *types.Audit) (*string, error)
+
+	Controls(ctx context.Context, obj *types.Audit, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy, filter *types.ControlFilter) (*types.ControlConnection, error)
 }
 type AuditConnectionResolver interface {
 	TotalCount(ctx context.Context, obj *types.AuditConnection) (int, error)
@@ -1081,6 +1201,7 @@ type ControlResolver interface {
 	Framework(ctx context.Context, obj *types.Control) (*types.Framework, error)
 	Measures(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy, filter *types.MeasureFilter) (*types.MeasureConnection, error)
 	Documents(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentOrderBy, filter *types.DocumentFilter) (*types.DocumentConnection, error)
+	Audits(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.AuditOrderBy) (*types.AuditConnection, error)
 }
 type ControlConnectionResolver interface {
 	TotalCount(ctx context.Context, obj *types.ControlConnection) (int, error)
@@ -1161,6 +1282,9 @@ type MutationResolver interface {
 	CreateVendor(ctx context.Context, input types.CreateVendorInput) (*types.CreateVendorPayload, error)
 	UpdateVendor(ctx context.Context, input types.UpdateVendorInput) (*types.UpdateVendorPayload, error)
 	DeleteVendor(ctx context.Context, input types.DeleteVendorInput) (*types.DeleteVendorPayload, error)
+	CreateVendorContact(ctx context.Context, input types.CreateVendorContactInput) (*types.CreateVendorContactPayload, error)
+	UpdateVendorContact(ctx context.Context, input types.UpdateVendorContactInput) (*types.UpdateVendorContactPayload, error)
+	DeleteVendorContact(ctx context.Context, input types.DeleteVendorContactInput) (*types.DeleteVendorContactPayload, error)
 	CreateFramework(ctx context.Context, input types.CreateFrameworkInput) (*types.CreateFrameworkPayload, error)
 	UpdateFramework(ctx context.Context, input types.UpdateFrameworkInput) (*types.UpdateFrameworkPayload, error)
 	ImportFramework(ctx context.Context, input types.ImportFrameworkInput) (*types.ImportFrameworkPayload, error)
@@ -1178,6 +1302,8 @@ type MutationResolver interface {
 	CreateControlDocumentMapping(ctx context.Context, input types.CreateControlDocumentMappingInput) (*types.CreateControlDocumentMappingPayload, error)
 	DeleteControlMeasureMapping(ctx context.Context, input types.DeleteControlMeasureMappingInput) (*types.DeleteControlMeasureMappingPayload, error)
 	DeleteControlDocumentMapping(ctx context.Context, input types.DeleteControlDocumentMappingInput) (*types.DeleteControlDocumentMappingPayload, error)
+	CreateControlAuditMapping(ctx context.Context, input types.CreateControlAuditMappingInput) (*types.CreateControlAuditMappingPayload, error)
+	DeleteControlAuditMapping(ctx context.Context, input types.DeleteControlAuditMappingInput) (*types.DeleteControlAuditMappingPayload, error)
 	CreateTask(ctx context.Context, input types.CreateTaskInput) (*types.CreateTaskPayload, error)
 	UpdateTask(ctx context.Context, input types.UpdateTaskInput) (*types.UpdateTaskPayload, error)
 	DeleteTask(ctx context.Context, input types.DeleteTaskInput) (*types.DeleteTaskPayload, error)
@@ -1197,6 +1323,12 @@ type MutationResolver interface {
 	UploadMeasureEvidence(ctx context.Context, input types.UploadMeasureEvidenceInput) (*types.UploadMeasureEvidencePayload, error)
 	UploadVendorComplianceReport(ctx context.Context, input types.UploadVendorComplianceReportInput) (*types.UploadVendorComplianceReportPayload, error)
 	DeleteVendorComplianceReport(ctx context.Context, input types.DeleteVendorComplianceReportInput) (*types.DeleteVendorComplianceReportPayload, error)
+	UploadVendorBusinessAssociateAgreement(ctx context.Context, input types.UploadVendorBusinessAssociateAgreementInput) (*types.UploadVendorBusinessAssociateAgreementPayload, error)
+	UpdateVendorBusinessAssociateAgreement(ctx context.Context, input types.UpdateVendorBusinessAssociateAgreementInput) (*types.UpdateVendorBusinessAssociateAgreementPayload, error)
+	DeleteVendorBusinessAssociateAgreement(ctx context.Context, input types.DeleteVendorBusinessAssociateAgreementInput) (*types.DeleteVendorBusinessAssociateAgreementPayload, error)
+	UploadVendorDataPrivacyAgreement(ctx context.Context, input types.UploadVendorDataPrivacyAgreementInput) (*types.UploadVendorDataPrivacyAgreementPayload, error)
+	UpdateVendorDataPrivacyAgreement(ctx context.Context, input types.UpdateVendorDataPrivacyAgreementInput) (*types.UpdateVendorDataPrivacyAgreementPayload, error)
+	DeleteVendorDataPrivacyAgreement(ctx context.Context, input types.DeleteVendorDataPrivacyAgreementInput) (*types.DeleteVendorDataPrivacyAgreementPayload, error)
 	CreateDocument(ctx context.Context, input types.CreateDocumentInput) (*types.CreateDocumentPayload, error)
 	UpdateDocument(ctx context.Context, input types.UpdateDocumentInput) (*types.UpdateDocumentPayload, error)
 	DeleteDocument(ctx context.Context, input types.DeleteDocumentInput) (*types.DeleteDocumentPayload, error)
@@ -1204,6 +1336,7 @@ type MutationResolver interface {
 	BulkPublishDocumentVersions(ctx context.Context, input types.BulkPublishDocumentVersionsInput) (*types.BulkPublishDocumentVersionsPayload, error)
 	GenerateDocumentChangelog(ctx context.Context, input types.GenerateDocumentChangelogInput) (*types.GenerateDocumentChangelogPayload, error)
 	CreateDraftDocumentVersion(ctx context.Context, input types.CreateDraftDocumentVersionInput) (*types.CreateDraftDocumentVersionPayload, error)
+	DeleteDraftDocumentVersion(ctx context.Context, input types.DeleteDraftDocumentVersionInput) (*types.DeleteDraftDocumentVersionPayload, error)
 	UpdateDocumentVersion(ctx context.Context, input types.UpdateDocumentVersionInput) (*types.UpdateDocumentVersionPayload, error)
 	RequestSignature(ctx context.Context, input types.RequestSignatureInput) (*types.RequestSignaturePayload, error)
 	BulkRequestSignatures(ctx context.Context, input types.BulkRequestSignaturesInput) (*types.BulkRequestSignaturesPayload, error)
@@ -1232,7 +1365,7 @@ type OrganizationResolver interface {
 	Frameworks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.FrameworkOrderBy) (*types.FrameworkConnection, error)
 	Controls(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy, filter *types.ControlFilter) (*types.ControlConnection, error)
 	Vendors(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorOrderBy) (*types.VendorConnection, error)
-	Peoples(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PeopleOrderBy) (*types.PeopleConnection, error)
+	Peoples(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.PeopleOrderBy, filter *types.PeopleFilter) (*types.PeopleConnection, error)
 	Documents(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentOrderBy, filter *types.DocumentFilter) (*types.DocumentConnection, error)
 	Measures(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.MeasureOrderBy, filter *types.MeasureFilter) (*types.MeasureConnection, error)
 	Risks(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.RiskOrderBy, filter *types.RiskFilter) (*types.RiskConnection, error)
@@ -1284,9 +1417,17 @@ type UserResolver interface {
 type VendorResolver interface {
 	Organization(ctx context.Context, obj *types.Vendor) (*types.Organization, error)
 	ComplianceReports(ctx context.Context, obj *types.Vendor, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorComplianceReportOrderBy) (*types.VendorComplianceReportConnection, error)
+	BusinessAssociateAgreement(ctx context.Context, obj *types.Vendor) (*types.VendorBusinessAssociateAgreement, error)
+	DataPrivacyAgreement(ctx context.Context, obj *types.Vendor) (*types.VendorDataPrivacyAgreement, error)
+	Contacts(ctx context.Context, obj *types.Vendor, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorContactOrderBy) (*types.VendorContactConnection, error)
 	RiskAssessments(ctx context.Context, obj *types.Vendor, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorRiskAssessmentOrder) (*types.VendorRiskAssessmentConnection, error)
 	BusinessOwner(ctx context.Context, obj *types.Vendor) (*types.People, error)
 	SecurityOwner(ctx context.Context, obj *types.Vendor) (*types.People, error)
+}
+type VendorBusinessAssociateAgreementResolver interface {
+	Vendor(ctx context.Context, obj *types.VendorBusinessAssociateAgreement) (*types.Vendor, error)
+
+	FileURL(ctx context.Context, obj *types.VendorBusinessAssociateAgreement) (string, error)
 }
 type VendorComplianceReportResolver interface {
 	Vendor(ctx context.Context, obj *types.VendorComplianceReport) (*types.Vendor, error)
@@ -1295,6 +1436,14 @@ type VendorComplianceReportResolver interface {
 }
 type VendorConnectionResolver interface {
 	TotalCount(ctx context.Context, obj *types.VendorConnection) (int, error)
+}
+type VendorContactResolver interface {
+	Vendor(ctx context.Context, obj *types.VendorContact) (*types.Vendor, error)
+}
+type VendorDataPrivacyAgreementResolver interface {
+	Vendor(ctx context.Context, obj *types.VendorDataPrivacyAgreement) (*types.Vendor, error)
+
+	FileURL(ctx context.Context, obj *types.VendorDataPrivacyAgreement) (string, error)
 }
 type VendorRiskAssessmentResolver interface {
 	Vendor(ctx context.Context, obj *types.VendorRiskAssessment) (*types.Vendor, error)
@@ -1455,6 +1604,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.AssignTaskPayload.Task(childComplexity), true
 
+	case "Audit.controls":
+		if e.complexity.Audit.Controls == nil {
+			break
+		}
+
+		args, err := ec.field_Audit_controls_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Audit.Controls(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.ControlOrderBy), args["filter"].(*types.ControlFilter)), true
+
 	case "Audit.createdAt":
 		if e.complexity.Audit.CreatedAt == nil {
 			break
@@ -1475,6 +1636,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Audit.ID(childComplexity), true
+
+	case "Audit.name":
+		if e.complexity.Audit.Name == nil {
+			break
+		}
+
+		return e.complexity.Audit.Name(childComplexity), true
 
 	case "Audit.organization":
 		if e.complexity.Audit.Organization == nil {
@@ -1665,6 +1833,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.ConnectorEdge.Node(childComplexity), true
 
+	case "Control.audits":
+		if e.complexity.Control.Audits == nil {
+			break
+		}
+
+		args, err := ec.field_Control_audits_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Control.Audits(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.AuditOrderBy)), true
+
 	case "Control.createdAt":
 		if e.complexity.Control.CreatedAt == nil {
 			break
@@ -1800,6 +1980,20 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.CreateAuditPayload.AuditEdge(childComplexity), true
+
+	case "CreateControlAuditMappingPayload.auditEdge":
+		if e.complexity.CreateControlAuditMappingPayload.AuditEdge == nil {
+			break
+		}
+
+		return e.complexity.CreateControlAuditMappingPayload.AuditEdge(childComplexity), true
+
+	case "CreateControlAuditMappingPayload.controlEdge":
+		if e.complexity.CreateControlAuditMappingPayload.ControlEdge == nil {
+			break
+		}
+
+		return e.complexity.CreateControlAuditMappingPayload.ControlEdge(childComplexity), true
 
 	case "CreateControlDocumentMappingPayload.controlEdge":
 		if e.complexity.CreateControlDocumentMappingPayload.ControlEdge == nil {
@@ -1948,6 +2142,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.CreateTrustCenterAccessPayload.TrustCenterAccessEdge(childComplexity), true
 
+	case "CreateVendorContactPayload.vendorContactEdge":
+		if e.complexity.CreateVendorContactPayload.VendorContactEdge == nil {
+			break
+		}
+
+		return e.complexity.CreateVendorContactPayload.VendorContactEdge(childComplexity), true
+
 	case "CreateVendorPayload.vendorEdge":
 		if e.complexity.CreateVendorPayload.VendorEdge == nil {
 			break
@@ -2079,6 +2280,20 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.DeleteAuditReportPayload.Audit(childComplexity), true
 
+	case "DeleteControlAuditMappingPayload.deletedAuditId":
+		if e.complexity.DeleteControlAuditMappingPayload.DeletedAuditID == nil {
+			break
+		}
+
+		return e.complexity.DeleteControlAuditMappingPayload.DeletedAuditID(childComplexity), true
+
+	case "DeleteControlAuditMappingPayload.deletedControlId":
+		if e.complexity.DeleteControlAuditMappingPayload.DeletedControlID == nil {
+			break
+		}
+
+		return e.complexity.DeleteControlAuditMappingPayload.DeletedControlID(childComplexity), true
+
 	case "DeleteControlDocumentMappingPayload.deletedControlId":
 		if e.complexity.DeleteControlDocumentMappingPayload.DeletedControlID == nil {
 			break
@@ -2128,6 +2343,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.DeleteDocumentPayload.DeletedDocumentID(childComplexity), true
 
+	case "DeleteDraftDocumentVersionPayload.deletedDocumentVersionId":
+		if e.complexity.DeleteDraftDocumentVersionPayload.DeletedDocumentVersionID == nil {
+			break
+		}
+
+		return e.complexity.DeleteDraftDocumentVersionPayload.DeletedDocumentVersionID(childComplexity), true
+
 	case "DeleteEvidencePayload.deletedEvidenceId":
 		if e.complexity.DeleteEvidencePayload.DeletedEvidenceID == nil {
 			break
@@ -2156,12 +2378,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.DeleteMeasurePayload.DeletedTaskIds(childComplexity), true
 
-	case "DeleteOrganizationPayload.success":
-		if e.complexity.DeleteOrganizationPayload.Success == nil {
+	case "DeleteOrganizationPayload.deletedOrganizationId":
+		if e.complexity.DeleteOrganizationPayload.DeletedOrganizationID == nil {
 			break
 		}
 
-		return e.complexity.DeleteOrganizationPayload.Success(childComplexity), true
+		return e.complexity.DeleteOrganizationPayload.DeletedOrganizationID(childComplexity), true
 
 	case "DeletePeoplePayload.deletedPeopleId":
 		if e.complexity.DeletePeoplePayload.DeletedPeopleID == nil {
@@ -2219,12 +2441,33 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.DeleteTrustCenterAccessPayload.DeletedTrustCenterAccessID(childComplexity), true
 
+	case "DeleteVendorBusinessAssociateAgreementPayload.deletedVendorId":
+		if e.complexity.DeleteVendorBusinessAssociateAgreementPayload.DeletedVendorID == nil {
+			break
+		}
+
+		return e.complexity.DeleteVendorBusinessAssociateAgreementPayload.DeletedVendorID(childComplexity), true
+
 	case "DeleteVendorComplianceReportPayload.deletedVendorComplianceReportId":
 		if e.complexity.DeleteVendorComplianceReportPayload.DeletedVendorComplianceReportID == nil {
 			break
 		}
 
 		return e.complexity.DeleteVendorComplianceReportPayload.DeletedVendorComplianceReportID(childComplexity), true
+
+	case "DeleteVendorContactPayload.deletedVendorContactId":
+		if e.complexity.DeleteVendorContactPayload.DeletedVendorContactID == nil {
+			break
+		}
+
+		return e.complexity.DeleteVendorContactPayload.DeletedVendorContactID(childComplexity), true
+
+	case "DeleteVendorDataPrivacyAgreementPayload.deletedVendorId":
+		if e.complexity.DeleteVendorDataPrivacyAgreementPayload.DeletedVendorID == nil {
+			break
+		}
+
+		return e.complexity.DeleteVendorDataPrivacyAgreementPayload.DeletedVendorID(childComplexity), true
 
 	case "DeleteVendorPayload.deletedVendorId":
 		if e.complexity.DeleteVendorPayload.DeletedVendorID == nil {
@@ -3137,6 +3380,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Mutation.CreateControl(childComplexity, args["input"].(types.CreateControlInput)), true
 
+	case "Mutation.createControlAuditMapping":
+		if e.complexity.Mutation.CreateControlAuditMapping == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createControlAuditMapping_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateControlAuditMapping(childComplexity, args["input"].(types.CreateControlAuditMappingInput)), true
+
 	case "Mutation.createControlDocumentMapping":
 		if e.complexity.Mutation.CreateControlDocumentMapping == nil {
 			break
@@ -3317,6 +3572,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Mutation.CreateVendor(childComplexity, args["input"].(types.CreateVendorInput)), true
 
+	case "Mutation.createVendorContact":
+		if e.complexity.Mutation.CreateVendorContact == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createVendorContact_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateVendorContact(childComplexity, args["input"].(types.CreateVendorContactInput)), true
+
 	case "Mutation.createVendorRiskAssessment":
 		if e.complexity.Mutation.CreateVendorRiskAssessment == nil {
 			break
@@ -3377,6 +3644,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Mutation.DeleteControl(childComplexity, args["input"].(types.DeleteControlInput)), true
 
+	case "Mutation.deleteControlAuditMapping":
+		if e.complexity.Mutation.DeleteControlAuditMapping == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteControlAuditMapping_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteControlAuditMapping(childComplexity, args["input"].(types.DeleteControlAuditMappingInput)), true
+
 	case "Mutation.deleteControlDocumentMapping":
 		if e.complexity.Mutation.DeleteControlDocumentMapping == nil {
 			break
@@ -3424,6 +3703,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.DeleteDocument(childComplexity, args["input"].(types.DeleteDocumentInput)), true
+
+	case "Mutation.deleteDraftDocumentVersion":
+		if e.complexity.Mutation.DeleteDraftDocumentVersion == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteDraftDocumentVersion_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteDraftDocumentVersion(childComplexity, args["input"].(types.DeleteDraftDocumentVersionInput)), true
 
 	case "Mutation.deleteEvidence":
 		if e.complexity.Mutation.DeleteEvidence == nil {
@@ -3557,6 +3848,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Mutation.DeleteVendor(childComplexity, args["input"].(types.DeleteVendorInput)), true
 
+	case "Mutation.deleteVendorBusinessAssociateAgreement":
+		if e.complexity.Mutation.DeleteVendorBusinessAssociateAgreement == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteVendorBusinessAssociateAgreement_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteVendorBusinessAssociateAgreement(childComplexity, args["input"].(types.DeleteVendorBusinessAssociateAgreementInput)), true
+
 	case "Mutation.deleteVendorComplianceReport":
 		if e.complexity.Mutation.DeleteVendorComplianceReport == nil {
 			break
@@ -3568,6 +3871,30 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.DeleteVendorComplianceReport(childComplexity, args["input"].(types.DeleteVendorComplianceReportInput)), true
+
+	case "Mutation.deleteVendorContact":
+		if e.complexity.Mutation.DeleteVendorContact == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteVendorContact_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteVendorContact(childComplexity, args["input"].(types.DeleteVendorContactInput)), true
+
+	case "Mutation.deleteVendorDataPrivacyAgreement":
+		if e.complexity.Mutation.DeleteVendorDataPrivacyAgreement == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteVendorDataPrivacyAgreement_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteVendorDataPrivacyAgreement(childComplexity, args["input"].(types.DeleteVendorDataPrivacyAgreementInput)), true
 
 	case "Mutation.exportDocumentVersionPDF":
 		if e.complexity.Mutation.ExportDocumentVersionPDF == nil {
@@ -3905,6 +4232,42 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Mutation.UpdateVendor(childComplexity, args["input"].(types.UpdateVendorInput)), true
 
+	case "Mutation.updateVendorBusinessAssociateAgreement":
+		if e.complexity.Mutation.UpdateVendorBusinessAssociateAgreement == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateVendorBusinessAssociateAgreement_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateVendorBusinessAssociateAgreement(childComplexity, args["input"].(types.UpdateVendorBusinessAssociateAgreementInput)), true
+
+	case "Mutation.updateVendorContact":
+		if e.complexity.Mutation.UpdateVendorContact == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateVendorContact_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateVendorContact(childComplexity, args["input"].(types.UpdateVendorContactInput)), true
+
+	case "Mutation.updateVendorDataPrivacyAgreement":
+		if e.complexity.Mutation.UpdateVendorDataPrivacyAgreement == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateVendorDataPrivacyAgreement_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateVendorDataPrivacyAgreement(childComplexity, args["input"].(types.UpdateVendorDataPrivacyAgreementInput)), true
+
 	case "Mutation.uploadAuditReport":
 		if e.complexity.Mutation.UploadAuditReport == nil {
 			break
@@ -3941,6 +4304,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Mutation.UploadTaskEvidence(childComplexity, args["input"].(types.UploadTaskEvidenceInput)), true
 
+	case "Mutation.uploadVendorBusinessAssociateAgreement":
+		if e.complexity.Mutation.UploadVendorBusinessAssociateAgreement == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_uploadVendorBusinessAssociateAgreement_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UploadVendorBusinessAssociateAgreement(childComplexity, args["input"].(types.UploadVendorBusinessAssociateAgreementInput)), true
+
 	case "Mutation.uploadVendorComplianceReport":
 		if e.complexity.Mutation.UploadVendorComplianceReport == nil {
 			break
@@ -3952,6 +4327,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.UploadVendorComplianceReport(childComplexity, args["input"].(types.UploadVendorComplianceReportInput)), true
+
+	case "Mutation.uploadVendorDataPrivacyAgreement":
+		if e.complexity.Mutation.UploadVendorDataPrivacyAgreement == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_uploadVendorDataPrivacyAgreement_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UploadVendorDataPrivacyAgreement(childComplexity, args["input"].(types.UploadVendorDataPrivacyAgreementInput)), true
 
 	case "Organization.assets":
 		if e.complexity.Organization.Assets == nil {
@@ -4108,7 +4495,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.Organization.Peoples(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.PeopleOrderBy)), true
+		return e.complexity.Organization.Peoples(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.PeopleOrderBy), args["filter"].(*types.PeopleFilter)), true
 
 	case "Organization.risks":
 		if e.complexity.Organization.Risks == nil {
@@ -5068,6 +5455,27 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.UpdateTrustCenterPayload.TrustCenter(childComplexity), true
 
+	case "UpdateVendorBusinessAssociateAgreementPayload.vendorBusinessAssociateAgreement":
+		if e.complexity.UpdateVendorBusinessAssociateAgreementPayload.VendorBusinessAssociateAgreement == nil {
+			break
+		}
+
+		return e.complexity.UpdateVendorBusinessAssociateAgreementPayload.VendorBusinessAssociateAgreement(childComplexity), true
+
+	case "UpdateVendorContactPayload.vendorContact":
+		if e.complexity.UpdateVendorContactPayload.VendorContact == nil {
+			break
+		}
+
+		return e.complexity.UpdateVendorContactPayload.VendorContact(childComplexity), true
+
+	case "UpdateVendorDataPrivacyAgreementPayload.vendorDataPrivacyAgreement":
+		if e.complexity.UpdateVendorDataPrivacyAgreementPayload.VendorDataPrivacyAgreement == nil {
+			break
+		}
+
+		return e.complexity.UpdateVendorDataPrivacyAgreementPayload.VendorDataPrivacyAgreement(childComplexity), true
+
 	case "UpdateVendorPayload.vendor":
 		if e.complexity.UpdateVendorPayload.Vendor == nil {
 			break
@@ -5096,12 +5504,26 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.UploadTaskEvidencePayload.EvidenceEdge(childComplexity), true
 
+	case "UploadVendorBusinessAssociateAgreementPayload.vendorBusinessAssociateAgreement":
+		if e.complexity.UploadVendorBusinessAssociateAgreementPayload.VendorBusinessAssociateAgreement == nil {
+			break
+		}
+
+		return e.complexity.UploadVendorBusinessAssociateAgreementPayload.VendorBusinessAssociateAgreement(childComplexity), true
+
 	case "UploadVendorComplianceReportPayload.vendorComplianceReportEdge":
 		if e.complexity.UploadVendorComplianceReportPayload.VendorComplianceReportEdge == nil {
 			break
 		}
 
 		return e.complexity.UploadVendorComplianceReportPayload.VendorComplianceReportEdge(childComplexity), true
+
+	case "UploadVendorDataPrivacyAgreementPayload.vendorDataPrivacyAgreement":
+		if e.complexity.UploadVendorDataPrivacyAgreementPayload.VendorDataPrivacyAgreement == nil {
+			break
+		}
+
+		return e.complexity.UploadVendorDataPrivacyAgreementPayload.VendorDataPrivacyAgreement(childComplexity), true
 
 	case "User.createdAt":
 		if e.complexity.User.CreatedAt == nil {
@@ -5178,6 +5600,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.UserEdge.Node(childComplexity), true
 
+	case "Vendor.businessAssociateAgreement":
+		if e.complexity.Vendor.BusinessAssociateAgreement == nil {
+			break
+		}
+
+		return e.complexity.Vendor.BusinessAssociateAgreement(childComplexity), true
+
 	case "Vendor.businessAssociateAgreementUrl":
 		if e.complexity.Vendor.BusinessAssociateAgreementURL == nil {
 			break
@@ -5218,12 +5647,31 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Vendor.ComplianceReports(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.VendorComplianceReportOrderBy)), true
 
+	case "Vendor.contacts":
+		if e.complexity.Vendor.Contacts == nil {
+			break
+		}
+
+		args, err := ec.field_Vendor_contacts_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Vendor.Contacts(childComplexity, args["first"].(*int), args["after"].(*page.CursorKey), args["last"].(*int), args["before"].(*page.CursorKey), args["orderBy"].(*types.VendorContactOrderBy)), true
+
 	case "Vendor.createdAt":
 		if e.complexity.Vendor.CreatedAt == nil {
 			break
 		}
 
 		return e.complexity.Vendor.CreatedAt(childComplexity), true
+
+	case "Vendor.dataPrivacyAgreement":
+		if e.complexity.Vendor.DataPrivacyAgreement == nil {
+			break
+		}
+
+		return e.complexity.Vendor.DataPrivacyAgreement(childComplexity), true
 
 	case "Vendor.dataProcessingAgreementUrl":
 		if e.complexity.Vendor.DataProcessingAgreementURL == nil {
@@ -5363,6 +5811,69 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Vendor.WebsiteURL(childComplexity), true
 
+	case "VendorBusinessAssociateAgreement.createdAt":
+		if e.complexity.VendorBusinessAssociateAgreement.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.VendorBusinessAssociateAgreement.CreatedAt(childComplexity), true
+
+	case "VendorBusinessAssociateAgreement.fileName":
+		if e.complexity.VendorBusinessAssociateAgreement.FileName == nil {
+			break
+		}
+
+		return e.complexity.VendorBusinessAssociateAgreement.FileName(childComplexity), true
+
+	case "VendorBusinessAssociateAgreement.fileSize":
+		if e.complexity.VendorBusinessAssociateAgreement.FileSize == nil {
+			break
+		}
+
+		return e.complexity.VendorBusinessAssociateAgreement.FileSize(childComplexity), true
+
+	case "VendorBusinessAssociateAgreement.fileUrl":
+		if e.complexity.VendorBusinessAssociateAgreement.FileURL == nil {
+			break
+		}
+
+		return e.complexity.VendorBusinessAssociateAgreement.FileURL(childComplexity), true
+
+	case "VendorBusinessAssociateAgreement.id":
+		if e.complexity.VendorBusinessAssociateAgreement.ID == nil {
+			break
+		}
+
+		return e.complexity.VendorBusinessAssociateAgreement.ID(childComplexity), true
+
+	case "VendorBusinessAssociateAgreement.updatedAt":
+		if e.complexity.VendorBusinessAssociateAgreement.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.VendorBusinessAssociateAgreement.UpdatedAt(childComplexity), true
+
+	case "VendorBusinessAssociateAgreement.validFrom":
+		if e.complexity.VendorBusinessAssociateAgreement.ValidFrom == nil {
+			break
+		}
+
+		return e.complexity.VendorBusinessAssociateAgreement.ValidFrom(childComplexity), true
+
+	case "VendorBusinessAssociateAgreement.validUntil":
+		if e.complexity.VendorBusinessAssociateAgreement.ValidUntil == nil {
+			break
+		}
+
+		return e.complexity.VendorBusinessAssociateAgreement.ValidUntil(childComplexity), true
+
+	case "VendorBusinessAssociateAgreement.vendor":
+		if e.complexity.VendorBusinessAssociateAgreement.Vendor == nil {
+			break
+		}
+
+		return e.complexity.VendorBusinessAssociateAgreement.Vendor(childComplexity), true
+
 	case "VendorComplianceReport.createdAt":
 		if e.complexity.VendorComplianceReport.CreatedAt == nil {
 			break
@@ -5474,6 +5985,153 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.VendorConnection.TotalCount(childComplexity), true
+
+	case "VendorContact.createdAt":
+		if e.complexity.VendorContact.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.VendorContact.CreatedAt(childComplexity), true
+
+	case "VendorContact.email":
+		if e.complexity.VendorContact.Email == nil {
+			break
+		}
+
+		return e.complexity.VendorContact.Email(childComplexity), true
+
+	case "VendorContact.fullName":
+		if e.complexity.VendorContact.FullName == nil {
+			break
+		}
+
+		return e.complexity.VendorContact.FullName(childComplexity), true
+
+	case "VendorContact.id":
+		if e.complexity.VendorContact.ID == nil {
+			break
+		}
+
+		return e.complexity.VendorContact.ID(childComplexity), true
+
+	case "VendorContact.phone":
+		if e.complexity.VendorContact.Phone == nil {
+			break
+		}
+
+		return e.complexity.VendorContact.Phone(childComplexity), true
+
+	case "VendorContact.role":
+		if e.complexity.VendorContact.Role == nil {
+			break
+		}
+
+		return e.complexity.VendorContact.Role(childComplexity), true
+
+	case "VendorContact.updatedAt":
+		if e.complexity.VendorContact.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.VendorContact.UpdatedAt(childComplexity), true
+
+	case "VendorContact.vendor":
+		if e.complexity.VendorContact.Vendor == nil {
+			break
+		}
+
+		return e.complexity.VendorContact.Vendor(childComplexity), true
+
+	case "VendorContactConnection.edges":
+		if e.complexity.VendorContactConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.VendorContactConnection.Edges(childComplexity), true
+
+	case "VendorContactConnection.pageInfo":
+		if e.complexity.VendorContactConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.VendorContactConnection.PageInfo(childComplexity), true
+
+	case "VendorContactEdge.cursor":
+		if e.complexity.VendorContactEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.VendorContactEdge.Cursor(childComplexity), true
+
+	case "VendorContactEdge.node":
+		if e.complexity.VendorContactEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.VendorContactEdge.Node(childComplexity), true
+
+	case "VendorDataPrivacyAgreement.createdAt":
+		if e.complexity.VendorDataPrivacyAgreement.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.VendorDataPrivacyAgreement.CreatedAt(childComplexity), true
+
+	case "VendorDataPrivacyAgreement.fileName":
+		if e.complexity.VendorDataPrivacyAgreement.FileName == nil {
+			break
+		}
+
+		return e.complexity.VendorDataPrivacyAgreement.FileName(childComplexity), true
+
+	case "VendorDataPrivacyAgreement.fileSize":
+		if e.complexity.VendorDataPrivacyAgreement.FileSize == nil {
+			break
+		}
+
+		return e.complexity.VendorDataPrivacyAgreement.FileSize(childComplexity), true
+
+	case "VendorDataPrivacyAgreement.fileUrl":
+		if e.complexity.VendorDataPrivacyAgreement.FileURL == nil {
+			break
+		}
+
+		return e.complexity.VendorDataPrivacyAgreement.FileURL(childComplexity), true
+
+	case "VendorDataPrivacyAgreement.id":
+		if e.complexity.VendorDataPrivacyAgreement.ID == nil {
+			break
+		}
+
+		return e.complexity.VendorDataPrivacyAgreement.ID(childComplexity), true
+
+	case "VendorDataPrivacyAgreement.updatedAt":
+		if e.complexity.VendorDataPrivacyAgreement.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.VendorDataPrivacyAgreement.UpdatedAt(childComplexity), true
+
+	case "VendorDataPrivacyAgreement.validFrom":
+		if e.complexity.VendorDataPrivacyAgreement.ValidFrom == nil {
+			break
+		}
+
+		return e.complexity.VendorDataPrivacyAgreement.ValidFrom(childComplexity), true
+
+	case "VendorDataPrivacyAgreement.validUntil":
+		if e.complexity.VendorDataPrivacyAgreement.ValidUntil == nil {
+			break
+		}
+
+		return e.complexity.VendorDataPrivacyAgreement.ValidUntil(childComplexity), true
+
+	case "VendorDataPrivacyAgreement.vendor":
+		if e.complexity.VendorDataPrivacyAgreement.Vendor == nil {
+			break
+		}
+
+		return e.complexity.VendorDataPrivacyAgreement.Vendor(childComplexity), true
 
 	case "VendorEdge.cursor":
 		if e.complexity.VendorEdge.Cursor == nil {
@@ -5634,6 +6292,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputControlOrder,
 		ec.unmarshalInputCreateAssetInput,
 		ec.unmarshalInputCreateAuditInput,
+		ec.unmarshalInputCreateControlAuditMappingInput,
 		ec.unmarshalInputCreateControlDocumentMappingInput,
 		ec.unmarshalInputCreateControlInput,
 		ec.unmarshalInputCreateControlMeasureMappingInput,
@@ -5650,17 +6309,20 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputCreateRiskMeasureMappingInput,
 		ec.unmarshalInputCreateTaskInput,
 		ec.unmarshalInputCreateTrustCenterAccessInput,
+		ec.unmarshalInputCreateVendorContactInput,
 		ec.unmarshalInputCreateVendorInput,
 		ec.unmarshalInputCreateVendorRiskAssessmentInput,
 		ec.unmarshalInputDatumOrder,
 		ec.unmarshalInputDeleteAssetInput,
 		ec.unmarshalInputDeleteAuditInput,
 		ec.unmarshalInputDeleteAuditReportInput,
+		ec.unmarshalInputDeleteControlAuditMappingInput,
 		ec.unmarshalInputDeleteControlDocumentMappingInput,
 		ec.unmarshalInputDeleteControlInput,
 		ec.unmarshalInputDeleteControlMeasureMappingInput,
 		ec.unmarshalInputDeleteDatumInput,
 		ec.unmarshalInputDeleteDocumentInput,
+		ec.unmarshalInputDeleteDraftDocumentVersionInput,
 		ec.unmarshalInputDeleteEvidenceInput,
 		ec.unmarshalInputDeleteFrameworkInput,
 		ec.unmarshalInputDeleteMeasureInput,
@@ -5671,7 +6333,10 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputDeleteRiskMeasureMappingInput,
 		ec.unmarshalInputDeleteTaskInput,
 		ec.unmarshalInputDeleteTrustCenterAccessInput,
+		ec.unmarshalInputDeleteVendorBusinessAssociateAgreementInput,
 		ec.unmarshalInputDeleteVendorComplianceReportInput,
+		ec.unmarshalInputDeleteVendorContactInput,
+		ec.unmarshalInputDeleteVendorDataPrivacyAgreementInput,
 		ec.unmarshalInputDeleteVendorInput,
 		ec.unmarshalInputDocumentFilter,
 		ec.unmarshalInputDocumentOrder,
@@ -5692,6 +6357,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputMeasureOrder,
 		ec.unmarshalInputOrganizationFilter,
 		ec.unmarshalInputOrganizationOrder,
+		ec.unmarshalInputPeopleFilter,
 		ec.unmarshalInputPeopleOrder,
 		ec.unmarshalInputPublishDocumentVersionInput,
 		ec.unmarshalInputRemoveUserInput,
@@ -5717,13 +6383,19 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputUpdateRiskInput,
 		ec.unmarshalInputUpdateTaskInput,
 		ec.unmarshalInputUpdateTrustCenterInput,
+		ec.unmarshalInputUpdateVendorBusinessAssociateAgreementInput,
+		ec.unmarshalInputUpdateVendorContactInput,
+		ec.unmarshalInputUpdateVendorDataPrivacyAgreementInput,
 		ec.unmarshalInputUpdateVendorInput,
 		ec.unmarshalInputUploadAuditReportInput,
 		ec.unmarshalInputUploadMeasureEvidenceInput,
 		ec.unmarshalInputUploadTaskEvidenceInput,
+		ec.unmarshalInputUploadVendorBusinessAssociateAgreementInput,
 		ec.unmarshalInputUploadVendorComplianceReportInput,
+		ec.unmarshalInputUploadVendorDataPrivacyAgreementInput,
 		ec.unmarshalInputUserOrder,
 		ec.unmarshalInputVendorComplianceReportOrder,
+		ec.unmarshalInputVendorContactOrder,
 		ec.unmarshalInputVendorOrder,
 		ec.unmarshalInputVendorRiskAssessmentOrder,
 	)
@@ -6117,6 +6789,24 @@ enum VendorComplianceReportOrderField
     )
 }
 
+enum VendorContactOrderField
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/coredata.VendorContactOrderField"
+  ) {
+  CREATED_AT
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorContactOrderFieldCreatedAt"
+    )
+  FULL_NAME
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorContactOrderFieldFullName"
+    )
+  EMAIL
+    @goEnum(
+      value: "github.com/getprobo/probo/pkg/coredata.VendorContactOrderFieldEmail"
+    )
+}
+
 enum OrganizationOrderField
   @goModel(
     model: "github.com/getprobo/probo/pkg/coredata.OrganizationOrderField"
@@ -6504,6 +7194,14 @@ input VendorComplianceReportOrder
   field: VendorComplianceReportOrderField!
 }
 
+input VendorContactOrder
+  @goModel(
+    model: "github.com/getprobo/probo/pkg/server/api/console/v1/types.VendorContactOrderBy"
+  ) {
+  direction: OrderDirection!
+  field: VendorContactOrderField!
+}
+
 input OrganizationOrder {
   direction: OrderDirection!
   field: OrganizationOrderField!
@@ -6541,6 +7239,10 @@ input MeasureFilter {
 
 input RiskFilter {
   query: String
+}
+
+input PeopleFilter {
+  excludeContractEnded: Boolean
 }
 
 input OrganizationFilter {
@@ -6627,6 +7329,7 @@ type Organization implements Node {
     last: Int
     before: CursorKey
     orderBy: PeopleOrder
+    filter: PeopleFilter
   ): PeopleConnection! @goField(forceResolver: true)
 
   documents(
@@ -6741,6 +7444,17 @@ type Vendor implements Node {
     orderBy: VendorComplianceReportOrder
   ): VendorComplianceReportConnection! @goField(forceResolver: true)
 
+  businessAssociateAgreement: VendorBusinessAssociateAgreement @goField(forceResolver: true)
+  dataPrivacyAgreement: VendorDataPrivacyAgreement @goField(forceResolver: true)
+
+  contacts(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: VendorContactOrder
+  ): VendorContactConnection! @goField(forceResolver: true)
+
   riskAssessments(
     first: Int
     after: CursorKey
@@ -6776,6 +7490,41 @@ type VendorComplianceReport implements Node {
   reportDate: Datetime!
   validUntil: Datetime
   reportName: String!
+  fileUrl: String! @goField(forceResolver: true)
+  fileSize: Int!
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type VendorBusinessAssociateAgreement implements Node {
+  id: ID!
+  vendor: Vendor! @goField(forceResolver: true)
+  validFrom: Datetime
+  validUntil: Datetime
+  fileName: String!
+  fileUrl: String! @goField(forceResolver: true)
+  fileSize: Int!
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type VendorContact implements Node {
+  id: ID!
+  vendor: Vendor! @goField(forceResolver: true)
+  fullName: String
+  email: String
+  phone: String
+  role: String
+  createdAt: Datetime!
+  updatedAt: Datetime!
+}
+
+type VendorDataPrivacyAgreement implements Node {
+  id: ID!
+  vendor: Vendor! @goField(forceResolver: true)
+  validFrom: Datetime
+  validUntil: Datetime
+  fileName: String!
   fileUrl: String! @goField(forceResolver: true)
   fileSize: Int!
   createdAt: Datetime!
@@ -6830,6 +7579,14 @@ type Control implements Node {
     orderBy: DocumentOrder
     filter: DocumentFilter
   ): DocumentConnection! @goField(forceResolver: true)
+
+  audits(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: AuditOrder
+  ): AuditConnection! @goField(forceResolver: true)
 
   createdAt: Datetime!
   updatedAt: Datetime!
@@ -7006,6 +7763,7 @@ type Risk implements Node {
 
 type Audit implements Node {
   id: ID!
+  name: String
   organization: Organization! @goField(forceResolver: true)
   framework: Framework! @goField(forceResolver: true)
   validFrom: Datetime
@@ -7013,6 +7771,16 @@ type Audit implements Node {
   report: Report @goField(forceResolver: true)
   reportUrl: String @goField(forceResolver: true)
   state: AuditState!
+
+  controls(
+    first: Int
+    after: CursorKey
+    last: Int
+    before: CursorKey
+    orderBy: ControlOrder
+    filter: ControlFilter
+  ): ControlConnection! @goField(forceResolver: true)
+
   showOnTrustCenter: Boolean!
   createdAt: Datetime!
   updatedAt: Datetime!
@@ -7239,6 +8007,16 @@ type VendorComplianceReportEdge {
   node: VendorComplianceReport!
 }
 
+type VendorContactConnection {
+  edges: [VendorContactEdge!]!
+  pageInfo: PageInfo!
+}
+
+type VendorContactEdge {
+  cursor: CursorKey!
+  node: VendorContact!
+}
+
 type ConnectorConnection {
   edges: [ConnectorEdge!]!
   pageInfo: PageInfo!
@@ -7350,6 +8128,11 @@ type Mutation {
   updateVendor(input: UpdateVendorInput!): UpdateVendorPayload!
   deleteVendor(input: DeleteVendorInput!): DeleteVendorPayload!
 
+  # Vendor Contact mutations
+  createVendorContact(input: CreateVendorContactInput!): CreateVendorContactPayload!
+  updateVendorContact(input: UpdateVendorContactInput!): UpdateVendorContactPayload!
+  deleteVendorContact(input: DeleteVendorContactInput!): DeleteVendorContactPayload!
+
   # Framework mutations
   createFramework(input: CreateFrameworkInput!): CreateFrameworkPayload!
   updateFramework(input: UpdateFrameworkInput!): UpdateFrameworkPayload!
@@ -7384,6 +8167,12 @@ type Mutation {
   deleteControlDocumentMapping(
     input: DeleteControlDocumentMappingInput!
   ): DeleteControlDocumentMappingPayload!
+  createControlAuditMapping(
+    input: CreateControlAuditMappingInput!
+  ): CreateControlAuditMappingPayload!
+  deleteControlAuditMapping(
+    input: DeleteControlAuditMappingInput!
+  ): DeleteControlAuditMappingPayload!
 
   # Task mutations
   createTask(input: CreateTaskInput!): CreateTaskPayload!
@@ -7429,6 +8218,28 @@ type Mutation {
     input: DeleteVendorComplianceReportInput!
   ): DeleteVendorComplianceReportPayload!
 
+  # Vendor Business Associate Agreement mutations
+  uploadVendorBusinessAssociateAgreement(
+    input: UploadVendorBusinessAssociateAgreementInput!
+  ): UploadVendorBusinessAssociateAgreementPayload!
+  updateVendorBusinessAssociateAgreement(
+    input: UpdateVendorBusinessAssociateAgreementInput!
+  ): UpdateVendorBusinessAssociateAgreementPayload!
+  deleteVendorBusinessAssociateAgreement(
+    input: DeleteVendorBusinessAssociateAgreementInput!
+  ): DeleteVendorBusinessAssociateAgreementPayload!
+
+  # Vendor Data Privacy Agreement mutations
+  uploadVendorDataPrivacyAgreement(
+    input: UploadVendorDataPrivacyAgreementInput!
+  ): UploadVendorDataPrivacyAgreementPayload!
+  updateVendorDataPrivacyAgreement(
+    input: UpdateVendorDataPrivacyAgreementInput!
+  ): UpdateVendorDataPrivacyAgreementPayload!
+  deleteVendorDataPrivacyAgreement(
+    input: DeleteVendorDataPrivacyAgreementInput!
+  ): DeleteVendorDataPrivacyAgreementPayload!
+
   # Document mutations
   createDocument(input: CreateDocumentInput!): CreateDocumentPayload!
   updateDocument(input: UpdateDocumentInput!): UpdateDocumentPayload!
@@ -7445,6 +8256,9 @@ type Mutation {
   createDraftDocumentVersion(
     input: CreateDraftDocumentVersionInput!
   ): CreateDraftDocumentVersionPayload!
+  deleteDraftDocumentVersion(
+    input: DeleteDraftDocumentVersionInput!
+  ): DeleteDraftDocumentVersionPayload!
   updateDocumentVersion(
     input: UpdateDocumentVersionInput!
   ): UpdateDocumentVersionPayload!
@@ -7577,6 +8391,26 @@ input DeleteVendorInput {
   vendorId: ID!
 }
 
+input CreateVendorContactInput {
+  vendorId: ID!
+  fullName: String
+  email: String
+  phone: String
+  role: String
+}
+
+input UpdateVendorContactInput {
+  id: ID!
+  fullName: String
+  email: String
+  phone: String
+  role: String
+}
+
+input DeleteVendorContactInput {
+  vendorContactId: ID!
+}
+
 input CreatePeopleInput {
   organizationId: ID!
   fullName: String!
@@ -7696,6 +8530,16 @@ input DeleteControlDocumentMappingInput {
   documentId: ID!
 }
 
+input CreateControlAuditMappingInput {
+  controlId: ID!
+  auditId: ID!
+}
+
+input DeleteControlAuditMappingInput {
+  controlId: ID!
+  auditId: ID!
+}
+
 input CreateRiskInput {
   organizationId: ID!
   name: String!
@@ -7787,6 +8631,42 @@ input DeleteVendorComplianceReportInput {
   reportId: ID!
 }
 
+input UploadVendorBusinessAssociateAgreementInput {
+  vendorId: ID!
+  validFrom: Datetime
+  validUntil: Datetime
+  fileName: String!
+  file: Upload!
+}
+
+input UpdateVendorBusinessAssociateAgreementInput {
+  vendorId: ID!
+  validFrom: Datetime
+  validUntil: Datetime
+}
+
+input DeleteVendorBusinessAssociateAgreementInput {
+  vendorId: ID!
+}
+
+input UploadVendorDataPrivacyAgreementInput {
+  vendorId: ID!
+  validFrom: Datetime
+  validUntil: Datetime
+  fileName: String!
+  file: Upload!
+}
+
+input UpdateVendorDataPrivacyAgreementInput {
+  vendorId: ID!
+  validFrom: Datetime
+  validUntil: Datetime
+}
+
+input DeleteVendorDataPrivacyAgreementInput {
+  vendorId: ID!
+}
+
 input CreateDocumentInput {
   organizationId: ID!
   title: String!
@@ -7854,6 +8734,7 @@ input DeleteControlInput {
 input CreateAuditInput {
   organizationId: ID!
   frameworkId: ID!
+  name: String
   validFrom: Datetime
   validUntil: Datetime
   state: AuditState
@@ -7861,6 +8742,7 @@ input CreateAuditInput {
 
 input UpdateAuditInput {
   id: ID!
+  name: String
   validFrom: Datetime
   validUntil: Datetime
   state: AuditState
@@ -7890,7 +8772,7 @@ type UpdateOrganizationPayload {
 }
 
 type DeleteOrganizationPayload {
-  success: Boolean!
+  deletedOrganizationId: ID!
 }
 
 type UpdateTrustCenterPayload {
@@ -7929,6 +8811,18 @@ type UpdateVendorPayload {
 
 type DeleteVendorPayload {
   deletedVendorId: ID!
+}
+
+type CreateVendorContactPayload {
+  vendorContactEdge: VendorContactEdge!
+}
+
+type UpdateVendorContactPayload {
+  vendorContact: VendorContact!
+}
+
+type DeleteVendorContactPayload {
+  deletedVendorContactId: ID!
 }
 
 type CreatePeoplePayload {
@@ -8012,6 +8906,16 @@ type DeleteControlDocumentMappingPayload {
   deletedDocumentId: ID!
 }
 
+type CreateControlAuditMappingPayload {
+  controlEdge: ControlEdge!
+  auditEdge: AuditEdge!
+}
+
+type DeleteControlAuditMappingPayload {
+  deletedControlId: ID!
+  deletedAuditId: ID!
+}
+
 type CreateRiskPayload {
   riskEdge: RiskEdge!
 }
@@ -8066,6 +8970,30 @@ type UploadVendorComplianceReportPayload {
 
 type DeleteVendorComplianceReportPayload {
   deletedVendorComplianceReportId: ID!
+}
+
+type UploadVendorBusinessAssociateAgreementPayload {
+  vendorBusinessAssociateAgreement: VendorBusinessAssociateAgreement!
+}
+
+type UpdateVendorBusinessAssociateAgreementPayload {
+  vendorBusinessAssociateAgreement: VendorBusinessAssociateAgreement!
+}
+
+type DeleteVendorBusinessAssociateAgreementPayload {
+  deletedVendorId: ID!
+}
+
+type UploadVendorDataPrivacyAgreementPayload {
+  vendorDataPrivacyAgreement: VendorDataPrivacyAgreement!
+}
+
+type UpdateVendorDataPrivacyAgreementPayload {
+  vendorDataPrivacyAgreement: VendorDataPrivacyAgreement!
+}
+
+type DeleteVendorDataPrivacyAgreementPayload {
+  deletedVendorId: ID!
 }
 
 type CreateDocumentPayload {
@@ -8296,8 +9224,16 @@ type CreateDraftDocumentVersionPayload {
   documentVersionEdge: DocumentVersionEdge!
 }
 
+type DeleteDraftDocumentVersionPayload {
+  deletedDocumentVersionId: ID!
+}
+
 input CreateDraftDocumentVersionInput {
   documentID: ID!
+}
+
+input DeleteDraftDocumentVersionInput {
+  documentVersionId: ID!
 }
 
 input UpdateDocumentVersionInput {
@@ -8616,6 +9552,214 @@ func (ec *executionContext) field_Asset_vendors_argsOrderBy(
 	}
 
 	var zeroVal *types.VendorOrderBy
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Audit_controls_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Audit_controls_argsFirst(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["first"] = arg0
+	arg1, err := ec.field_Audit_controls_argsAfter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["after"] = arg1
+	arg2, err := ec.field_Audit_controls_argsLast(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["last"] = arg2
+	arg3, err := ec.field_Audit_controls_argsBefore(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["before"] = arg3
+	arg4, err := ec.field_Audit_controls_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg4
+	arg5, err := ec.field_Audit_controls_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg5
+	return args, nil
+}
+func (ec *executionContext) field_Audit_controls_argsFirst(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+	if tmp, ok := rawArgs["first"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Audit_controls_argsAfter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+	if tmp, ok := rawArgs["after"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Audit_controls_argsLast(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+	if tmp, ok := rawArgs["last"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Audit_controls_argsBefore(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+	if tmp, ok := rawArgs["before"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Audit_controls_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.ControlOrderBy, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOControlOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐControlOrderBy(ctx, tmp)
+	}
+
+	var zeroVal *types.ControlOrderBy
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Audit_controls_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.ControlFilter, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOControlFilter2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐControlFilter(ctx, tmp)
+	}
+
+	var zeroVal *types.ControlFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Control_audits_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Control_audits_argsFirst(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["first"] = arg0
+	arg1, err := ec.field_Control_audits_argsAfter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["after"] = arg1
+	arg2, err := ec.field_Control_audits_argsLast(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["last"] = arg2
+	arg3, err := ec.field_Control_audits_argsBefore(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["before"] = arg3
+	arg4, err := ec.field_Control_audits_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg4
+	return args, nil
+}
+func (ec *executionContext) field_Control_audits_argsFirst(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+	if tmp, ok := rawArgs["first"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Control_audits_argsAfter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+	if tmp, ok := rawArgs["after"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Control_audits_argsLast(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+	if tmp, ok := rawArgs["last"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Control_audits_argsBefore(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+	if tmp, ok := rawArgs["before"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Control_audits_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.AuditOrderBy, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOAuditOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐAuditOrderBy(ctx, tmp)
+	}
+
+	var zeroVal *types.AuditOrderBy
 	return zeroVal, nil
 }
 
@@ -9974,6 +11118,29 @@ func (ec *executionContext) field_Mutation_createAudit_argsInput(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Mutation_createControlAuditMapping_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_createControlAuditMapping_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_createControlAuditMapping_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.CreateControlAuditMappingInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNCreateControlAuditMappingInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateControlAuditMappingInput(ctx, tmp)
+	}
+
+	var zeroVal types.CreateControlAuditMappingInput
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Mutation_createControlDocumentMapping_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -10319,6 +11486,29 @@ func (ec *executionContext) field_Mutation_createTrustCenterAccess_argsInput(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Mutation_createVendorContact_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_createVendorContact_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_createVendorContact_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.CreateVendorContactInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNCreateVendorContactInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateVendorContactInput(ctx, tmp)
+	}
+
+	var zeroVal types.CreateVendorContactInput
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Mutation_createVendorRiskAssessment_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -10434,6 +11624,29 @@ func (ec *executionContext) field_Mutation_deleteAudit_argsInput(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Mutation_deleteControlAuditMapping_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deleteControlAuditMapping_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deleteControlAuditMapping_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.DeleteControlAuditMappingInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNDeleteControlAuditMappingInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteControlAuditMappingInput(ctx, tmp)
+	}
+
+	var zeroVal types.DeleteControlAuditMappingInput
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Mutation_deleteControlDocumentMapping_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -10546,6 +11759,29 @@ func (ec *executionContext) field_Mutation_deleteDocument_argsInput(
 	}
 
 	var zeroVal types.DeleteDocumentInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteDraftDocumentVersion_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deleteDraftDocumentVersion_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deleteDraftDocumentVersion_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.DeleteDraftDocumentVersionInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNDeleteDraftDocumentVersionInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteDraftDocumentVersionInput(ctx, tmp)
+	}
+
+	var zeroVal types.DeleteDraftDocumentVersionInput
 	return zeroVal, nil
 }
 
@@ -10779,6 +12015,29 @@ func (ec *executionContext) field_Mutation_deleteTrustCenterAccess_argsInput(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Mutation_deleteVendorBusinessAssociateAgreement_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deleteVendorBusinessAssociateAgreement_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deleteVendorBusinessAssociateAgreement_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.DeleteVendorBusinessAssociateAgreementInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNDeleteVendorBusinessAssociateAgreementInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteVendorBusinessAssociateAgreementInput(ctx, tmp)
+	}
+
+	var zeroVal types.DeleteVendorBusinessAssociateAgreementInput
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Mutation_deleteVendorComplianceReport_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -10799,6 +12058,52 @@ func (ec *executionContext) field_Mutation_deleteVendorComplianceReport_argsInpu
 	}
 
 	var zeroVal types.DeleteVendorComplianceReportInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteVendorContact_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deleteVendorContact_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deleteVendorContact_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.DeleteVendorContactInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNDeleteVendorContactInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteVendorContactInput(ctx, tmp)
+	}
+
+	var zeroVal types.DeleteVendorContactInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteVendorDataPrivacyAgreement_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deleteVendorDataPrivacyAgreement_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deleteVendorDataPrivacyAgreement_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.DeleteVendorDataPrivacyAgreementInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNDeleteVendorDataPrivacyAgreementInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteVendorDataPrivacyAgreementInput(ctx, tmp)
+	}
+
+	var zeroVal types.DeleteVendorDataPrivacyAgreementInput
 	return zeroVal, nil
 }
 
@@ -11446,6 +12751,75 @@ func (ec *executionContext) field_Mutation_updateTrustCenter_argsInput(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Mutation_updateVendorBusinessAssociateAgreement_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_updateVendorBusinessAssociateAgreement_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_updateVendorBusinessAssociateAgreement_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.UpdateVendorBusinessAssociateAgreementInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNUpdateVendorBusinessAssociateAgreementInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateVendorBusinessAssociateAgreementInput(ctx, tmp)
+	}
+
+	var zeroVal types.UpdateVendorBusinessAssociateAgreementInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updateVendorContact_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_updateVendorContact_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_updateVendorContact_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.UpdateVendorContactInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNUpdateVendorContactInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateVendorContactInput(ctx, tmp)
+	}
+
+	var zeroVal types.UpdateVendorContactInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updateVendorDataPrivacyAgreement_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_updateVendorDataPrivacyAgreement_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_updateVendorDataPrivacyAgreement_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.UpdateVendorDataPrivacyAgreementInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNUpdateVendorDataPrivacyAgreementInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateVendorDataPrivacyAgreementInput(ctx, tmp)
+	}
+
+	var zeroVal types.UpdateVendorDataPrivacyAgreementInput
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Mutation_updateVendor_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -11538,6 +12912,29 @@ func (ec *executionContext) field_Mutation_uploadTaskEvidence_argsInput(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Mutation_uploadVendorBusinessAssociateAgreement_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_uploadVendorBusinessAssociateAgreement_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_uploadVendorBusinessAssociateAgreement_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.UploadVendorBusinessAssociateAgreementInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNUploadVendorBusinessAssociateAgreementInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUploadVendorBusinessAssociateAgreementInput(ctx, tmp)
+	}
+
+	var zeroVal types.UploadVendorBusinessAssociateAgreementInput
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Mutation_uploadVendorComplianceReport_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -11558,6 +12955,29 @@ func (ec *executionContext) field_Mutation_uploadVendorComplianceReport_argsInpu
 	}
 
 	var zeroVal types.UploadVendorComplianceReportInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_uploadVendorDataPrivacyAgreement_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_uploadVendorDataPrivacyAgreement_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_uploadVendorDataPrivacyAgreement_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.UploadVendorDataPrivacyAgreementInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNUploadVendorDataPrivacyAgreementInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUploadVendorDataPrivacyAgreementInput(ctx, tmp)
+	}
+
+	var zeroVal types.UploadVendorDataPrivacyAgreementInput
 	return zeroVal, nil
 }
 
@@ -12403,6 +13823,11 @@ func (ec *executionContext) field_Organization_peoples_args(ctx context.Context,
 		return nil, err
 	}
 	args["orderBy"] = arg4
+	arg5, err := ec.field_Organization_peoples_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["filter"] = arg5
 	return args, nil
 }
 func (ec *executionContext) field_Organization_peoples_argsFirst(
@@ -12467,6 +13892,19 @@ func (ec *executionContext) field_Organization_peoples_argsOrderBy(
 	}
 
 	var zeroVal *types.PeopleOrderBy
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Organization_peoples_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.PeopleFilter, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalOPeopleFilter2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPeopleFilter(ctx, tmp)
+	}
+
+	var zeroVal *types.PeopleFilter
 	return zeroVal, nil
 }
 
@@ -13656,6 +15094,101 @@ func (ec *executionContext) field_Vendor_complianceReports_argsOrderBy(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Vendor_contacts_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Vendor_contacts_argsFirst(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["first"] = arg0
+	arg1, err := ec.field_Vendor_contacts_argsAfter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["after"] = arg1
+	arg2, err := ec.field_Vendor_contacts_argsLast(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["last"] = arg2
+	arg3, err := ec.field_Vendor_contacts_argsBefore(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["before"] = arg3
+	arg4, err := ec.field_Vendor_contacts_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg4
+	return args, nil
+}
+func (ec *executionContext) field_Vendor_contacts_argsFirst(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+	if tmp, ok := rawArgs["first"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Vendor_contacts_argsAfter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+	if tmp, ok := rawArgs["after"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Vendor_contacts_argsLast(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+	if tmp, ok := rawArgs["last"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Vendor_contacts_argsBefore(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*page.CursorKey, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+	if tmp, ok := rawArgs["before"]; ok {
+		return ec.unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, tmp)
+	}
+
+	var zeroVal *page.CursorKey
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Vendor_contacts_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*types.VendorContactOrderBy, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOVendorContactOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorContactOrderBy(ctx, tmp)
+	}
+
+	var zeroVal *types.VendorContactOrderBy
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Vendor_riskAssessments_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -14015,6 +15548,12 @@ func (ec *executionContext) fieldContext_AssessVendorPayload_vendor(_ context.Co
 				return ec.fieldContext_Vendor_organization(ctx, field)
 			case "complianceReports":
 				return ec.fieldContext_Vendor_complianceReports(ctx, field)
+			case "businessAssociateAgreement":
+				return ec.fieldContext_Vendor_businessAssociateAgreement(ctx, field)
+			case "dataPrivacyAgreement":
+				return ec.fieldContext_Vendor_dataPrivacyAgreement(ctx, field)
+			case "contacts":
+				return ec.fieldContext_Vendor_contacts(ctx, field)
 			case "riskAssessments":
 				return ec.fieldContext_Vendor_riskAssessments(ctx, field)
 			case "businessOwner":
@@ -15013,6 +16552,47 @@ func (ec *executionContext) fieldContext_Audit_id(_ context.Context, field graph
 	return fc, nil
 }
 
+func (ec *executionContext) _Audit_name(ctx context.Context, field graphql.CollectedField, obj *types.Audit) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Audit_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Audit_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Audit",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Audit_organization(ctx context.Context, field graphql.CollectedField, obj *types.Audit) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Audit_organization(ctx, field)
 	if err != nil {
@@ -15397,6 +16977,69 @@ func (ec *executionContext) fieldContext_Audit_state(_ context.Context, field gr
 	return fc, nil
 }
 
+func (ec *executionContext) _Audit_controls(ctx context.Context, field graphql.CollectedField, obj *types.Audit) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Audit_controls(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Audit().Controls(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.ControlOrderBy), fc.Args["filter"].(*types.ControlFilter))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.ControlConnection)
+	fc.Result = res
+	return ec.marshalNControlConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐControlConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Audit_controls(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Audit",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_ControlConnection_totalCount(ctx, field)
+			case "edges":
+				return ec.fieldContext_ControlConnection_edges(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_ControlConnection_pageInfo(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ControlConnection", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Audit_controls_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Audit_showOnTrustCenter(ctx context.Context, field graphql.CollectedField, obj *types.Audit) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Audit_showOnTrustCenter(ctx, field)
 	if err != nil {
@@ -15762,6 +17405,8 @@ func (ec *executionContext) fieldContext_AuditEdge_node(_ context.Context, field
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Audit_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Audit_name(ctx, field)
 			case "organization":
 				return ec.fieldContext_Audit_organization(ctx, field)
 			case "framework":
@@ -15776,6 +17421,8 @@ func (ec *executionContext) fieldContext_AuditEdge_node(_ context.Context, field
 				return ec.fieldContext_Audit_reportUrl(ctx, field)
 			case "state":
 				return ec.fieldContext_Audit_state(ctx, field)
+			case "controls":
+				return ec.fieldContext_Audit_controls(ctx, field)
 			case "showOnTrustCenter":
 				return ec.fieldContext_Audit_showOnTrustCenter(ctx, field)
 			case "createdAt":
@@ -16908,6 +18555,69 @@ func (ec *executionContext) fieldContext_Control_documents(ctx context.Context, 
 	return fc, nil
 }
 
+func (ec *executionContext) _Control_audits(ctx context.Context, field graphql.CollectedField, obj *types.Control) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Control_audits(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Control().Audits(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.AuditOrderBy))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.AuditConnection)
+	fc.Result = res
+	return ec.marshalNAuditConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐAuditConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Control_audits(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Control",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "totalCount":
+				return ec.fieldContext_AuditConnection_totalCount(ctx, field)
+			case "edges":
+				return ec.fieldContext_AuditConnection_edges(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_AuditConnection_pageInfo(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AuditConnection", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Control_audits_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Control_createdAt(ctx context.Context, field graphql.CollectedField, obj *types.Control) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Control_createdAt(ctx, field)
 	if err != nil {
@@ -17245,6 +18955,8 @@ func (ec *executionContext) fieldContext_ControlEdge_node(_ context.Context, fie
 				return ec.fieldContext_Control_measures(ctx, field)
 			case "documents":
 				return ec.fieldContext_Control_documents(ctx, field)
+			case "audits":
+				return ec.fieldContext_Control_audits(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Control_createdAt(ctx, field)
 			case "updatedAt":
@@ -17340,6 +19052,106 @@ func (ec *executionContext) _CreateAuditPayload_auditEdge(ctx context.Context, f
 func (ec *executionContext) fieldContext_CreateAuditPayload_auditEdge(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "CreateAuditPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_AuditEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_AuditEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AuditEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateControlAuditMappingPayload_controlEdge(ctx context.Context, field graphql.CollectedField, obj *types.CreateControlAuditMappingPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateControlAuditMappingPayload_controlEdge(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ControlEdge, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.ControlEdge)
+	fc.Result = res
+	return ec.marshalNControlEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐControlEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreateControlAuditMappingPayload_controlEdge(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateControlAuditMappingPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_ControlEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_ControlEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ControlEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateControlAuditMappingPayload_auditEdge(ctx context.Context, field graphql.CollectedField, obj *types.CreateControlAuditMappingPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateControlAuditMappingPayload_auditEdge(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AuditEdge, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.AuditEdge)
+	fc.Result = res
+	return ec.marshalNAuditEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐAuditEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreateControlAuditMappingPayload_auditEdge(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateControlAuditMappingPayload",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -18406,6 +20218,56 @@ func (ec *executionContext) fieldContext_CreateTrustCenterAccessPayload_trustCen
 	return fc, nil
 }
 
+func (ec *executionContext) _CreateVendorContactPayload_vendorContactEdge(ctx context.Context, field graphql.CollectedField, obj *types.CreateVendorContactPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateVendorContactPayload_vendorContactEdge(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.VendorContactEdge, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.VendorContactEdge)
+	fc.Result = res
+	return ec.marshalNVendorContactEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorContactEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreateVendorContactPayload_vendorContactEdge(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateVendorContactPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_VendorContactEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_VendorContactEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type VendorContactEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _CreateVendorPayload_vendorEdge(ctx context.Context, field graphql.CollectedField, obj *types.CreateVendorPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_CreateVendorPayload_vendorEdge(ctx, field)
 	if err != nil {
@@ -19334,6 +21196,8 @@ func (ec *executionContext) fieldContext_DeleteAuditReportPayload_audit(_ contex
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Audit_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Audit_name(ctx, field)
 			case "organization":
 				return ec.fieldContext_Audit_organization(ctx, field)
 			case "framework":
@@ -19348,6 +21212,8 @@ func (ec *executionContext) fieldContext_DeleteAuditReportPayload_audit(_ contex
 				return ec.fieldContext_Audit_reportUrl(ctx, field)
 			case "state":
 				return ec.fieldContext_Audit_state(ctx, field)
+			case "controls":
+				return ec.fieldContext_Audit_controls(ctx, field)
 			case "showOnTrustCenter":
 				return ec.fieldContext_Audit_showOnTrustCenter(ctx, field)
 			case "createdAt":
@@ -19356,6 +21222,94 @@ func (ec *executionContext) fieldContext_DeleteAuditReportPayload_audit(_ contex
 				return ec.fieldContext_Audit_updatedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Audit", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteControlAuditMappingPayload_deletedControlId(ctx context.Context, field graphql.CollectedField, obj *types.DeleteControlAuditMappingPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteControlAuditMappingPayload_deletedControlId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletedControlID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteControlAuditMappingPayload_deletedControlId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteControlAuditMappingPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteControlAuditMappingPayload_deletedAuditId(ctx context.Context, field graphql.CollectedField, obj *types.DeleteControlAuditMappingPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteControlAuditMappingPayload_deletedAuditId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletedAuditID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteControlAuditMappingPayload_deletedAuditId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteControlAuditMappingPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	return fc, nil
@@ -19669,6 +21623,50 @@ func (ec *executionContext) fieldContext_DeleteDocumentPayload_deletedDocumentId
 	return fc, nil
 }
 
+func (ec *executionContext) _DeleteDraftDocumentVersionPayload_deletedDocumentVersionId(ctx context.Context, field graphql.CollectedField, obj *types.DeleteDraftDocumentVersionPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteDraftDocumentVersionPayload_deletedDocumentVersionId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletedDocumentVersionID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteDraftDocumentVersionPayload_deletedDocumentVersionId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteDraftDocumentVersionPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _DeleteEvidencePayload_deletedEvidenceId(ctx context.Context, field graphql.CollectedField, obj *types.DeleteEvidencePayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_DeleteEvidencePayload_deletedEvidenceId(ctx, field)
 	if err != nil {
@@ -19845,8 +21843,8 @@ func (ec *executionContext) fieldContext_DeleteMeasurePayload_deletedTaskIds(_ c
 	return fc, nil
 }
 
-func (ec *executionContext) _DeleteOrganizationPayload_success(ctx context.Context, field graphql.CollectedField, obj *types.DeleteOrganizationPayload) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_DeleteOrganizationPayload_success(ctx, field)
+func (ec *executionContext) _DeleteOrganizationPayload_deletedOrganizationId(ctx context.Context, field graphql.CollectedField, obj *types.DeleteOrganizationPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteOrganizationPayload_deletedOrganizationId(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -19859,7 +21857,7 @@ func (ec *executionContext) _DeleteOrganizationPayload_success(ctx context.Conte
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Success, nil
+		return obj.DeletedOrganizationID, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -19871,19 +21869,19 @@ func (ec *executionContext) _DeleteOrganizationPayload_success(ctx context.Conte
 		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(gid.GID)
 	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_DeleteOrganizationPayload_success(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_DeleteOrganizationPayload_deletedOrganizationId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "DeleteOrganizationPayload",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
+			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	return fc, nil
@@ -20241,6 +22239,50 @@ func (ec *executionContext) fieldContext_DeleteTrustCenterAccessPayload_deletedT
 	return fc, nil
 }
 
+func (ec *executionContext) _DeleteVendorBusinessAssociateAgreementPayload_deletedVendorId(ctx context.Context, field graphql.CollectedField, obj *types.DeleteVendorBusinessAssociateAgreementPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteVendorBusinessAssociateAgreementPayload_deletedVendorId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletedVendorID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteVendorBusinessAssociateAgreementPayload_deletedVendorId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteVendorBusinessAssociateAgreementPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _DeleteVendorComplianceReportPayload_deletedVendorComplianceReportId(ctx context.Context, field graphql.CollectedField, obj *types.DeleteVendorComplianceReportPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_DeleteVendorComplianceReportPayload_deletedVendorComplianceReportId(ctx, field)
 	if err != nil {
@@ -20275,6 +22317,94 @@ func (ec *executionContext) _DeleteVendorComplianceReportPayload_deletedVendorCo
 func (ec *executionContext) fieldContext_DeleteVendorComplianceReportPayload_deletedVendorComplianceReportId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "DeleteVendorComplianceReportPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteVendorContactPayload_deletedVendorContactId(ctx context.Context, field graphql.CollectedField, obj *types.DeleteVendorContactPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteVendorContactPayload_deletedVendorContactId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletedVendorContactID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteVendorContactPayload_deletedVendorContactId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteVendorContactPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeleteVendorDataPrivacyAgreementPayload_deletedVendorId(ctx context.Context, field graphql.CollectedField, obj *types.DeleteVendorDataPrivacyAgreementPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DeleteVendorDataPrivacyAgreementPayload_deletedVendorId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeletedVendorID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DeleteVendorDataPrivacyAgreementPayload_deletedVendorId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeleteVendorDataPrivacyAgreementPayload",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -25957,8 +28087,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteOrganization(ctx context
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "success":
-				return ec.fieldContext_DeleteOrganizationPayload_success(ctx, field)
+			case "deletedOrganizationId":
+				return ec.fieldContext_DeleteOrganizationPayload_deletedOrganizationId(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type DeleteOrganizationPayload", field.Name)
 		},
@@ -26679,6 +28809,183 @@ func (ec *executionContext) fieldContext_Mutation_deleteVendor(ctx context.Conte
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteVendor_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createVendorContact(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createVendorContact(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateVendorContact(rctx, fc.Args["input"].(types.CreateVendorContactInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.CreateVendorContactPayload)
+	fc.Result = res
+	return ec.marshalNCreateVendorContactPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateVendorContactPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createVendorContact(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "vendorContactEdge":
+				return ec.fieldContext_CreateVendorContactPayload_vendorContactEdge(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CreateVendorContactPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createVendorContact_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateVendorContact(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateVendorContact(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateVendorContact(rctx, fc.Args["input"].(types.UpdateVendorContactInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.UpdateVendorContactPayload)
+	fc.Result = res
+	return ec.marshalNUpdateVendorContactPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateVendorContactPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateVendorContact(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "vendorContact":
+				return ec.fieldContext_UpdateVendorContactPayload_vendorContact(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UpdateVendorContactPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateVendorContact_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteVendorContact(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteVendorContact(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteVendorContact(rctx, fc.Args["input"].(types.DeleteVendorContactInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.DeleteVendorContactPayload)
+	fc.Result = res
+	return ec.marshalNDeleteVendorContactPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteVendorContactPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteVendorContact(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "deletedVendorContactId":
+				return ec.fieldContext_DeleteVendorContactPayload_deletedVendorContactId(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeleteVendorContactPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteVendorContact_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -27694,6 +30001,128 @@ func (ec *executionContext) fieldContext_Mutation_deleteControlDocumentMapping(c
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteControlDocumentMapping_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createControlAuditMapping(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createControlAuditMapping(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateControlAuditMapping(rctx, fc.Args["input"].(types.CreateControlAuditMappingInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.CreateControlAuditMappingPayload)
+	fc.Result = res
+	return ec.marshalNCreateControlAuditMappingPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateControlAuditMappingPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createControlAuditMapping(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "controlEdge":
+				return ec.fieldContext_CreateControlAuditMappingPayload_controlEdge(ctx, field)
+			case "auditEdge":
+				return ec.fieldContext_CreateControlAuditMappingPayload_auditEdge(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CreateControlAuditMappingPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createControlAuditMapping_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteControlAuditMapping(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteControlAuditMapping(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteControlAuditMapping(rctx, fc.Args["input"].(types.DeleteControlAuditMappingInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.DeleteControlAuditMappingPayload)
+	fc.Result = res
+	return ec.marshalNDeleteControlAuditMappingPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteControlAuditMappingPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteControlAuditMapping(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "deletedControlId":
+				return ec.fieldContext_DeleteControlAuditMappingPayload_deletedControlId(ctx, field)
+			case "deletedAuditId":
+				return ec.fieldContext_DeleteControlAuditMappingPayload_deletedAuditId(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeleteControlAuditMappingPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteControlAuditMapping_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -28829,6 +31258,360 @@ func (ec *executionContext) fieldContext_Mutation_deleteVendorComplianceReport(c
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_uploadVendorBusinessAssociateAgreement(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_uploadVendorBusinessAssociateAgreement(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UploadVendorBusinessAssociateAgreement(rctx, fc.Args["input"].(types.UploadVendorBusinessAssociateAgreementInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.UploadVendorBusinessAssociateAgreementPayload)
+	fc.Result = res
+	return ec.marshalNUploadVendorBusinessAssociateAgreementPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUploadVendorBusinessAssociateAgreementPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_uploadVendorBusinessAssociateAgreement(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "vendorBusinessAssociateAgreement":
+				return ec.fieldContext_UploadVendorBusinessAssociateAgreementPayload_vendorBusinessAssociateAgreement(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UploadVendorBusinessAssociateAgreementPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_uploadVendorBusinessAssociateAgreement_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateVendorBusinessAssociateAgreement(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateVendorBusinessAssociateAgreement(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateVendorBusinessAssociateAgreement(rctx, fc.Args["input"].(types.UpdateVendorBusinessAssociateAgreementInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.UpdateVendorBusinessAssociateAgreementPayload)
+	fc.Result = res
+	return ec.marshalNUpdateVendorBusinessAssociateAgreementPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateVendorBusinessAssociateAgreementPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateVendorBusinessAssociateAgreement(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "vendorBusinessAssociateAgreement":
+				return ec.fieldContext_UpdateVendorBusinessAssociateAgreementPayload_vendorBusinessAssociateAgreement(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UpdateVendorBusinessAssociateAgreementPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateVendorBusinessAssociateAgreement_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteVendorBusinessAssociateAgreement(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteVendorBusinessAssociateAgreement(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteVendorBusinessAssociateAgreement(rctx, fc.Args["input"].(types.DeleteVendorBusinessAssociateAgreementInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.DeleteVendorBusinessAssociateAgreementPayload)
+	fc.Result = res
+	return ec.marshalNDeleteVendorBusinessAssociateAgreementPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteVendorBusinessAssociateAgreementPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteVendorBusinessAssociateAgreement(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "deletedVendorId":
+				return ec.fieldContext_DeleteVendorBusinessAssociateAgreementPayload_deletedVendorId(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeleteVendorBusinessAssociateAgreementPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteVendorBusinessAssociateAgreement_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_uploadVendorDataPrivacyAgreement(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_uploadVendorDataPrivacyAgreement(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UploadVendorDataPrivacyAgreement(rctx, fc.Args["input"].(types.UploadVendorDataPrivacyAgreementInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.UploadVendorDataPrivacyAgreementPayload)
+	fc.Result = res
+	return ec.marshalNUploadVendorDataPrivacyAgreementPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUploadVendorDataPrivacyAgreementPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_uploadVendorDataPrivacyAgreement(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "vendorDataPrivacyAgreement":
+				return ec.fieldContext_UploadVendorDataPrivacyAgreementPayload_vendorDataPrivacyAgreement(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UploadVendorDataPrivacyAgreementPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_uploadVendorDataPrivacyAgreement_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateVendorDataPrivacyAgreement(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateVendorDataPrivacyAgreement(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateVendorDataPrivacyAgreement(rctx, fc.Args["input"].(types.UpdateVendorDataPrivacyAgreementInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.UpdateVendorDataPrivacyAgreementPayload)
+	fc.Result = res
+	return ec.marshalNUpdateVendorDataPrivacyAgreementPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateVendorDataPrivacyAgreementPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateVendorDataPrivacyAgreement(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "vendorDataPrivacyAgreement":
+				return ec.fieldContext_UpdateVendorDataPrivacyAgreementPayload_vendorDataPrivacyAgreement(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UpdateVendorDataPrivacyAgreementPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateVendorDataPrivacyAgreement_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteVendorDataPrivacyAgreement(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteVendorDataPrivacyAgreement(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteVendorDataPrivacyAgreement(rctx, fc.Args["input"].(types.DeleteVendorDataPrivacyAgreementInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.DeleteVendorDataPrivacyAgreementPayload)
+	fc.Result = res
+	return ec.marshalNDeleteVendorDataPrivacyAgreementPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteVendorDataPrivacyAgreementPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteVendorDataPrivacyAgreement(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "deletedVendorId":
+				return ec.fieldContext_DeleteVendorDataPrivacyAgreementPayload_deletedVendorId(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeleteVendorDataPrivacyAgreementPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteVendorDataPrivacyAgreement_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_createDocument(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_createDocument(ctx, field)
 	if err != nil {
@@ -29242,6 +32025,65 @@ func (ec *executionContext) fieldContext_Mutation_createDraftDocumentVersion(ctx
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_createDraftDocumentVersion_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteDraftDocumentVersion(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteDraftDocumentVersion(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteDraftDocumentVersion(rctx, fc.Args["input"].(types.DeleteDraftDocumentVersionInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.DeleteDraftDocumentVersionPayload)
+	fc.Result = res
+	return ec.marshalNDeleteDraftDocumentVersionPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteDraftDocumentVersionPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteDraftDocumentVersion(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "deletedDocumentVersionId":
+				return ec.fieldContext_DeleteDraftDocumentVersionPayload_deletedDocumentVersionId(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeleteDraftDocumentVersionPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteDraftDocumentVersion_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -31069,7 +33911,7 @@ func (ec *executionContext) _Organization_peoples(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Organization().Peoples(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.PeopleOrderBy))
+		return ec.resolvers.Organization().Peoples(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.PeopleOrderBy), fc.Args["filter"].(*types.PeopleFilter))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -36429,6 +39271,18 @@ func (ec *executionContext) fieldContext_TrustCenter_organization(_ context.Cont
 				return ec.fieldContext_Organization_name(ctx, field)
 			case "logoUrl":
 				return ec.fieldContext_Organization_logoUrl(ctx, field)
+			case "mailingAddress":
+				return ec.fieldContext_Organization_mailingAddress(ctx, field)
+			case "telephoneNumber":
+				return ec.fieldContext_Organization_telephoneNumber(ctx, field)
+			case "websiteUrl":
+				return ec.fieldContext_Organization_websiteUrl(ctx, field)
+			case "securityComplianceEmail":
+				return ec.fieldContext_Organization_securityComplianceEmail(ctx, field)
+			case "companyDescription":
+				return ec.fieldContext_Organization_companyDescription(ctx, field)
+			case "companyLegalName":
+				return ec.fieldContext_Organization_companyLegalName(ctx, field)
 			case "users":
 				return ec.fieldContext_Organization_users(ctx, field)
 			case "connectors":
@@ -37342,6 +40196,8 @@ func (ec *executionContext) fieldContext_UpdateAuditPayload_audit(_ context.Cont
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Audit_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Audit_name(ctx, field)
 			case "organization":
 				return ec.fieldContext_Audit_organization(ctx, field)
 			case "framework":
@@ -37356,6 +40212,8 @@ func (ec *executionContext) fieldContext_UpdateAuditPayload_audit(_ context.Cont
 				return ec.fieldContext_Audit_reportUrl(ctx, field)
 			case "state":
 				return ec.fieldContext_Audit_state(ctx, field)
+			case "controls":
+				return ec.fieldContext_Audit_controls(ctx, field)
 			case "showOnTrustCenter":
 				return ec.fieldContext_Audit_showOnTrustCenter(ctx, field)
 			case "createdAt":
@@ -37426,6 +40284,8 @@ func (ec *executionContext) fieldContext_UpdateControlPayload_control(_ context.
 				return ec.fieldContext_Control_measures(ctx, field)
 			case "documents":
 				return ec.fieldContext_Control_documents(ctx, field)
+			case "audits":
+				return ec.fieldContext_Control_audits(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Control_createdAt(ctx, field)
 			case "updatedAt":
@@ -38151,6 +41011,196 @@ func (ec *executionContext) fieldContext_UpdateTrustCenterPayload_trustCenter(_ 
 	return fc, nil
 }
 
+func (ec *executionContext) _UpdateVendorBusinessAssociateAgreementPayload_vendorBusinessAssociateAgreement(ctx context.Context, field graphql.CollectedField, obj *types.UpdateVendorBusinessAssociateAgreementPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateVendorBusinessAssociateAgreementPayload_vendorBusinessAssociateAgreement(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.VendorBusinessAssociateAgreement, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.VendorBusinessAssociateAgreement)
+	fc.Result = res
+	return ec.marshalNVendorBusinessAssociateAgreement2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorBusinessAssociateAgreement(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateVendorBusinessAssociateAgreementPayload_vendorBusinessAssociateAgreement(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateVendorBusinessAssociateAgreementPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_VendorBusinessAssociateAgreement_id(ctx, field)
+			case "vendor":
+				return ec.fieldContext_VendorBusinessAssociateAgreement_vendor(ctx, field)
+			case "validFrom":
+				return ec.fieldContext_VendorBusinessAssociateAgreement_validFrom(ctx, field)
+			case "validUntil":
+				return ec.fieldContext_VendorBusinessAssociateAgreement_validUntil(ctx, field)
+			case "fileName":
+				return ec.fieldContext_VendorBusinessAssociateAgreement_fileName(ctx, field)
+			case "fileUrl":
+				return ec.fieldContext_VendorBusinessAssociateAgreement_fileUrl(ctx, field)
+			case "fileSize":
+				return ec.fieldContext_VendorBusinessAssociateAgreement_fileSize(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_VendorBusinessAssociateAgreement_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_VendorBusinessAssociateAgreement_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type VendorBusinessAssociateAgreement", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateVendorContactPayload_vendorContact(ctx context.Context, field graphql.CollectedField, obj *types.UpdateVendorContactPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateVendorContactPayload_vendorContact(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.VendorContact, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.VendorContact)
+	fc.Result = res
+	return ec.marshalNVendorContact2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorContact(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateVendorContactPayload_vendorContact(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateVendorContactPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_VendorContact_id(ctx, field)
+			case "vendor":
+				return ec.fieldContext_VendorContact_vendor(ctx, field)
+			case "fullName":
+				return ec.fieldContext_VendorContact_fullName(ctx, field)
+			case "email":
+				return ec.fieldContext_VendorContact_email(ctx, field)
+			case "phone":
+				return ec.fieldContext_VendorContact_phone(ctx, field)
+			case "role":
+				return ec.fieldContext_VendorContact_role(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_VendorContact_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_VendorContact_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type VendorContact", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateVendorDataPrivacyAgreementPayload_vendorDataPrivacyAgreement(ctx context.Context, field graphql.CollectedField, obj *types.UpdateVendorDataPrivacyAgreementPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateVendorDataPrivacyAgreementPayload_vendorDataPrivacyAgreement(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.VendorDataPrivacyAgreement, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.VendorDataPrivacyAgreement)
+	fc.Result = res
+	return ec.marshalNVendorDataPrivacyAgreement2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorDataPrivacyAgreement(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateVendorDataPrivacyAgreementPayload_vendorDataPrivacyAgreement(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateVendorDataPrivacyAgreementPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_VendorDataPrivacyAgreement_id(ctx, field)
+			case "vendor":
+				return ec.fieldContext_VendorDataPrivacyAgreement_vendor(ctx, field)
+			case "validFrom":
+				return ec.fieldContext_VendorDataPrivacyAgreement_validFrom(ctx, field)
+			case "validUntil":
+				return ec.fieldContext_VendorDataPrivacyAgreement_validUntil(ctx, field)
+			case "fileName":
+				return ec.fieldContext_VendorDataPrivacyAgreement_fileName(ctx, field)
+			case "fileUrl":
+				return ec.fieldContext_VendorDataPrivacyAgreement_fileUrl(ctx, field)
+			case "fileSize":
+				return ec.fieldContext_VendorDataPrivacyAgreement_fileSize(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_VendorDataPrivacyAgreement_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_VendorDataPrivacyAgreement_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type VendorDataPrivacyAgreement", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _UpdateVendorPayload_vendor(ctx context.Context, field graphql.CollectedField, obj *types.UpdateVendorPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_UpdateVendorPayload_vendor(ctx, field)
 	if err != nil {
@@ -38202,6 +41252,12 @@ func (ec *executionContext) fieldContext_UpdateVendorPayload_vendor(_ context.Co
 				return ec.fieldContext_Vendor_organization(ctx, field)
 			case "complianceReports":
 				return ec.fieldContext_Vendor_complianceReports(ctx, field)
+			case "businessAssociateAgreement":
+				return ec.fieldContext_Vendor_businessAssociateAgreement(ctx, field)
+			case "dataPrivacyAgreement":
+				return ec.fieldContext_Vendor_dataPrivacyAgreement(ctx, field)
+			case "contacts":
+				return ec.fieldContext_Vendor_contacts(ctx, field)
 			case "riskAssessments":
 				return ec.fieldContext_Vendor_riskAssessments(ctx, field)
 			case "businessOwner":
@@ -38288,6 +41344,8 @@ func (ec *executionContext) fieldContext_UploadAuditReportPayload_audit(_ contex
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Audit_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Audit_name(ctx, field)
 			case "organization":
 				return ec.fieldContext_Audit_organization(ctx, field)
 			case "framework":
@@ -38302,6 +41360,8 @@ func (ec *executionContext) fieldContext_UploadAuditReportPayload_audit(_ contex
 				return ec.fieldContext_Audit_reportUrl(ctx, field)
 			case "state":
 				return ec.fieldContext_Audit_state(ctx, field)
+			case "controls":
+				return ec.fieldContext_Audit_controls(ctx, field)
 			case "showOnTrustCenter":
 				return ec.fieldContext_Audit_showOnTrustCenter(ctx, field)
 			case "createdAt":
@@ -38415,6 +41475,70 @@ func (ec *executionContext) fieldContext_UploadTaskEvidencePayload_evidenceEdge(
 	return fc, nil
 }
 
+func (ec *executionContext) _UploadVendorBusinessAssociateAgreementPayload_vendorBusinessAssociateAgreement(ctx context.Context, field graphql.CollectedField, obj *types.UploadVendorBusinessAssociateAgreementPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UploadVendorBusinessAssociateAgreementPayload_vendorBusinessAssociateAgreement(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.VendorBusinessAssociateAgreement, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.VendorBusinessAssociateAgreement)
+	fc.Result = res
+	return ec.marshalNVendorBusinessAssociateAgreement2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorBusinessAssociateAgreement(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UploadVendorBusinessAssociateAgreementPayload_vendorBusinessAssociateAgreement(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UploadVendorBusinessAssociateAgreementPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_VendorBusinessAssociateAgreement_id(ctx, field)
+			case "vendor":
+				return ec.fieldContext_VendorBusinessAssociateAgreement_vendor(ctx, field)
+			case "validFrom":
+				return ec.fieldContext_VendorBusinessAssociateAgreement_validFrom(ctx, field)
+			case "validUntil":
+				return ec.fieldContext_VendorBusinessAssociateAgreement_validUntil(ctx, field)
+			case "fileName":
+				return ec.fieldContext_VendorBusinessAssociateAgreement_fileName(ctx, field)
+			case "fileUrl":
+				return ec.fieldContext_VendorBusinessAssociateAgreement_fileUrl(ctx, field)
+			case "fileSize":
+				return ec.fieldContext_VendorBusinessAssociateAgreement_fileSize(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_VendorBusinessAssociateAgreement_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_VendorBusinessAssociateAgreement_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type VendorBusinessAssociateAgreement", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _UploadVendorComplianceReportPayload_vendorComplianceReportEdge(ctx context.Context, field graphql.CollectedField, obj *types.UploadVendorComplianceReportPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_UploadVendorComplianceReportPayload_vendorComplianceReportEdge(ctx, field)
 	if err != nil {
@@ -38460,6 +41584,70 @@ func (ec *executionContext) fieldContext_UploadVendorComplianceReportPayload_ven
 				return ec.fieldContext_VendorComplianceReportEdge_node(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type VendorComplianceReportEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UploadVendorDataPrivacyAgreementPayload_vendorDataPrivacyAgreement(ctx context.Context, field graphql.CollectedField, obj *types.UploadVendorDataPrivacyAgreementPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UploadVendorDataPrivacyAgreementPayload_vendorDataPrivacyAgreement(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.VendorDataPrivacyAgreement, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.VendorDataPrivacyAgreement)
+	fc.Result = res
+	return ec.marshalNVendorDataPrivacyAgreement2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorDataPrivacyAgreement(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UploadVendorDataPrivacyAgreementPayload_vendorDataPrivacyAgreement(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UploadVendorDataPrivacyAgreementPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_VendorDataPrivacyAgreement_id(ctx, field)
+			case "vendor":
+				return ec.fieldContext_VendorDataPrivacyAgreement_vendor(ctx, field)
+			case "validFrom":
+				return ec.fieldContext_VendorDataPrivacyAgreement_validFrom(ctx, field)
+			case "validUntil":
+				return ec.fieldContext_VendorDataPrivacyAgreement_validUntil(ctx, field)
+			case "fileName":
+				return ec.fieldContext_VendorDataPrivacyAgreement_fileName(ctx, field)
+			case "fileUrl":
+				return ec.fieldContext_VendorDataPrivacyAgreement_fileUrl(ctx, field)
+			case "fileSize":
+				return ec.fieldContext_VendorDataPrivacyAgreement_fileSize(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_VendorDataPrivacyAgreement_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_VendorDataPrivacyAgreement_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type VendorDataPrivacyAgreement", field.Name)
 		},
 	}
 	return fc, nil
@@ -39289,6 +42477,189 @@ func (ec *executionContext) fieldContext_Vendor_complianceReports(ctx context.Co
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Vendor_complianceReports_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Vendor_businessAssociateAgreement(ctx context.Context, field graphql.CollectedField, obj *types.Vendor) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vendor_businessAssociateAgreement(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Vendor().BusinessAssociateAgreement(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*types.VendorBusinessAssociateAgreement)
+	fc.Result = res
+	return ec.marshalOVendorBusinessAssociateAgreement2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorBusinessAssociateAgreement(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vendor_businessAssociateAgreement(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vendor",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_VendorBusinessAssociateAgreement_id(ctx, field)
+			case "vendor":
+				return ec.fieldContext_VendorBusinessAssociateAgreement_vendor(ctx, field)
+			case "validFrom":
+				return ec.fieldContext_VendorBusinessAssociateAgreement_validFrom(ctx, field)
+			case "validUntil":
+				return ec.fieldContext_VendorBusinessAssociateAgreement_validUntil(ctx, field)
+			case "fileName":
+				return ec.fieldContext_VendorBusinessAssociateAgreement_fileName(ctx, field)
+			case "fileUrl":
+				return ec.fieldContext_VendorBusinessAssociateAgreement_fileUrl(ctx, field)
+			case "fileSize":
+				return ec.fieldContext_VendorBusinessAssociateAgreement_fileSize(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_VendorBusinessAssociateAgreement_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_VendorBusinessAssociateAgreement_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type VendorBusinessAssociateAgreement", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Vendor_dataPrivacyAgreement(ctx context.Context, field graphql.CollectedField, obj *types.Vendor) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vendor_dataPrivacyAgreement(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Vendor().DataPrivacyAgreement(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*types.VendorDataPrivacyAgreement)
+	fc.Result = res
+	return ec.marshalOVendorDataPrivacyAgreement2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorDataPrivacyAgreement(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vendor_dataPrivacyAgreement(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vendor",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_VendorDataPrivacyAgreement_id(ctx, field)
+			case "vendor":
+				return ec.fieldContext_VendorDataPrivacyAgreement_vendor(ctx, field)
+			case "validFrom":
+				return ec.fieldContext_VendorDataPrivacyAgreement_validFrom(ctx, field)
+			case "validUntil":
+				return ec.fieldContext_VendorDataPrivacyAgreement_validUntil(ctx, field)
+			case "fileName":
+				return ec.fieldContext_VendorDataPrivacyAgreement_fileName(ctx, field)
+			case "fileUrl":
+				return ec.fieldContext_VendorDataPrivacyAgreement_fileUrl(ctx, field)
+			case "fileSize":
+				return ec.fieldContext_VendorDataPrivacyAgreement_fileSize(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_VendorDataPrivacyAgreement_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_VendorDataPrivacyAgreement_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type VendorDataPrivacyAgreement", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Vendor_contacts(ctx context.Context, field graphql.CollectedField, obj *types.Vendor) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Vendor_contacts(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Vendor().Contacts(rctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*page.CursorKey), fc.Args["last"].(*int), fc.Args["before"].(*page.CursorKey), fc.Args["orderBy"].(*types.VendorContactOrderBy))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.VendorContactConnection)
+	fc.Result = res
+	return ec.marshalNVendorContactConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorContactConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Vendor_contacts(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Vendor",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "edges":
+				return ec.fieldContext_VendorContactConnection_edges(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_VendorContactConnection_pageInfo(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type VendorContactConnection", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Vendor_contacts_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -40150,6 +43521,454 @@ func (ec *executionContext) fieldContext_Vendor_updatedAt(_ context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _VendorBusinessAssociateAgreement_id(ctx context.Context, field graphql.CollectedField, obj *types.VendorBusinessAssociateAgreement) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorBusinessAssociateAgreement_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorBusinessAssociateAgreement_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorBusinessAssociateAgreement",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorBusinessAssociateAgreement_vendor(ctx context.Context, field graphql.CollectedField, obj *types.VendorBusinessAssociateAgreement) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorBusinessAssociateAgreement_vendor(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.VendorBusinessAssociateAgreement().Vendor(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.Vendor)
+	fc.Result = res
+	return ec.marshalNVendor2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendor(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorBusinessAssociateAgreement_vendor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorBusinessAssociateAgreement",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Vendor_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Vendor_name(ctx, field)
+			case "category":
+				return ec.fieldContext_Vendor_category(ctx, field)
+			case "description":
+				return ec.fieldContext_Vendor_description(ctx, field)
+			case "organization":
+				return ec.fieldContext_Vendor_organization(ctx, field)
+			case "complianceReports":
+				return ec.fieldContext_Vendor_complianceReports(ctx, field)
+			case "businessAssociateAgreement":
+				return ec.fieldContext_Vendor_businessAssociateAgreement(ctx, field)
+			case "dataPrivacyAgreement":
+				return ec.fieldContext_Vendor_dataPrivacyAgreement(ctx, field)
+			case "contacts":
+				return ec.fieldContext_Vendor_contacts(ctx, field)
+			case "riskAssessments":
+				return ec.fieldContext_Vendor_riskAssessments(ctx, field)
+			case "businessOwner":
+				return ec.fieldContext_Vendor_businessOwner(ctx, field)
+			case "securityOwner":
+				return ec.fieldContext_Vendor_securityOwner(ctx, field)
+			case "statusPageUrl":
+				return ec.fieldContext_Vendor_statusPageUrl(ctx, field)
+			case "termsOfServiceUrl":
+				return ec.fieldContext_Vendor_termsOfServiceUrl(ctx, field)
+			case "privacyPolicyUrl":
+				return ec.fieldContext_Vendor_privacyPolicyUrl(ctx, field)
+			case "serviceLevelAgreementUrl":
+				return ec.fieldContext_Vendor_serviceLevelAgreementUrl(ctx, field)
+			case "dataProcessingAgreementUrl":
+				return ec.fieldContext_Vendor_dataProcessingAgreementUrl(ctx, field)
+			case "businessAssociateAgreementUrl":
+				return ec.fieldContext_Vendor_businessAssociateAgreementUrl(ctx, field)
+			case "subprocessorsListUrl":
+				return ec.fieldContext_Vendor_subprocessorsListUrl(ctx, field)
+			case "certifications":
+				return ec.fieldContext_Vendor_certifications(ctx, field)
+			case "securityPageUrl":
+				return ec.fieldContext_Vendor_securityPageUrl(ctx, field)
+			case "trustPageUrl":
+				return ec.fieldContext_Vendor_trustPageUrl(ctx, field)
+			case "headquarterAddress":
+				return ec.fieldContext_Vendor_headquarterAddress(ctx, field)
+			case "legalName":
+				return ec.fieldContext_Vendor_legalName(ctx, field)
+			case "websiteUrl":
+				return ec.fieldContext_Vendor_websiteUrl(ctx, field)
+			case "showOnTrustCenter":
+				return ec.fieldContext_Vendor_showOnTrustCenter(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Vendor_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Vendor_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Vendor", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorBusinessAssociateAgreement_validFrom(ctx context.Context, field graphql.CollectedField, obj *types.VendorBusinessAssociateAgreement) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorBusinessAssociateAgreement_validFrom(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ValidFrom, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalODatetime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorBusinessAssociateAgreement_validFrom(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorBusinessAssociateAgreement",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorBusinessAssociateAgreement_validUntil(ctx context.Context, field graphql.CollectedField, obj *types.VendorBusinessAssociateAgreement) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorBusinessAssociateAgreement_validUntil(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ValidUntil, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalODatetime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorBusinessAssociateAgreement_validUntil(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorBusinessAssociateAgreement",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorBusinessAssociateAgreement_fileName(ctx context.Context, field graphql.CollectedField, obj *types.VendorBusinessAssociateAgreement) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorBusinessAssociateAgreement_fileName(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FileName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorBusinessAssociateAgreement_fileName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorBusinessAssociateAgreement",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorBusinessAssociateAgreement_fileUrl(ctx context.Context, field graphql.CollectedField, obj *types.VendorBusinessAssociateAgreement) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorBusinessAssociateAgreement_fileUrl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.VendorBusinessAssociateAgreement().FileURL(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorBusinessAssociateAgreement_fileUrl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorBusinessAssociateAgreement",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorBusinessAssociateAgreement_fileSize(ctx context.Context, field graphql.CollectedField, obj *types.VendorBusinessAssociateAgreement) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorBusinessAssociateAgreement_fileSize(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FileSize, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorBusinessAssociateAgreement_fileSize(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorBusinessAssociateAgreement",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorBusinessAssociateAgreement_createdAt(ctx context.Context, field graphql.CollectedField, obj *types.VendorBusinessAssociateAgreement) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorBusinessAssociateAgreement_createdAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDatetime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorBusinessAssociateAgreement_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorBusinessAssociateAgreement",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorBusinessAssociateAgreement_updatedAt(ctx context.Context, field graphql.CollectedField, obj *types.VendorBusinessAssociateAgreement) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorBusinessAssociateAgreement_updatedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDatetime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorBusinessAssociateAgreement_updatedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorBusinessAssociateAgreement",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _VendorComplianceReport_id(ctx context.Context, field graphql.CollectedField, obj *types.VendorComplianceReport) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_VendorComplianceReport_id(ctx, field)
 	if err != nil {
@@ -40245,6 +44064,12 @@ func (ec *executionContext) fieldContext_VendorComplianceReport_vendor(_ context
 				return ec.fieldContext_Vendor_organization(ctx, field)
 			case "complianceReports":
 				return ec.fieldContext_Vendor_complianceReports(ctx, field)
+			case "businessAssociateAgreement":
+				return ec.fieldContext_Vendor_businessAssociateAgreement(ctx, field)
+			case "dataPrivacyAgreement":
+				return ec.fieldContext_Vendor_dataPrivacyAgreement(ctx, field)
+			case "contacts":
+				return ec.fieldContext_Vendor_contacts(ctx, field)
 			case "riskAssessments":
 				return ec.fieldContext_Vendor_riskAssessments(ctx, field)
 			case "businessOwner":
@@ -40955,6 +44780,1062 @@ func (ec *executionContext) fieldContext_VendorConnection_pageInfo(_ context.Con
 	return fc, nil
 }
 
+func (ec *executionContext) _VendorContact_id(ctx context.Context, field graphql.CollectedField, obj *types.VendorContact) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorContact_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorContact_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorContact",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorContact_vendor(ctx context.Context, field graphql.CollectedField, obj *types.VendorContact) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorContact_vendor(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.VendorContact().Vendor(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.Vendor)
+	fc.Result = res
+	return ec.marshalNVendor2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendor(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorContact_vendor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorContact",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Vendor_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Vendor_name(ctx, field)
+			case "category":
+				return ec.fieldContext_Vendor_category(ctx, field)
+			case "description":
+				return ec.fieldContext_Vendor_description(ctx, field)
+			case "organization":
+				return ec.fieldContext_Vendor_organization(ctx, field)
+			case "complianceReports":
+				return ec.fieldContext_Vendor_complianceReports(ctx, field)
+			case "businessAssociateAgreement":
+				return ec.fieldContext_Vendor_businessAssociateAgreement(ctx, field)
+			case "dataPrivacyAgreement":
+				return ec.fieldContext_Vendor_dataPrivacyAgreement(ctx, field)
+			case "contacts":
+				return ec.fieldContext_Vendor_contacts(ctx, field)
+			case "riskAssessments":
+				return ec.fieldContext_Vendor_riskAssessments(ctx, field)
+			case "businessOwner":
+				return ec.fieldContext_Vendor_businessOwner(ctx, field)
+			case "securityOwner":
+				return ec.fieldContext_Vendor_securityOwner(ctx, field)
+			case "statusPageUrl":
+				return ec.fieldContext_Vendor_statusPageUrl(ctx, field)
+			case "termsOfServiceUrl":
+				return ec.fieldContext_Vendor_termsOfServiceUrl(ctx, field)
+			case "privacyPolicyUrl":
+				return ec.fieldContext_Vendor_privacyPolicyUrl(ctx, field)
+			case "serviceLevelAgreementUrl":
+				return ec.fieldContext_Vendor_serviceLevelAgreementUrl(ctx, field)
+			case "dataProcessingAgreementUrl":
+				return ec.fieldContext_Vendor_dataProcessingAgreementUrl(ctx, field)
+			case "businessAssociateAgreementUrl":
+				return ec.fieldContext_Vendor_businessAssociateAgreementUrl(ctx, field)
+			case "subprocessorsListUrl":
+				return ec.fieldContext_Vendor_subprocessorsListUrl(ctx, field)
+			case "certifications":
+				return ec.fieldContext_Vendor_certifications(ctx, field)
+			case "securityPageUrl":
+				return ec.fieldContext_Vendor_securityPageUrl(ctx, field)
+			case "trustPageUrl":
+				return ec.fieldContext_Vendor_trustPageUrl(ctx, field)
+			case "headquarterAddress":
+				return ec.fieldContext_Vendor_headquarterAddress(ctx, field)
+			case "legalName":
+				return ec.fieldContext_Vendor_legalName(ctx, field)
+			case "websiteUrl":
+				return ec.fieldContext_Vendor_websiteUrl(ctx, field)
+			case "showOnTrustCenter":
+				return ec.fieldContext_Vendor_showOnTrustCenter(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Vendor_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Vendor_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Vendor", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorContact_fullName(ctx context.Context, field graphql.CollectedField, obj *types.VendorContact) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorContact_fullName(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FullName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorContact_fullName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorContact",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorContact_email(ctx context.Context, field graphql.CollectedField, obj *types.VendorContact) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorContact_email(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Email, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorContact_email(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorContact",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorContact_phone(ctx context.Context, field graphql.CollectedField, obj *types.VendorContact) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorContact_phone(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Phone, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorContact_phone(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorContact",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorContact_role(ctx context.Context, field graphql.CollectedField, obj *types.VendorContact) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorContact_role(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Role, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorContact_role(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorContact",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorContact_createdAt(ctx context.Context, field graphql.CollectedField, obj *types.VendorContact) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorContact_createdAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDatetime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorContact_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorContact",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorContact_updatedAt(ctx context.Context, field graphql.CollectedField, obj *types.VendorContact) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorContact_updatedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDatetime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorContact_updatedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorContact",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorContactConnection_edges(ctx context.Context, field graphql.CollectedField, obj *types.VendorContactConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorContactConnection_edges(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Edges, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*types.VendorContactEdge)
+	fc.Result = res
+	return ec.marshalNVendorContactEdge2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorContactEdgeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorContactConnection_edges(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorContactConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_VendorContactEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_VendorContactEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type VendorContactEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorContactConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *types.VendorContactConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorContactConnection_pageInfo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageInfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.PageInfo)
+	fc.Result = res
+	return ec.marshalNPageInfo2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPageInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorContactConnection_pageInfo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorContactConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "hasNextPage":
+				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
+			case "hasPreviousPage":
+				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
+			case "startCursor":
+				return ec.fieldContext_PageInfo_startCursor(ctx, field)
+			case "endCursor":
+				return ec.fieldContext_PageInfo_endCursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorContactEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *types.VendorContactEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorContactEdge_cursor(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cursor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(page.CursorKey)
+	fc.Result = res
+	return ec.marshalNCursorKey2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorContactEdge_cursor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorContactEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type CursorKey does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorContactEdge_node(ctx context.Context, field graphql.CollectedField, obj *types.VendorContactEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorContactEdge_node(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Node, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.VendorContact)
+	fc.Result = res
+	return ec.marshalNVendorContact2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorContact(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorContactEdge_node(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorContactEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_VendorContact_id(ctx, field)
+			case "vendor":
+				return ec.fieldContext_VendorContact_vendor(ctx, field)
+			case "fullName":
+				return ec.fieldContext_VendorContact_fullName(ctx, field)
+			case "email":
+				return ec.fieldContext_VendorContact_email(ctx, field)
+			case "phone":
+				return ec.fieldContext_VendorContact_phone(ctx, field)
+			case "role":
+				return ec.fieldContext_VendorContact_role(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_VendorContact_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_VendorContact_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type VendorContact", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorDataPrivacyAgreement_id(ctx context.Context, field graphql.CollectedField, obj *types.VendorDataPrivacyAgreement) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorDataPrivacyAgreement_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gid.GID)
+	fc.Result = res
+	return ec.marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorDataPrivacyAgreement_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorDataPrivacyAgreement",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorDataPrivacyAgreement_vendor(ctx context.Context, field graphql.CollectedField, obj *types.VendorDataPrivacyAgreement) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorDataPrivacyAgreement_vendor(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.VendorDataPrivacyAgreement().Vendor(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.Vendor)
+	fc.Result = res
+	return ec.marshalNVendor2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendor(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorDataPrivacyAgreement_vendor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorDataPrivacyAgreement",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Vendor_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Vendor_name(ctx, field)
+			case "category":
+				return ec.fieldContext_Vendor_category(ctx, field)
+			case "description":
+				return ec.fieldContext_Vendor_description(ctx, field)
+			case "organization":
+				return ec.fieldContext_Vendor_organization(ctx, field)
+			case "complianceReports":
+				return ec.fieldContext_Vendor_complianceReports(ctx, field)
+			case "businessAssociateAgreement":
+				return ec.fieldContext_Vendor_businessAssociateAgreement(ctx, field)
+			case "dataPrivacyAgreement":
+				return ec.fieldContext_Vendor_dataPrivacyAgreement(ctx, field)
+			case "contacts":
+				return ec.fieldContext_Vendor_contacts(ctx, field)
+			case "riskAssessments":
+				return ec.fieldContext_Vendor_riskAssessments(ctx, field)
+			case "businessOwner":
+				return ec.fieldContext_Vendor_businessOwner(ctx, field)
+			case "securityOwner":
+				return ec.fieldContext_Vendor_securityOwner(ctx, field)
+			case "statusPageUrl":
+				return ec.fieldContext_Vendor_statusPageUrl(ctx, field)
+			case "termsOfServiceUrl":
+				return ec.fieldContext_Vendor_termsOfServiceUrl(ctx, field)
+			case "privacyPolicyUrl":
+				return ec.fieldContext_Vendor_privacyPolicyUrl(ctx, field)
+			case "serviceLevelAgreementUrl":
+				return ec.fieldContext_Vendor_serviceLevelAgreementUrl(ctx, field)
+			case "dataProcessingAgreementUrl":
+				return ec.fieldContext_Vendor_dataProcessingAgreementUrl(ctx, field)
+			case "businessAssociateAgreementUrl":
+				return ec.fieldContext_Vendor_businessAssociateAgreementUrl(ctx, field)
+			case "subprocessorsListUrl":
+				return ec.fieldContext_Vendor_subprocessorsListUrl(ctx, field)
+			case "certifications":
+				return ec.fieldContext_Vendor_certifications(ctx, field)
+			case "securityPageUrl":
+				return ec.fieldContext_Vendor_securityPageUrl(ctx, field)
+			case "trustPageUrl":
+				return ec.fieldContext_Vendor_trustPageUrl(ctx, field)
+			case "headquarterAddress":
+				return ec.fieldContext_Vendor_headquarterAddress(ctx, field)
+			case "legalName":
+				return ec.fieldContext_Vendor_legalName(ctx, field)
+			case "websiteUrl":
+				return ec.fieldContext_Vendor_websiteUrl(ctx, field)
+			case "showOnTrustCenter":
+				return ec.fieldContext_Vendor_showOnTrustCenter(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Vendor_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Vendor_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Vendor", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorDataPrivacyAgreement_validFrom(ctx context.Context, field graphql.CollectedField, obj *types.VendorDataPrivacyAgreement) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorDataPrivacyAgreement_validFrom(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ValidFrom, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalODatetime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorDataPrivacyAgreement_validFrom(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorDataPrivacyAgreement",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorDataPrivacyAgreement_validUntil(ctx context.Context, field graphql.CollectedField, obj *types.VendorDataPrivacyAgreement) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorDataPrivacyAgreement_validUntil(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ValidUntil, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalODatetime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorDataPrivacyAgreement_validUntil(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorDataPrivacyAgreement",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorDataPrivacyAgreement_fileName(ctx context.Context, field graphql.CollectedField, obj *types.VendorDataPrivacyAgreement) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorDataPrivacyAgreement_fileName(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FileName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorDataPrivacyAgreement_fileName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorDataPrivacyAgreement",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorDataPrivacyAgreement_fileUrl(ctx context.Context, field graphql.CollectedField, obj *types.VendorDataPrivacyAgreement) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorDataPrivacyAgreement_fileUrl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.VendorDataPrivacyAgreement().FileURL(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorDataPrivacyAgreement_fileUrl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorDataPrivacyAgreement",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorDataPrivacyAgreement_fileSize(ctx context.Context, field graphql.CollectedField, obj *types.VendorDataPrivacyAgreement) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorDataPrivacyAgreement_fileSize(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FileSize, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorDataPrivacyAgreement_fileSize(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorDataPrivacyAgreement",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorDataPrivacyAgreement_createdAt(ctx context.Context, field graphql.CollectedField, obj *types.VendorDataPrivacyAgreement) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorDataPrivacyAgreement_createdAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDatetime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorDataPrivacyAgreement_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorDataPrivacyAgreement",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VendorDataPrivacyAgreement_updatedAt(ctx context.Context, field graphql.CollectedField, obj *types.VendorDataPrivacyAgreement) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VendorDataPrivacyAgreement_updatedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNDatetime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VendorDataPrivacyAgreement_updatedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VendorDataPrivacyAgreement",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Datetime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _VendorEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *types.VendorEdge) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_VendorEdge_cursor(ctx, field)
 	if err != nil {
@@ -41050,6 +45931,12 @@ func (ec *executionContext) fieldContext_VendorEdge_node(_ context.Context, fiel
 				return ec.fieldContext_Vendor_organization(ctx, field)
 			case "complianceReports":
 				return ec.fieldContext_Vendor_complianceReports(ctx, field)
+			case "businessAssociateAgreement":
+				return ec.fieldContext_Vendor_businessAssociateAgreement(ctx, field)
+			case "dataPrivacyAgreement":
+				return ec.fieldContext_Vendor_dataPrivacyAgreement(ctx, field)
+			case "contacts":
+				return ec.fieldContext_Vendor_contacts(ctx, field)
 			case "riskAssessments":
 				return ec.fieldContext_Vendor_riskAssessments(ctx, field)
 			case "businessOwner":
@@ -41190,6 +46077,12 @@ func (ec *executionContext) fieldContext_VendorRiskAssessment_vendor(_ context.C
 				return ec.fieldContext_Vendor_organization(ctx, field)
 			case "complianceReports":
 				return ec.fieldContext_Vendor_complianceReports(ctx, field)
+			case "businessAssociateAgreement":
+				return ec.fieldContext_Vendor_businessAssociateAgreement(ctx, field)
+			case "dataPrivacyAgreement":
+				return ec.fieldContext_Vendor_dataPrivacyAgreement(ctx, field)
+			case "contacts":
+				return ec.fieldContext_Vendor_contacts(ctx, field)
 			case "riskAssessments":
 				return ec.fieldContext_Vendor_riskAssessments(ctx, field)
 			case "businessOwner":
@@ -44374,7 +49267,7 @@ func (ec *executionContext) unmarshalInputCreateAuditInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"organizationId", "frameworkId", "validFrom", "validUntil", "state"}
+	fieldsInOrder := [...]string{"organizationId", "frameworkId", "name", "validFrom", "validUntil", "state"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -44395,6 +49288,13 @@ func (ec *executionContext) unmarshalInputCreateAuditInput(ctx context.Context, 
 				return it, err
 			}
 			it.FrameworkID = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
 		case "validFrom":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("validFrom"))
 			data, err := ec.unmarshalODatetime2ᚖtimeᚐTime(ctx, v)
@@ -44416,6 +49316,40 @@ func (ec *executionContext) unmarshalInputCreateAuditInput(ctx context.Context, 
 				return it, err
 			}
 			it.State = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreateControlAuditMappingInput(ctx context.Context, obj any) (types.CreateControlAuditMappingInput, error) {
+	var it types.CreateControlAuditMappingInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"controlId", "auditId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "controlId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("controlId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ControlID = data
+		case "auditId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("auditId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AuditID = data
 		}
 	}
 
@@ -45218,6 +50152,61 @@ func (ec *executionContext) unmarshalInputCreateTrustCenterAccessInput(ctx conte
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCreateVendorContactInput(ctx context.Context, obj any) (types.CreateVendorContactInput, error) {
+	var it types.CreateVendorContactInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"vendorId", "fullName", "email", "phone", "role"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "vendorId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("vendorId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.VendorID = data
+		case "fullName":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fullName"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.FullName = data
+		case "email":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Email = data
+		case "phone":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("phone"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Phone = data
+		case "role":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Role = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreateVendorInput(ctx context.Context, obj any) (types.CreateVendorInput, error) {
 	var it types.CreateVendorInput
 	asMap := map[string]any{}
@@ -45548,6 +50537,40 @@ func (ec *executionContext) unmarshalInputDeleteAuditReportInput(ctx context.Con
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputDeleteControlAuditMappingInput(ctx context.Context, obj any) (types.DeleteControlAuditMappingInput, error) {
+	var it types.DeleteControlAuditMappingInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"controlId", "auditId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "controlId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("controlId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ControlID = data
+		case "auditId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("auditId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AuditID = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputDeleteControlDocumentMappingInput(ctx context.Context, obj any) (types.DeleteControlDocumentMappingInput, error) {
 	var it types.DeleteControlDocumentMappingInput
 	asMap := map[string]any{}
@@ -45691,6 +50714,33 @@ func (ec *executionContext) unmarshalInputDeleteDocumentInput(ctx context.Contex
 				return it, err
 			}
 			it.DocumentID = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputDeleteDraftDocumentVersionInput(ctx context.Context, obj any) (types.DeleteDraftDocumentVersionInput, error) {
+	var it types.DeleteDraftDocumentVersionInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"documentVersionId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "documentVersionId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("documentVersionId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DocumentVersionID = data
 		}
 	}
 
@@ -45981,6 +51031,33 @@ func (ec *executionContext) unmarshalInputDeleteTrustCenterAccessInput(ctx conte
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputDeleteVendorBusinessAssociateAgreementInput(ctx context.Context, obj any) (types.DeleteVendorBusinessAssociateAgreementInput, error) {
+	var it types.DeleteVendorBusinessAssociateAgreementInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"vendorId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "vendorId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("vendorId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.VendorID = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputDeleteVendorComplianceReportInput(ctx context.Context, obj any) (types.DeleteVendorComplianceReportInput, error) {
 	var it types.DeleteVendorComplianceReportInput
 	asMap := map[string]any{}
@@ -46002,6 +51079,60 @@ func (ec *executionContext) unmarshalInputDeleteVendorComplianceReportInput(ctx 
 				return it, err
 			}
 			it.ReportID = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputDeleteVendorContactInput(ctx context.Context, obj any) (types.DeleteVendorContactInput, error) {
+	var it types.DeleteVendorContactInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"vendorContactId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "vendorContactId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("vendorContactId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.VendorContactID = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputDeleteVendorDataPrivacyAgreementInput(ctx context.Context, obj any) (types.DeleteVendorDataPrivacyAgreementInput, error) {
+	var it types.DeleteVendorDataPrivacyAgreementInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"vendorId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "vendorId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("vendorId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.VendorID = data
 		}
 	}
 
@@ -46660,6 +51791,33 @@ func (ec *executionContext) unmarshalInputOrganizationOrder(ctx context.Context,
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputPeopleFilter(ctx context.Context, obj any) (types.PeopleFilter, error) {
+	var it types.PeopleFilter
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"excludeContractEnded"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "excludeContractEnded":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("excludeContractEnded"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExcludeContractEnded = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputPeopleOrder(ctx context.Context, obj any) (types.PeopleOrderBy, error) {
 	var it types.PeopleOrderBy
 	asMap := map[string]any{}
@@ -47137,7 +52295,7 @@ func (ec *executionContext) unmarshalInputUpdateAuditInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "validFrom", "validUntil", "state", "showOnTrustCenter"}
+	fieldsInOrder := [...]string{"id", "name", "validFrom", "validUntil", "state", "showOnTrustCenter"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -47151,6 +52309,13 @@ func (ec *executionContext) unmarshalInputUpdateAuditInput(ctx context.Context, 
 				return it, err
 			}
 			it.ID = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
 		case "validFrom":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("validFrom"))
 			data, err := ec.unmarshalODatetime2ᚖtimeᚐTime(ctx, v)
@@ -47860,6 +53025,143 @@ func (ec *executionContext) unmarshalInputUpdateTrustCenterInput(ctx context.Con
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateVendorBusinessAssociateAgreementInput(ctx context.Context, obj any) (types.UpdateVendorBusinessAssociateAgreementInput, error) {
+	var it types.UpdateVendorBusinessAssociateAgreementInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"vendorId", "validFrom", "validUntil"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "vendorId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("vendorId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.VendorID = data
+		case "validFrom":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("validFrom"))
+			data, err := ec.unmarshalODatetime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ValidFrom = data
+		case "validUntil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("validUntil"))
+			data, err := ec.unmarshalODatetime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ValidUntil = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateVendorContactInput(ctx context.Context, obj any) (types.UpdateVendorContactInput, error) {
+	var it types.UpdateVendorContactInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "fullName", "email", "phone", "role"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "fullName":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fullName"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.FullName = data
+		case "email":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Email = data
+		case "phone":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("phone"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Phone = data
+		case "role":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Role = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateVendorDataPrivacyAgreementInput(ctx context.Context, obj any) (types.UpdateVendorDataPrivacyAgreementInput, error) {
+	var it types.UpdateVendorDataPrivacyAgreementInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"vendorId", "validFrom", "validUntil"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "vendorId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("vendorId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.VendorID = data
+		case "validFrom":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("validFrom"))
+			data, err := ec.unmarshalODatetime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ValidFrom = data
+		case "validUntil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("validUntil"))
+			data, err := ec.unmarshalODatetime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ValidUntil = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateVendorInput(ctx context.Context, obj any) (types.UpdateVendorInput, error) {
 	var it types.UpdateVendorInput
 	asMap := map[string]any{}
@@ -48122,6 +53424,61 @@ func (ec *executionContext) unmarshalInputUploadTaskEvidenceInput(ctx context.Co
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUploadVendorBusinessAssociateAgreementInput(ctx context.Context, obj any) (types.UploadVendorBusinessAssociateAgreementInput, error) {
+	var it types.UploadVendorBusinessAssociateAgreementInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"vendorId", "validFrom", "validUntil", "fileName", "file"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "vendorId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("vendorId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.VendorID = data
+		case "validFrom":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("validFrom"))
+			data, err := ec.unmarshalODatetime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ValidFrom = data
+		case "validUntil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("validUntil"))
+			data, err := ec.unmarshalODatetime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ValidUntil = data
+		case "fileName":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fileName"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.FileName = data
+		case "file":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("file"))
+			data, err := ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.File = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUploadVendorComplianceReportInput(ctx context.Context, obj any) (types.UploadVendorComplianceReportInput, error) {
 	var it types.UploadVendorComplianceReportInput
 	asMap := map[string]any{}
@@ -48164,6 +53521,61 @@ func (ec *executionContext) unmarshalInputUploadVendorComplianceReportInput(ctx 
 				return it, err
 			}
 			it.ReportName = data
+		case "file":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("file"))
+			data, err := ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.File = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUploadVendorDataPrivacyAgreementInput(ctx context.Context, obj any) (types.UploadVendorDataPrivacyAgreementInput, error) {
+	var it types.UploadVendorDataPrivacyAgreementInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"vendorId", "validFrom", "validUntil", "fileName", "file"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "vendorId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("vendorId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.VendorID = data
+		case "validFrom":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("validFrom"))
+			data, err := ec.unmarshalODatetime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ValidFrom = data
+		case "validUntil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("validUntil"))
+			data, err := ec.unmarshalODatetime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ValidUntil = data
+		case "fileName":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fileName"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.FileName = data
 		case "file":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("file"))
 			data, err := ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
@@ -48235,6 +53647,40 @@ func (ec *executionContext) unmarshalInputVendorComplianceReportOrder(ctx contex
 		case "field":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
 			data, err := ec.unmarshalNVendorComplianceReportOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorComplianceReportOrderField(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Field = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputVendorContactOrder(ctx context.Context, obj any) (types.VendorContactOrderBy, error) {
+	var it types.VendorContactOrderBy
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "direction":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
+			data, err := ec.unmarshalNOrderDirection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐOrderDirection(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Direction = data
+		case "field":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
+			data, err := ec.unmarshalNVendorContactOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorContactOrderField(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -48328,6 +53774,20 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			return graphql.Null
 		}
 		return ec._VendorRiskAssessment(ctx, sel, obj)
+	case types.VendorDataPrivacyAgreement:
+		return ec._VendorDataPrivacyAgreement(ctx, sel, &obj)
+	case *types.VendorDataPrivacyAgreement:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._VendorDataPrivacyAgreement(ctx, sel, obj)
+	case types.VendorContact:
+		return ec._VendorContact(ctx, sel, &obj)
+	case *types.VendorContact:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._VendorContact(ctx, sel, obj)
 	case types.VendorComplianceReport:
 		return ec._VendorComplianceReport(ctx, sel, &obj)
 	case *types.VendorComplianceReport:
@@ -48335,6 +53795,13 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			return graphql.Null
 		}
 		return ec._VendorComplianceReport(ctx, sel, obj)
+	case types.VendorBusinessAssociateAgreement:
+		return ec._VendorBusinessAssociateAgreement(ctx, sel, &obj)
+	case *types.VendorBusinessAssociateAgreement:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._VendorBusinessAssociateAgreement(ctx, sel, obj)
 	case types.Vendor:
 		return ec._Vendor(ctx, sel, &obj)
 	case *types.Vendor:
@@ -48915,6 +54382,8 @@ func (ec *executionContext) _Audit(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "name":
+			out.Values[i] = ec._Audit_name(ctx, field, obj)
 		case "organization":
 			field := field
 
@@ -49062,6 +54531,42 @@ func (ec *executionContext) _Audit(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "controls":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Audit_controls(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "showOnTrustCenter":
 			out.Values[i] = ec._Audit_showOnTrustCenter(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -49678,6 +55183,42 @@ func (ec *executionContext) _Control(ctx context.Context, sel ast.SelectionSet, 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "audits":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Control_audits(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "createdAt":
 			out.Values[i] = ec._Control_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -49887,6 +55428,50 @@ func (ec *executionContext) _CreateAuditPayload(ctx context.Context, sel ast.Sel
 			out.Values[i] = graphql.MarshalString("CreateAuditPayload")
 		case "auditEdge":
 			out.Values[i] = ec._CreateAuditPayload_auditEdge(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var createControlAuditMappingPayloadImplementors = []string{"CreateControlAuditMappingPayload"}
+
+func (ec *executionContext) _CreateControlAuditMappingPayload(ctx context.Context, sel ast.SelectionSet, obj *types.CreateControlAuditMappingPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, createControlAuditMappingPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CreateControlAuditMappingPayload")
+		case "controlEdge":
+			out.Values[i] = ec._CreateControlAuditMappingPayload_controlEdge(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "auditEdge":
+			out.Values[i] = ec._CreateControlAuditMappingPayload_auditEdge(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -50562,6 +56147,45 @@ func (ec *executionContext) _CreateTrustCenterAccessPayload(ctx context.Context,
 	return out
 }
 
+var createVendorContactPayloadImplementors = []string{"CreateVendorContactPayload"}
+
+func (ec *executionContext) _CreateVendorContactPayload(ctx context.Context, sel ast.SelectionSet, obj *types.CreateVendorContactPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, createVendorContactPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CreateVendorContactPayload")
+		case "vendorContactEdge":
+			out.Values[i] = ec._CreateVendorContactPayload_vendorContactEdge(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var createVendorPayloadImplementors = []string{"CreateVendorPayload"}
 
 func (ec *executionContext) _CreateVendorPayload(ctx context.Context, sel ast.SelectionSet, obj *types.CreateVendorPayload) graphql.Marshaler {
@@ -51048,6 +56672,50 @@ func (ec *executionContext) _DeleteAuditReportPayload(ctx context.Context, sel a
 	return out
 }
 
+var deleteControlAuditMappingPayloadImplementors = []string{"DeleteControlAuditMappingPayload"}
+
+func (ec *executionContext) _DeleteControlAuditMappingPayload(ctx context.Context, sel ast.SelectionSet, obj *types.DeleteControlAuditMappingPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteControlAuditMappingPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteControlAuditMappingPayload")
+		case "deletedControlId":
+			out.Values[i] = ec._DeleteControlAuditMappingPayload_deletedControlId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deletedAuditId":
+			out.Values[i] = ec._DeleteControlAuditMappingPayload_deletedAuditId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var deleteControlDocumentMappingPayloadImplementors = []string{"DeleteControlDocumentMappingPayload"}
 
 func (ec *executionContext) _DeleteControlDocumentMappingPayload(ctx context.Context, sel ast.SelectionSet, obj *types.DeleteControlDocumentMappingPayload) graphql.Marshaler {
@@ -51253,6 +56921,45 @@ func (ec *executionContext) _DeleteDocumentPayload(ctx context.Context, sel ast.
 	return out
 }
 
+var deleteDraftDocumentVersionPayloadImplementors = []string{"DeleteDraftDocumentVersionPayload"}
+
+func (ec *executionContext) _DeleteDraftDocumentVersionPayload(ctx context.Context, sel ast.SelectionSet, obj *types.DeleteDraftDocumentVersionPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteDraftDocumentVersionPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteDraftDocumentVersionPayload")
+		case "deletedDocumentVersionId":
+			out.Values[i] = ec._DeleteDraftDocumentVersionPayload_deletedDocumentVersionId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var deleteEvidencePayloadImplementors = []string{"DeleteEvidencePayload"}
 
 func (ec *executionContext) _DeleteEvidencePayload(ctx context.Context, sel ast.SelectionSet, obj *types.DeleteEvidencePayload) graphql.Marshaler {
@@ -51386,8 +57093,8 @@ func (ec *executionContext) _DeleteOrganizationPayload(ctx context.Context, sel 
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("DeleteOrganizationPayload")
-		case "success":
-			out.Values[i] = ec._DeleteOrganizationPayload_success(ctx, field, obj)
+		case "deletedOrganizationId":
+			out.Values[i] = ec._DeleteOrganizationPayload_deletedOrganizationId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -51658,6 +57365,45 @@ func (ec *executionContext) _DeleteTrustCenterAccessPayload(ctx context.Context,
 	return out
 }
 
+var deleteVendorBusinessAssociateAgreementPayloadImplementors = []string{"DeleteVendorBusinessAssociateAgreementPayload"}
+
+func (ec *executionContext) _DeleteVendorBusinessAssociateAgreementPayload(ctx context.Context, sel ast.SelectionSet, obj *types.DeleteVendorBusinessAssociateAgreementPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteVendorBusinessAssociateAgreementPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteVendorBusinessAssociateAgreementPayload")
+		case "deletedVendorId":
+			out.Values[i] = ec._DeleteVendorBusinessAssociateAgreementPayload_deletedVendorId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var deleteVendorComplianceReportPayloadImplementors = []string{"DeleteVendorComplianceReportPayload"}
 
 func (ec *executionContext) _DeleteVendorComplianceReportPayload(ctx context.Context, sel ast.SelectionSet, obj *types.DeleteVendorComplianceReportPayload) graphql.Marshaler {
@@ -51671,6 +57417,84 @@ func (ec *executionContext) _DeleteVendorComplianceReportPayload(ctx context.Con
 			out.Values[i] = graphql.MarshalString("DeleteVendorComplianceReportPayload")
 		case "deletedVendorComplianceReportId":
 			out.Values[i] = ec._DeleteVendorComplianceReportPayload_deletedVendorComplianceReportId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var deleteVendorContactPayloadImplementors = []string{"DeleteVendorContactPayload"}
+
+func (ec *executionContext) _DeleteVendorContactPayload(ctx context.Context, sel ast.SelectionSet, obj *types.DeleteVendorContactPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteVendorContactPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteVendorContactPayload")
+		case "deletedVendorContactId":
+			out.Values[i] = ec._DeleteVendorContactPayload_deletedVendorContactId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var deleteVendorDataPrivacyAgreementPayloadImplementors = []string{"DeleteVendorDataPrivacyAgreementPayload"}
+
+func (ec *executionContext) _DeleteVendorDataPrivacyAgreementPayload(ctx context.Context, sel ast.SelectionSet, obj *types.DeleteVendorDataPrivacyAgreementPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deleteVendorDataPrivacyAgreementPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeleteVendorDataPrivacyAgreementPayload")
+		case "deletedVendorId":
+			out.Values[i] = ec._DeleteVendorDataPrivacyAgreementPayload_deletedVendorId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -54131,6 +59955,27 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "createVendorContact":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createVendorContact(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateVendorContact":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateVendorContact(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteVendorContact":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteVendorContact(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "createFramework":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createFramework(ctx, field)
@@ -54246,6 +60091,20 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "deleteControlDocumentMapping":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteControlDocumentMapping(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createControlAuditMapping":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createControlAuditMapping(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteControlAuditMapping":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteControlAuditMapping(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -54383,6 +60242,48 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "uploadVendorBusinessAssociateAgreement":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_uploadVendorBusinessAssociateAgreement(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateVendorBusinessAssociateAgreement":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateVendorBusinessAssociateAgreement(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteVendorBusinessAssociateAgreement":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteVendorBusinessAssociateAgreement(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "uploadVendorDataPrivacyAgreement":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_uploadVendorDataPrivacyAgreement(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateVendorDataPrivacyAgreement":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateVendorDataPrivacyAgreement(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteVendorDataPrivacyAgreement":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteVendorDataPrivacyAgreement(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "createDocument":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createDocument(ctx, field)
@@ -54428,6 +60329,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "createDraftDocumentVersion":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createDraftDocumentVersion(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteDraftDocumentVersion":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteDraftDocumentVersion(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -57709,6 +63617,123 @@ func (ec *executionContext) _UpdateTrustCenterPayload(ctx context.Context, sel a
 	return out
 }
 
+var updateVendorBusinessAssociateAgreementPayloadImplementors = []string{"UpdateVendorBusinessAssociateAgreementPayload"}
+
+func (ec *executionContext) _UpdateVendorBusinessAssociateAgreementPayload(ctx context.Context, sel ast.SelectionSet, obj *types.UpdateVendorBusinessAssociateAgreementPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateVendorBusinessAssociateAgreementPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateVendorBusinessAssociateAgreementPayload")
+		case "vendorBusinessAssociateAgreement":
+			out.Values[i] = ec._UpdateVendorBusinessAssociateAgreementPayload_vendorBusinessAssociateAgreement(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var updateVendorContactPayloadImplementors = []string{"UpdateVendorContactPayload"}
+
+func (ec *executionContext) _UpdateVendorContactPayload(ctx context.Context, sel ast.SelectionSet, obj *types.UpdateVendorContactPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateVendorContactPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateVendorContactPayload")
+		case "vendorContact":
+			out.Values[i] = ec._UpdateVendorContactPayload_vendorContact(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var updateVendorDataPrivacyAgreementPayloadImplementors = []string{"UpdateVendorDataPrivacyAgreementPayload"}
+
+func (ec *executionContext) _UpdateVendorDataPrivacyAgreementPayload(ctx context.Context, sel ast.SelectionSet, obj *types.UpdateVendorDataPrivacyAgreementPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateVendorDataPrivacyAgreementPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateVendorDataPrivacyAgreementPayload")
+		case "vendorDataPrivacyAgreement":
+			out.Values[i] = ec._UpdateVendorDataPrivacyAgreementPayload_vendorDataPrivacyAgreement(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var updateVendorPayloadImplementors = []string{"UpdateVendorPayload"}
 
 func (ec *executionContext) _UpdateVendorPayload(ctx context.Context, sel ast.SelectionSet, obj *types.UpdateVendorPayload) graphql.Marshaler {
@@ -57865,6 +63890,45 @@ func (ec *executionContext) _UploadTaskEvidencePayload(ctx context.Context, sel 
 	return out
 }
 
+var uploadVendorBusinessAssociateAgreementPayloadImplementors = []string{"UploadVendorBusinessAssociateAgreementPayload"}
+
+func (ec *executionContext) _UploadVendorBusinessAssociateAgreementPayload(ctx context.Context, sel ast.SelectionSet, obj *types.UploadVendorBusinessAssociateAgreementPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, uploadVendorBusinessAssociateAgreementPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UploadVendorBusinessAssociateAgreementPayload")
+		case "vendorBusinessAssociateAgreement":
+			out.Values[i] = ec._UploadVendorBusinessAssociateAgreementPayload_vendorBusinessAssociateAgreement(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var uploadVendorComplianceReportPayloadImplementors = []string{"UploadVendorComplianceReportPayload"}
 
 func (ec *executionContext) _UploadVendorComplianceReportPayload(ctx context.Context, sel ast.SelectionSet, obj *types.UploadVendorComplianceReportPayload) graphql.Marshaler {
@@ -57878,6 +63942,45 @@ func (ec *executionContext) _UploadVendorComplianceReportPayload(ctx context.Con
 			out.Values[i] = graphql.MarshalString("UploadVendorComplianceReportPayload")
 		case "vendorComplianceReportEdge":
 			out.Values[i] = ec._UploadVendorComplianceReportPayload_vendorComplianceReportEdge(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var uploadVendorDataPrivacyAgreementPayloadImplementors = []string{"UploadVendorDataPrivacyAgreementPayload"}
+
+func (ec *executionContext) _UploadVendorDataPrivacyAgreementPayload(ctx context.Context, sel ast.SelectionSet, obj *types.UploadVendorDataPrivacyAgreementPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, uploadVendorDataPrivacyAgreementPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UploadVendorDataPrivacyAgreementPayload")
+		case "vendorDataPrivacyAgreement":
+			out.Values[i] = ec._UploadVendorDataPrivacyAgreementPayload_vendorDataPrivacyAgreement(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -58184,6 +64287,108 @@ func (ec *executionContext) _Vendor(ctx context.Context, sel ast.SelectionSet, o
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "businessAssociateAgreement":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Vendor_businessAssociateAgreement(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "dataPrivacyAgreement":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Vendor_dataPrivacyAgreement(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "contacts":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Vendor_contacts(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "riskAssessments":
 			field := field
 
@@ -58327,6 +64532,141 @@ func (ec *executionContext) _Vendor(ctx context.Context, sel ast.SelectionSet, o
 			}
 		case "updatedAt":
 			out.Values[i] = ec._Vendor_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var vendorBusinessAssociateAgreementImplementors = []string{"VendorBusinessAssociateAgreement", "Node"}
+
+func (ec *executionContext) _VendorBusinessAssociateAgreement(ctx context.Context, sel ast.SelectionSet, obj *types.VendorBusinessAssociateAgreement) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, vendorBusinessAssociateAgreementImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("VendorBusinessAssociateAgreement")
+		case "id":
+			out.Values[i] = ec._VendorBusinessAssociateAgreement_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "vendor":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._VendorBusinessAssociateAgreement_vendor(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "validFrom":
+			out.Values[i] = ec._VendorBusinessAssociateAgreement_validFrom(ctx, field, obj)
+		case "validUntil":
+			out.Values[i] = ec._VendorBusinessAssociateAgreement_validUntil(ctx, field, obj)
+		case "fileName":
+			out.Values[i] = ec._VendorBusinessAssociateAgreement_fileName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "fileUrl":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._VendorBusinessAssociateAgreement_fileUrl(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "fileSize":
+			out.Values[i] = ec._VendorBusinessAssociateAgreement_fileSize(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "createdAt":
+			out.Values[i] = ec._VendorBusinessAssociateAgreement_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "updatedAt":
+			out.Values[i] = ec._VendorBusinessAssociateAgreement_updatedAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -58633,6 +64973,322 @@ func (ec *executionContext) _VendorConnection(ctx context.Context, sel ast.Selec
 			}
 		case "pageInfo":
 			out.Values[i] = ec._VendorConnection_pageInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var vendorContactImplementors = []string{"VendorContact", "Node"}
+
+func (ec *executionContext) _VendorContact(ctx context.Context, sel ast.SelectionSet, obj *types.VendorContact) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, vendorContactImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("VendorContact")
+		case "id":
+			out.Values[i] = ec._VendorContact_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "vendor":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._VendorContact_vendor(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "fullName":
+			out.Values[i] = ec._VendorContact_fullName(ctx, field, obj)
+		case "email":
+			out.Values[i] = ec._VendorContact_email(ctx, field, obj)
+		case "phone":
+			out.Values[i] = ec._VendorContact_phone(ctx, field, obj)
+		case "role":
+			out.Values[i] = ec._VendorContact_role(ctx, field, obj)
+		case "createdAt":
+			out.Values[i] = ec._VendorContact_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "updatedAt":
+			out.Values[i] = ec._VendorContact_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var vendorContactConnectionImplementors = []string{"VendorContactConnection"}
+
+func (ec *executionContext) _VendorContactConnection(ctx context.Context, sel ast.SelectionSet, obj *types.VendorContactConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, vendorContactConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("VendorContactConnection")
+		case "edges":
+			out.Values[i] = ec._VendorContactConnection_edges(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "pageInfo":
+			out.Values[i] = ec._VendorContactConnection_pageInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var vendorContactEdgeImplementors = []string{"VendorContactEdge"}
+
+func (ec *executionContext) _VendorContactEdge(ctx context.Context, sel ast.SelectionSet, obj *types.VendorContactEdge) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, vendorContactEdgeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("VendorContactEdge")
+		case "cursor":
+			out.Values[i] = ec._VendorContactEdge_cursor(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "node":
+			out.Values[i] = ec._VendorContactEdge_node(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var vendorDataPrivacyAgreementImplementors = []string{"VendorDataPrivacyAgreement", "Node"}
+
+func (ec *executionContext) _VendorDataPrivacyAgreement(ctx context.Context, sel ast.SelectionSet, obj *types.VendorDataPrivacyAgreement) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, vendorDataPrivacyAgreementImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("VendorDataPrivacyAgreement")
+		case "id":
+			out.Values[i] = ec._VendorDataPrivacyAgreement_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "vendor":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._VendorDataPrivacyAgreement_vendor(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "validFrom":
+			out.Values[i] = ec._VendorDataPrivacyAgreement_validFrom(ctx, field, obj)
+		case "validUntil":
+			out.Values[i] = ec._VendorDataPrivacyAgreement_validUntil(ctx, field, obj)
+		case "fileName":
+			out.Values[i] = ec._VendorDataPrivacyAgreement_fileName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "fileUrl":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._VendorDataPrivacyAgreement_fileUrl(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "fileSize":
+			out.Values[i] = ec._VendorDataPrivacyAgreement_fileSize(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "createdAt":
+			out.Values[i] = ec._VendorDataPrivacyAgreement_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "updatedAt":
+			out.Values[i] = ec._VendorDataPrivacyAgreement_updatedAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -60069,6 +66725,25 @@ func (ec *executionContext) marshalNCreateAuditPayload2ᚖgithubᚗcomᚋgetprob
 	return ec._CreateAuditPayload(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNCreateControlAuditMappingInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateControlAuditMappingInput(ctx context.Context, v any) (types.CreateControlAuditMappingInput, error) {
+	res, err := ec.unmarshalInputCreateControlAuditMappingInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCreateControlAuditMappingPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateControlAuditMappingPayload(ctx context.Context, sel ast.SelectionSet, v types.CreateControlAuditMappingPayload) graphql.Marshaler {
+	return ec._CreateControlAuditMappingPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCreateControlAuditMappingPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateControlAuditMappingPayload(ctx context.Context, sel ast.SelectionSet, v *types.CreateControlAuditMappingPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CreateControlAuditMappingPayload(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNCreateControlDocumentMappingInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateControlDocumentMappingInput(ctx context.Context, v any) (types.CreateControlDocumentMappingInput, error) {
 	res, err := ec.unmarshalInputCreateControlDocumentMappingInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -60354,6 +67029,25 @@ func (ec *executionContext) marshalNCreateTrustCenterAccessPayload2ᚖgithubᚗc
 	return ec._CreateTrustCenterAccessPayload(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNCreateVendorContactInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateVendorContactInput(ctx context.Context, v any) (types.CreateVendorContactInput, error) {
+	res, err := ec.unmarshalInputCreateVendorContactInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCreateVendorContactPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateVendorContactPayload(ctx context.Context, sel ast.SelectionSet, v types.CreateVendorContactPayload) graphql.Marshaler {
+	return ec._CreateVendorContactPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCreateVendorContactPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateVendorContactPayload(ctx context.Context, sel ast.SelectionSet, v *types.CreateVendorContactPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CreateVendorContactPayload(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNCreateVendorInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateVendorInput(ctx context.Context, v any) (types.CreateVendorInput, error) {
 	res, err := ec.unmarshalInputCreateVendorInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -60423,13 +67117,13 @@ var (
 )
 
 func (ec *executionContext) unmarshalNCursorKey2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx context.Context, v any) (page.CursorKey, error) {
-	res, err := types.UnmarshalCursorKeyScalar(v)
+	res, err := cursor.UnmarshalCursorKeyScalar(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNCursorKey2githubᚗcomᚋgetproboᚋproboᚋpkgᚋpageᚐCursorKey(ctx context.Context, sel ast.SelectionSet, v page.CursorKey) graphql.Marshaler {
 	_ = sel
-	res := types.MarshalCursorKeyScalar(v)
+	res := cursor.MarshalCursorKeyScalar(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -60685,6 +67379,25 @@ func (ec *executionContext) marshalNDeleteAuditReportPayload2ᚖgithubᚗcomᚋg
 	return ec._DeleteAuditReportPayload(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNDeleteControlAuditMappingInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteControlAuditMappingInput(ctx context.Context, v any) (types.DeleteControlAuditMappingInput, error) {
+	res, err := ec.unmarshalInputDeleteControlAuditMappingInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNDeleteControlAuditMappingPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteControlAuditMappingPayload(ctx context.Context, sel ast.SelectionSet, v types.DeleteControlAuditMappingPayload) graphql.Marshaler {
+	return ec._DeleteControlAuditMappingPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDeleteControlAuditMappingPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteControlAuditMappingPayload(ctx context.Context, sel ast.SelectionSet, v *types.DeleteControlAuditMappingPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._DeleteControlAuditMappingPayload(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNDeleteControlDocumentMappingInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteControlDocumentMappingInput(ctx context.Context, v any) (types.DeleteControlDocumentMappingInput, error) {
 	res, err := ec.unmarshalInputDeleteControlDocumentMappingInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -60778,6 +67491,25 @@ func (ec *executionContext) marshalNDeleteDocumentPayload2ᚖgithubᚗcomᚋgetp
 		return graphql.Null
 	}
 	return ec._DeleteDocumentPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNDeleteDraftDocumentVersionInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteDraftDocumentVersionInput(ctx context.Context, v any) (types.DeleteDraftDocumentVersionInput, error) {
+	res, err := ec.unmarshalInputDeleteDraftDocumentVersionInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNDeleteDraftDocumentVersionPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteDraftDocumentVersionPayload(ctx context.Context, sel ast.SelectionSet, v types.DeleteDraftDocumentVersionPayload) graphql.Marshaler {
+	return ec._DeleteDraftDocumentVersionPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDeleteDraftDocumentVersionPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteDraftDocumentVersionPayload(ctx context.Context, sel ast.SelectionSet, v *types.DeleteDraftDocumentVersionPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._DeleteDraftDocumentVersionPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNDeleteEvidenceInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteEvidenceInput(ctx context.Context, v any) (types.DeleteEvidenceInput, error) {
@@ -60970,6 +67702,25 @@ func (ec *executionContext) marshalNDeleteTrustCenterAccessPayload2ᚖgithubᚗc
 	return ec._DeleteTrustCenterAccessPayload(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNDeleteVendorBusinessAssociateAgreementInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteVendorBusinessAssociateAgreementInput(ctx context.Context, v any) (types.DeleteVendorBusinessAssociateAgreementInput, error) {
+	res, err := ec.unmarshalInputDeleteVendorBusinessAssociateAgreementInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNDeleteVendorBusinessAssociateAgreementPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteVendorBusinessAssociateAgreementPayload(ctx context.Context, sel ast.SelectionSet, v types.DeleteVendorBusinessAssociateAgreementPayload) graphql.Marshaler {
+	return ec._DeleteVendorBusinessAssociateAgreementPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDeleteVendorBusinessAssociateAgreementPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteVendorBusinessAssociateAgreementPayload(ctx context.Context, sel ast.SelectionSet, v *types.DeleteVendorBusinessAssociateAgreementPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._DeleteVendorBusinessAssociateAgreementPayload(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNDeleteVendorComplianceReportInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteVendorComplianceReportInput(ctx context.Context, v any) (types.DeleteVendorComplianceReportInput, error) {
 	res, err := ec.unmarshalInputDeleteVendorComplianceReportInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -60987,6 +67738,44 @@ func (ec *executionContext) marshalNDeleteVendorComplianceReportPayload2ᚖgithu
 		return graphql.Null
 	}
 	return ec._DeleteVendorComplianceReportPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNDeleteVendorContactInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteVendorContactInput(ctx context.Context, v any) (types.DeleteVendorContactInput, error) {
+	res, err := ec.unmarshalInputDeleteVendorContactInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNDeleteVendorContactPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteVendorContactPayload(ctx context.Context, sel ast.SelectionSet, v types.DeleteVendorContactPayload) graphql.Marshaler {
+	return ec._DeleteVendorContactPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDeleteVendorContactPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteVendorContactPayload(ctx context.Context, sel ast.SelectionSet, v *types.DeleteVendorContactPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._DeleteVendorContactPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNDeleteVendorDataPrivacyAgreementInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteVendorDataPrivacyAgreementInput(ctx context.Context, v any) (types.DeleteVendorDataPrivacyAgreementInput, error) {
+	res, err := ec.unmarshalInputDeleteVendorDataPrivacyAgreementInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNDeleteVendorDataPrivacyAgreementPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteVendorDataPrivacyAgreementPayload(ctx context.Context, sel ast.SelectionSet, v types.DeleteVendorDataPrivacyAgreementPayload) graphql.Marshaler {
+	return ec._DeleteVendorDataPrivacyAgreementPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDeleteVendorDataPrivacyAgreementPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteVendorDataPrivacyAgreementPayload(ctx context.Context, sel ast.SelectionSet, v *types.DeleteVendorDataPrivacyAgreementPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._DeleteVendorDataPrivacyAgreementPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNDeleteVendorInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDeleteVendorInput(ctx context.Context, v any) (types.DeleteVendorInput, error) {
@@ -61797,13 +68586,13 @@ func (ec *executionContext) marshalNGenerateFrameworkStateOfApplicabilityPayload
 }
 
 func (ec *executionContext) unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx context.Context, v any) (gid.GID, error) {
-	res, err := types.UnmarshalGIDScalar(v)
+	res, err := gid1.UnmarshalGIDScalar(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx context.Context, sel ast.SelectionSet, v gid.GID) graphql.Marshaler {
 	_ = sel
-	res := types.MarshalGIDScalar(v)
+	res := gid1.MarshalGIDScalar(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -63221,6 +70010,63 @@ func (ec *executionContext) marshalNUpdateTrustCenterPayload2ᚖgithubᚗcomᚋg
 	return ec._UpdateTrustCenterPayload(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNUpdateVendorBusinessAssociateAgreementInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateVendorBusinessAssociateAgreementInput(ctx context.Context, v any) (types.UpdateVendorBusinessAssociateAgreementInput, error) {
+	res, err := ec.unmarshalInputUpdateVendorBusinessAssociateAgreementInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUpdateVendorBusinessAssociateAgreementPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateVendorBusinessAssociateAgreementPayload(ctx context.Context, sel ast.SelectionSet, v types.UpdateVendorBusinessAssociateAgreementPayload) graphql.Marshaler {
+	return ec._UpdateVendorBusinessAssociateAgreementPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUpdateVendorBusinessAssociateAgreementPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateVendorBusinessAssociateAgreementPayload(ctx context.Context, sel ast.SelectionSet, v *types.UpdateVendorBusinessAssociateAgreementPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UpdateVendorBusinessAssociateAgreementPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNUpdateVendorContactInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateVendorContactInput(ctx context.Context, v any) (types.UpdateVendorContactInput, error) {
+	res, err := ec.unmarshalInputUpdateVendorContactInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUpdateVendorContactPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateVendorContactPayload(ctx context.Context, sel ast.SelectionSet, v types.UpdateVendorContactPayload) graphql.Marshaler {
+	return ec._UpdateVendorContactPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUpdateVendorContactPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateVendorContactPayload(ctx context.Context, sel ast.SelectionSet, v *types.UpdateVendorContactPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UpdateVendorContactPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNUpdateVendorDataPrivacyAgreementInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateVendorDataPrivacyAgreementInput(ctx context.Context, v any) (types.UpdateVendorDataPrivacyAgreementInput, error) {
+	res, err := ec.unmarshalInputUpdateVendorDataPrivacyAgreementInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUpdateVendorDataPrivacyAgreementPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateVendorDataPrivacyAgreementPayload(ctx context.Context, sel ast.SelectionSet, v types.UpdateVendorDataPrivacyAgreementPayload) graphql.Marshaler {
+	return ec._UpdateVendorDataPrivacyAgreementPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUpdateVendorDataPrivacyAgreementPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateVendorDataPrivacyAgreementPayload(ctx context.Context, sel ast.SelectionSet, v *types.UpdateVendorDataPrivacyAgreementPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UpdateVendorDataPrivacyAgreementPayload(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNUpdateVendorInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUpdateVendorInput(ctx context.Context, v any) (types.UpdateVendorInput, error) {
 	res, err := ec.unmarshalInputUpdateVendorInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -63313,6 +70159,25 @@ func (ec *executionContext) marshalNUploadTaskEvidencePayload2ᚖgithubᚗcomᚋ
 	return ec._UploadTaskEvidencePayload(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNUploadVendorBusinessAssociateAgreementInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUploadVendorBusinessAssociateAgreementInput(ctx context.Context, v any) (types.UploadVendorBusinessAssociateAgreementInput, error) {
+	res, err := ec.unmarshalInputUploadVendorBusinessAssociateAgreementInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUploadVendorBusinessAssociateAgreementPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUploadVendorBusinessAssociateAgreementPayload(ctx context.Context, sel ast.SelectionSet, v types.UploadVendorBusinessAssociateAgreementPayload) graphql.Marshaler {
+	return ec._UploadVendorBusinessAssociateAgreementPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUploadVendorBusinessAssociateAgreementPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUploadVendorBusinessAssociateAgreementPayload(ctx context.Context, sel ast.SelectionSet, v *types.UploadVendorBusinessAssociateAgreementPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UploadVendorBusinessAssociateAgreementPayload(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNUploadVendorComplianceReportInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUploadVendorComplianceReportInput(ctx context.Context, v any) (types.UploadVendorComplianceReportInput, error) {
 	res, err := ec.unmarshalInputUploadVendorComplianceReportInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -63330,6 +70195,25 @@ func (ec *executionContext) marshalNUploadVendorComplianceReportPayload2ᚖgithu
 		return graphql.Null
 	}
 	return ec._UploadVendorComplianceReportPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNUploadVendorDataPrivacyAgreementInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUploadVendorDataPrivacyAgreementInput(ctx context.Context, v any) (types.UploadVendorDataPrivacyAgreementInput, error) {
+	res, err := ec.unmarshalInputUploadVendorDataPrivacyAgreementInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUploadVendorDataPrivacyAgreementPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUploadVendorDataPrivacyAgreementPayload(ctx context.Context, sel ast.SelectionSet, v types.UploadVendorDataPrivacyAgreementPayload) graphql.Marshaler {
+	return ec._UploadVendorDataPrivacyAgreementPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUploadVendorDataPrivacyAgreementPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUploadVendorDataPrivacyAgreementPayload(ctx context.Context, sel ast.SelectionSet, v *types.UploadVendorDataPrivacyAgreementPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UploadVendorDataPrivacyAgreementPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐUser(ctx context.Context, sel ast.SelectionSet, v *types.User) graphql.Marshaler {
@@ -63448,6 +70332,16 @@ func (ec *executionContext) marshalNVendor2ᚖgithubᚗcomᚋgetproboᚋproboᚋ
 		return graphql.Null
 	}
 	return ec._Vendor(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNVendorBusinessAssociateAgreement2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorBusinessAssociateAgreement(ctx context.Context, sel ast.SelectionSet, v *types.VendorBusinessAssociateAgreement) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._VendorBusinessAssociateAgreement(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNVendorCategory2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorCategory(ctx context.Context, v any) (coredata.VendorCategory, error) {
@@ -63636,6 +70530,124 @@ func (ec *executionContext) marshalNVendorConnection2ᚖgithubᚗcomᚋgetprobo�
 		return graphql.Null
 	}
 	return ec._VendorConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNVendorContact2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorContact(ctx context.Context, sel ast.SelectionSet, v *types.VendorContact) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._VendorContact(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNVendorContactConnection2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorContactConnection(ctx context.Context, sel ast.SelectionSet, v types.VendorContactConnection) graphql.Marshaler {
+	return ec._VendorContactConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNVendorContactConnection2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorContactConnection(ctx context.Context, sel ast.SelectionSet, v *types.VendorContactConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._VendorContactConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNVendorContactEdge2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorContactEdgeᚄ(ctx context.Context, sel ast.SelectionSet, v []*types.VendorContactEdge) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNVendorContactEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorContactEdge(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNVendorContactEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorContactEdge(ctx context.Context, sel ast.SelectionSet, v *types.VendorContactEdge) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._VendorContactEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNVendorContactOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorContactOrderField(ctx context.Context, v any) (coredata.VendorContactOrderField, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := unmarshalNVendorContactOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorContactOrderField[tmp]
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNVendorContactOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorContactOrderField(ctx context.Context, sel ast.SelectionSet, v coredata.VendorContactOrderField) graphql.Marshaler {
+	_ = sel
+	res := graphql.MarshalString(marshalNVendorContactOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorContactOrderField[v])
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+var (
+	unmarshalNVendorContactOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorContactOrderField = map[string]coredata.VendorContactOrderField{
+		"CREATED_AT": coredata.VendorContactOrderFieldCreatedAt,
+		"FULL_NAME":  coredata.VendorContactOrderFieldFullName,
+		"EMAIL":      coredata.VendorContactOrderFieldEmail,
+	}
+	marshalNVendorContactOrderField2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorContactOrderField = map[coredata.VendorContactOrderField]string{
+		coredata.VendorContactOrderFieldCreatedAt: "CREATED_AT",
+		coredata.VendorContactOrderFieldFullName:  "FULL_NAME",
+		coredata.VendorContactOrderFieldEmail:     "EMAIL",
+	}
+)
+
+func (ec *executionContext) marshalNVendorDataPrivacyAgreement2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorDataPrivacyAgreement(ctx context.Context, sel ast.SelectionSet, v *types.VendorDataPrivacyAgreement) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._VendorDataPrivacyAgreement(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNVendorEdge2ᚕᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorEdgeᚄ(ctx context.Context, sel ast.SelectionSet, v []*types.VendorEdge) graphql.Marshaler {
@@ -64299,7 +71311,7 @@ func (ec *executionContext) unmarshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋpro
 	if v == nil {
 		return nil, nil
 	}
-	res, err := types.UnmarshalCursorKeyScalar(v)
+	res, err := cursor.UnmarshalCursorKeyScalar(v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -64309,7 +71321,7 @@ func (ec *executionContext) marshalOCursorKey2ᚖgithubᚗcomᚋgetproboᚋprobo
 	}
 	_ = sel
 	_ = ctx
-	res := types.MarshalCursorKeyScalar(*v)
+	res := cursor.MarshalCursorKeyScalar(*v)
 	return res
 }
 
@@ -64549,7 +71561,7 @@ func (ec *executionContext) unmarshalOID2ᚖgithubᚗcomᚋgetproboᚋproboᚋpk
 	if v == nil {
 		return nil, nil
 	}
-	res, err := types.UnmarshalGIDScalar(v)
+	res, err := gid1.UnmarshalGIDScalar(v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -64559,7 +71571,7 @@ func (ec *executionContext) marshalOID2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkg�
 	}
 	_ = sel
 	_ = ctx
-	res := types.MarshalGIDScalar(*v)
+	res := gid1.MarshalGIDScalar(*v)
 	return res
 }
 
@@ -64659,6 +71671,14 @@ func (ec *executionContext) marshalOPeople2ᚖgithubᚗcomᚋgetproboᚋproboᚋ
 		return graphql.Null
 	}
 	return ec._People(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOPeopleFilter2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐPeopleFilter(ctx context.Context, v any) (*types.PeopleFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputPeopleFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOPeopleKind2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐPeopleKind(ctx context.Context, v any) (*coredata.PeopleKind, error) {
@@ -64906,6 +71926,13 @@ func (ec *executionContext) unmarshalOUserOrder2ᚖgithubᚗcomᚋgetproboᚋpro
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalOVendorBusinessAssociateAgreement2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorBusinessAssociateAgreement(ctx context.Context, sel ast.SelectionSet, v *types.VendorBusinessAssociateAgreement) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._VendorBusinessAssociateAgreement(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalOVendorCategory2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐVendorCategory(ctx context.Context, v any) (*coredata.VendorCategory, error) {
 	if v == nil {
 		return nil, nil
@@ -64982,6 +72009,21 @@ func (ec *executionContext) unmarshalOVendorComplianceReportOrder2ᚖgithubᚗco
 	}
 	res, err := ec.unmarshalInputVendorComplianceReportOrder(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOVendorContactOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorContactOrderBy(ctx context.Context, v any) (*types.VendorContactOrderBy, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputVendorContactOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOVendorDataPrivacyAgreement2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorDataPrivacyAgreement(ctx context.Context, sel ast.SelectionSet, v *types.VendorDataPrivacyAgreement) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._VendorDataPrivacyAgreement(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOVendorOrder2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐVendorOrderBy(ctx context.Context, v any) (*types.VendorOrderBy, error) {

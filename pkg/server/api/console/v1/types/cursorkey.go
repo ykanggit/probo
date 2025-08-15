@@ -16,7 +16,7 @@ package types
 
 import (
 	"github.com/getprobo/probo/pkg/page"
-	sharedTypes "github.com/getprobo/probo/pkg/server/api/types"
+	"github.com/getprobo/probo/pkg/server/graphql/types/cursor"
 )
 
 func NewCursor[O page.OrderField](
@@ -26,24 +26,5 @@ func NewCursor[O page.OrderField](
 	before *page.CursorKey,
 	orderBy page.OrderBy[O],
 ) *page.Cursor[O] {
-	var (
-		size      int
-		from      *page.CursorKey
-		direction = page.Head
-	)
-
-	if first != nil {
-		size = *first
-		direction = page.Head
-		from = after
-	} else if last != nil {
-		size = *last
-		direction = page.Tail
-		from = before
-	}
-
-	return page.NewCursor(size, from, direction, orderBy)
+	return cursor.NewCursor(first, after, last, before, orderBy)
 }
-
-var MarshalCursorKeyScalar = sharedTypes.MarshalCursorKeyScalar
-var UnmarshalCursorKeyScalar = sharedTypes.UnmarshalCursorKeyScalar

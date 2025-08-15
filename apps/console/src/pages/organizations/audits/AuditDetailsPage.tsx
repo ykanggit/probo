@@ -28,13 +28,15 @@ import {
 } from "@probo/ui";
 import { useTranslate } from "@probo/i18n";
 import { useOrganizationId } from "/hooks/useOrganizationId";
+import { FrameworkLogo } from "/components/FrameworkLogo";
 import { ControlledField } from "/components/form/ControlledField";
 import { useFormWithSchema } from "/hooks/useFormWithSchema";
 import z from "zod";
-import { getAuditStateLabel, getAuditStateVariant, auditStates, fileSize, sprintf } from "@probo/helpers";
+import { getAuditStateLabel, getAuditStateVariant, auditStates, fileSize, sprintf, formatDatetime } from "@probo/helpers";
 import type { AuditGraphNodeQuery } from "/hooks/graph/__generated__/AuditGraphNodeQuery.graphql";
 
 const updateAuditSchema = z.object({
+  name: z.string().optional(),
   validFrom: z.string().optional(),
   validUntil: z.string().optional(),
   state: z.enum(["NOT_STARTED", "IN_PROGRESS", "COMPLETED", "REJECTED", "OUTDATED"]),
@@ -61,6 +63,7 @@ export default function AuditDetailsPage(props: Props) {
 
   const { control, formState, handleSubmit, register, reset } = useFormWithSchema(updateAuditSchema, {
     defaultValues: {
+      name: auditEntry.name || "",
       validFrom: auditEntry.validFrom?.split('T')[0] || "",
       validUntil: auditEntry.validUntil?.split('T')[0] || "",
       state: auditEntry.state || "NOT_STARTED",
@@ -77,13 +80,9 @@ export default function AuditDetailsPage(props: Props) {
     if (!auditEntry.id) return;
 
     try {
-      const formatDatetime = (dateString?: string) => {
-        if (!dateString) return undefined;
-        return `${dateString}T00:00:00Z`;
-      };
-
       await updateAudit({
         id: auditEntry.id,
+        name: formData.name,
         validFrom: formatDatetime(formData.validFrom),
         validUntil: formatDatetime(formData.validUntil),
         state: formData.state,
@@ -130,14 +129,17 @@ export default function AuditDetailsPage(props: Props) {
             to: `/organizations/${organizationId}/audits`,
           },
           {
-            label: auditEntry.framework?.name ?? __("Unknown Audit"),
+            label: (auditEntry.name || auditEntry.framework?.name) ?? __("Unknown Audit"),
           },
         ]}
       />
 
       <div className="flex justify-between items-start">
         <div className="flex items-center gap-4">
-          <div className="text-2xl">{auditEntry.framework?.name}</div>
+          <div className="flex items-center gap-3">
+            <FrameworkLogo name={auditEntry.framework?.name || ""} />
+            <div className="text-2xl">{auditEntry.framework?.name}</div>
+          </div>
           <Badge variant={getAuditStateVariant(auditEntry.state || "NOT_STARTED")}>
             {getAuditStateLabel(__, auditEntry.state || "NOT_STARTED")}
           </Badge>
@@ -155,6 +157,10 @@ export default function AuditDetailsPage(props: Props) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <form onSubmit={onSubmit} className="space-y-6">
+          <Field label={__("Name")}>
+            <Input {...register("name")} placeholder={__("Audit name")} />
+          </Field>
+
           <ControlledField
             control={control}
             name="state"

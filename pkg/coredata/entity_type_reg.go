@@ -39,4 +39,8 @@ const (
 	ReportEntityType
 	TrustCenterEntityType
 	TrustCenterAccessEntityType
+	VendorBusinessAssociateAgreementEntityType
+	FileEntityType
+	VendorContactEntityType
+	VendorDataPrivacyAgreementEntityType
 )

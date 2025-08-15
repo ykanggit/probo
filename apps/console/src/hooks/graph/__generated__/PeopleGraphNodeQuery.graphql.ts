@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<71df408810680ded020fb0e1cc93ff79>>
+ * @generated SignedSource<<e263259b92f7b1fe14bca5fca49b20bf>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -16,6 +16,8 @@ export type PeopleGraphNodeQuery$variables = {
 export type PeopleGraphNodeQuery$data = {
   readonly node: {
     readonly additionalEmailAddresses?: ReadonlyArray<string>;
+    readonly contractEndDate?: any | null | undefined;
+    readonly contractStartDate?: any | null | undefined;
     readonly fullName?: string;
     readonly id?: string;
     readonly kind?: PeopleKind;
@@ -84,6 +86,20 @@ v7 = {
   "kind": "ScalarField",
   "name": "additionalEmailAddresses",
   "storageKey": null
+},
+v8 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "contractStartDate",
+  "storageKey": null
+},
+v9 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "contractEndDate",
+  "storageKey": null
 };
 return {
   "fragment": {
@@ -108,7 +124,9 @@ return {
               (v4/*: any*/),
               (v5/*: any*/),
               (v6/*: any*/),
-              (v7/*: any*/)
+              (v7/*: any*/),
+              (v8/*: any*/),
+              (v9/*: any*/)
             ],
             "type": "People",
             "abstractKey": null
@@ -149,7 +167,9 @@ return {
               (v4/*: any*/),
               (v5/*: any*/),
               (v6/*: any*/),
-              (v7/*: any*/)
+              (v7/*: any*/),
+              (v8/*: any*/),
+              (v9/*: any*/)
             ],
             "type": "People",
             "abstractKey": null
@@ -160,16 +180,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "850de97d42fdda9d2335c0e5219fd067",
+    "cacheID": "096d011a1e9a7374a13d037738b46fc6",
     "id": null,
     "metadata": {},
     "name": "PeopleGraphNodeQuery",
     "operationKind": "query",
-    "text": "query PeopleGraphNodeQuery(\n  $peopleId: ID!\n) {\n  node(id: $peopleId) {\n    __typename\n    ... on People {\n      id\n      fullName\n      primaryEmailAddress\n      position\n      kind\n      additionalEmailAddresses\n    }\n    id\n  }\n}\n"
+    "text": "query PeopleGraphNodeQuery(\n  $peopleId: ID!\n) {\n  node(id: $peopleId) {\n    __typename\n    ... on People {\n      id\n      fullName\n      primaryEmailAddress\n      position\n      kind\n      additionalEmailAddresses\n      contractStartDate\n      contractEndDate\n    }\n    id\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "f39d45664dba2b3bcdad07ef8baebfe9";
+(node as any).hash = "af18ca63be219f85baa39bf99294b4f6";
 
 export default node;

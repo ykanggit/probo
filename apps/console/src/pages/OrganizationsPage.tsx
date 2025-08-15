@@ -4,13 +4,24 @@ import { graphql } from "relay-runtime";
 import type { OrganizationsPageQuery as OrganizationsPageQueryType } from "./__generated__/OrganizationsPageQuery.graphql";
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router";
-import { Avatar, Button, Card, IconPlusLarge } from "@probo/ui";
+import {
+  Avatar,
+  Button,
+  Card,
+  IconPlusLarge,
+  ActionDropdown,
+  DropdownItem,
+  IconTrashCan,
+} from "@probo/ui";
 import { usePageTitle } from "@probo/hooks";
+import { useDeleteOrganizationMutation } from "../hooks/graph/OrganizationGraph";
+import { DeleteOrganizationDialog } from "../components/organizations/DeleteOrganizationDialog";
 
 const OrganizationsPageQuery = graphql`
   query OrganizationsPageQuery {
     viewer {
-      organizations(first: 25) {
+      organizations(first: 25) @connection(key: "OrganizationsPage_organizations") {
+        __id
         edges {
           node {
             id
@@ -37,10 +48,11 @@ export default function OrganizationsPage() {
 
   usePageTitle(__("Select an organization"));
 
-  // Redirect to the first organization if only one exists
   useEffect(() => {
     if (organizations.length === 1) {
       navigate(`/organizations/${organizations[0].id}`);
+    } else if (organizations.length === 0) {
+      navigate("/organizations/new");
     }
   }, [organizations]);
 
@@ -52,27 +64,11 @@ export default function OrganizationsPage() {
         </h1>
         <div className="space-y-4 w-full">
           {organizations.map((organization) => (
-            <Card
-              asChild
-              padded
+            <OrganizationCard
               key={organization.id}
-              className="w-full hover:bg-tertiary-hover cursor-pointer"
-            >
-              <Link
-                to={`/organizations/${organization.id}`}
-                className="flex items-center justify-between"
-              >
-                <div className="flex items-center gap-4">
-                  <Avatar
-                    src={organization.logoUrl}
-                    name={organization.name}
-                    size="l"
-                  />
-                  <h2 className="font-semibold text-xl">{organization.name}</h2>
-                </div>
-                <Button>{__("Select")}</Button>
-              </Link>
-            </Card>
+              organization={organization}
+              connectionId={data.viewer.organizations.__id}
+            />
           ))}
           <Card padded>
             <h2 className="text-xl font-semibold mb-1">
@@ -93,5 +89,70 @@ export default function OrganizationsPage() {
         </div>
       </div>
     </>
+  );
+}
+
+type OrganizationCardProps = {
+  organization: {
+    id: string;
+    name: string;
+    logoUrl: string | null | undefined;
+  };
+  connectionId: string;
+};
+
+function OrganizationCard({ organization, connectionId }: OrganizationCardProps) {
+  const { __ } = useTranslate();
+  const [deleteOrganization, isDeleting] = useDeleteOrganizationMutation();
+
+  const handleDelete = () => {
+    return deleteOrganization({
+      variables: {
+        input: {
+          organizationId: organization.id,
+        },
+        connections: [connectionId],
+      },
+    });
+  };
+
+  return (
+    <Card padded className="w-full">
+      <div className="flex items-center justify-between">
+        <Link
+          to={`/organizations/${organization.id}`}
+          className="flex items-center gap-4 hover:text-primary flex-1"
+        >
+          <Avatar
+            src={organization.logoUrl}
+            name={organization.name}
+            size="l"
+          />
+          <h2 className="font-semibold text-xl">{organization.name}</h2>
+        </Link>
+        <div className="flex items-center gap-3">
+          <Button asChild>
+            <Link to={`/organizations/${organization.id}`}>
+              {__("Select")}
+            </Link>
+          </Button>
+          <DeleteOrganizationDialog
+            organizationName={organization.name}
+            onConfirm={handleDelete}
+            isDeleting={isDeleting}
+          >
+            <ActionDropdown>
+              <DropdownItem
+                variant="danger"
+                icon={IconTrashCan}
+                disabled={isDeleting}
+              >
+                {__("Delete organization")}
+              </DropdownItem>
+            </ActionDropdown>
+          </DeleteOrganizationDialog>
+        </div>
+      </div>
+    </Card>
   );
 }
