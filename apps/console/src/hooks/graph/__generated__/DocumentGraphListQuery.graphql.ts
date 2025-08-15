@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<655af0293c63115d54c7351c67f5391f>>
+ * @generated SignedSource<<b1d04cfcbd981655897ecadcc76259ef>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -66,6 +66,13 @@ v4 = [
       "direction": "ASC",
       "field": "TITLE"
     }
+  }
+],
+v5 = [
+  {
+    "kind": "Literal",
+    "name": "first",
+    "value": 1
   }
 ];
 return {
@@ -189,13 +196,48 @@ return {
                           },
                           {
                             "alias": null,
-                            "args": [
+                            "args": (v5/*: any*/),
+                            "concreteType": "ControlConnection",
+                            "kind": "LinkedField",
+                            "name": "controls",
+                            "plural": false,
+                            "selections": [
                               {
-                                "kind": "Literal",
-                                "name": "first",
-                                "value": 1
+                                "alias": null,
+                                "args": null,
+                                "concreteType": "ControlEdge",
+                                "kind": "LinkedField",
+                                "name": "edges",
+                                "plural": true,
+                                "selections": [
+                                  {
+                                    "alias": null,
+                                    "args": null,
+                                    "concreteType": "Control",
+                                    "kind": "LinkedField",
+                                    "name": "node",
+                                    "plural": false,
+                                    "selections": [
+                                      (v2/*: any*/),
+                                      {
+                                        "alias": null,
+                                        "args": null,
+                                        "kind": "ScalarField",
+                                        "name": "name",
+                                        "storageKey": null
+                                      }
+                                    ],
+                                    "storageKey": null
+                                  }
+                                ],
+                                "storageKey": null
                               }
                             ],
+                            "storageKey": "controls(first:1)"
+                          },
+                          {
+                            "alias": null,
+                            "args": (v5/*: any*/),
                             "concreteType": "DocumentVersionConnection",
                             "kind": "LinkedField",
                             "name": "versions",
@@ -370,12 +412,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "2af85ef46f318852086b498eea618a5b",
+    "cacheID": "ebaf3c83ca84f8c6fa058b00f1c47c37",
     "id": null,
     "metadata": {},
     "name": "DocumentGraphListQuery",
     "operationKind": "query",
-    "text": "query DocumentGraphListQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ...DocumentsPageListFragment\n  }\n}\n\nfragment DocumentsPageListFragment on Organization {\n  documents(first: 50, orderBy: {field: TITLE, direction: ASC}) {\n    edges {\n      node {\n        id\n        ...DocumentsPageRowFragment\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n\nfragment DocumentsPageRowFragment on Document {\n  id\n  title\n  description\n  documentType\n  updatedAt\n  owner {\n    id\n    fullName\n  }\n  versions(first: 1) {\n    edges {\n      node {\n        id\n        status\n        signatures(first: 100) {\n          edges {\n            node {\n              id\n              state\n            }\n          }\n        }\n      }\n    }\n  }\n}\n"
+    "text": "query DocumentGraphListQuery(\n  $organizationId: ID!\n) {\n  organization: node(id: $organizationId) {\n    __typename\n    id\n    ...DocumentsPageListFragment\n  }\n}\n\nfragment DocumentsPageListFragment on Organization {\n  documents(first: 50, orderBy: {field: TITLE, direction: ASC}) {\n    edges {\n      node {\n        id\n        ...DocumentsPageRowFragment\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n\nfragment DocumentsPageRowFragment on Document {\n  id\n  title\n  description\n  documentType\n  updatedAt\n  owner {\n    id\n    fullName\n  }\n  controls(first: 1) {\n    edges {\n      node {\n        id\n        name\n      }\n    }\n  }\n  versions(first: 1) {\n    edges {\n      node {\n        id\n        status\n        signatures(first: 100) {\n          edges {\n            node {\n              id\n              state\n            }\n          }\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();

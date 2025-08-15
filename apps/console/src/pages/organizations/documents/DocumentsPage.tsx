@@ -89,7 +89,9 @@ export default function DocumentsPage(props: Props) {
     organization as DocumentsPageListFragment$key
   );
 
-  const documents = pagination.data.documents.edges.map((edge) => edge.node);
+  const documents = pagination.data.documents.edges
+    .map((edge) => edge.node)
+    .filter((document) => document != null);
   const connectionId = pagination.data.documents.__id;
   const [sendSigningNotifications] = useSendSigningNotificationsMutation();
   const { list: selection, toggle, clear, reset } = useList<string>([]);
@@ -131,7 +133,7 @@ export default function DocumentsPage(props: Props) {
               <Th>
                 <Checkbox
                   checked={selection.length === documents.length && documents.length > 0}
-                  onChange={() => reset(documents.map((d) => d.id))}
+                  onChange={() => reset(documents.map((d) => d?.id).filter(Boolean))}
                 />
               </Th>
               <SortableTh field="TITLE">{__("Name")}</SortableTh>
@@ -185,7 +187,6 @@ export default function DocumentsPage(props: Props) {
               key={document.id}
               document={document}
               organizationId={organization.id}
-              connectionId={connectionId}
             />
           ))}
         </Tbody>
@@ -204,6 +205,14 @@ const rowFragment = graphql`
     owner {
       id
       fullName
+    }
+    controls(first: 1) {
+      edges {
+        node {
+          id
+          name
+        }
+      }
     }
     versions(first: 1) {
       edges {
@@ -232,7 +241,6 @@ function DocumentRow({
 }: {
   document: DocumentsPageRowFragment$key;
   organizationId: string;
-  connectionId: string;
   checked: boolean;
   onCheck: () => void;
 }) {
@@ -240,7 +248,16 @@ function DocumentRow({
     rowFragment,
     documentKey
   );
-  const lastVersion = document.versions.edges[0].node;
+  
+  // Safety check: if document is null, don't render
+  if (!document) {
+    return null;
+  }
+  
+  const lastVersion = document.versions.edges[0]?.node;
+  if (!lastVersion) {
+    return null;
+  }
   const isDraft = lastVersion.status === "DRAFT";
   const { __, dateFormat } = useTranslate();
   const signatures = lastVersion.signatures?.edges?.map((edge) => edge.node) ?? [];
@@ -250,23 +267,32 @@ function DocumentRow({
   const [deleteDocument] = useDeleteDocumentMutation();
   const confirm = useConfirm();
 
-  const handleDelete = () => {
-    confirm(
-      () =>
-        deleteDocument({
-          variables: {
-            input: { documentId: document.id },
-          },
-        }),
-      {
-        message: sprintf(
-          __(
-            'This will permanently delete the document "%s". This action cannot be undone.'
+    const handleDelete = () => {
+    const linkedControls = document.controls?.edges?.map(edge => edge.node) ?? [];
+    const hasLinkedControls = linkedControls.length > 0;
+    
+    if (hasLinkedControls) {
+      // Document has linked controls - show informational message with OK button only
+      alert(__('You have linked controls. Unlink before delete.'));
+    } else {
+      // No linked controls - proceed with normal deletion
+      confirm(
+        () =>
+          deleteDocument({
+            variables: {
+              input: { documentId: document.id },
+            },
+          }),
+        {
+          message: sprintf(
+            __(
+              'This will permanently delete the document "%s". This action cannot be undone.'
+            ),
+            document.title
           ),
-          document.title
-        ),
-      }
-    );
+        }
+      );
+    }
   };
 
   return (

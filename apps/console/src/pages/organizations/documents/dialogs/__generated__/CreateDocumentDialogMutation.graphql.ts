@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<ce2f4f138b340f04b4e413ecbfff2ea1>>
+ * @generated SignedSource<<ae79068f6dffafd5d13dd3d9a032b35e>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -61,7 +61,14 @@ v3 = {
   "kind": "ScalarField",
   "name": "id",
   "storageKey": null
-};
+},
+v4 = [
+  {
+    "kind": "Literal",
+    "name": "first",
+    "value": 1
+  }
+];
 return {
   "fragment": {
     "argumentDefinitions": [
@@ -198,13 +205,48 @@ return {
                   },
                   {
                     "alias": null,
-                    "args": [
+                    "args": (v4/*: any*/),
+                    "concreteType": "ControlConnection",
+                    "kind": "LinkedField",
+                    "name": "controls",
+                    "plural": false,
+                    "selections": [
                       {
-                        "kind": "Literal",
-                        "name": "first",
-                        "value": 1
+                        "alias": null,
+                        "args": null,
+                        "concreteType": "ControlEdge",
+                        "kind": "LinkedField",
+                        "name": "edges",
+                        "plural": true,
+                        "selections": [
+                          {
+                            "alias": null,
+                            "args": null,
+                            "concreteType": "Control",
+                            "kind": "LinkedField",
+                            "name": "node",
+                            "plural": false,
+                            "selections": [
+                              (v3/*: any*/),
+                              {
+                                "alias": null,
+                                "args": null,
+                                "kind": "ScalarField",
+                                "name": "name",
+                                "storageKey": null
+                              }
+                            ],
+                            "storageKey": null
+                          }
+                        ],
+                        "storageKey": null
                       }
                     ],
+                    "storageKey": "controls(first:1)"
+                  },
+                  {
+                    "alias": null,
+                    "args": (v4/*: any*/),
                     "concreteType": "DocumentVersionConnection",
                     "kind": "LinkedField",
                     "name": "versions",
@@ -318,12 +360,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "e60a87953e4157e808e0d4ce4436ed3b",
+    "cacheID": "78db97da4ac57ae7ea89af26f78172d3",
     "id": null,
     "metadata": {},
     "name": "CreateDocumentDialogMutation",
     "operationKind": "mutation",
-    "text": "mutation CreateDocumentDialogMutation(\n  $input: CreateDocumentInput!\n) {\n  createDocument(input: $input) {\n    documentEdge {\n      node {\n        id\n        ...DocumentsPageRowFragment\n      }\n    }\n  }\n}\n\nfragment DocumentsPageRowFragment on Document {\n  id\n  title\n  description\n  documentType\n  updatedAt\n  owner {\n    id\n    fullName\n  }\n  versions(first: 1) {\n    edges {\n      node {\n        id\n        status\n        signatures(first: 100) {\n          edges {\n            node {\n              id\n              state\n            }\n          }\n        }\n      }\n    }\n  }\n}\n"
+    "text": "mutation CreateDocumentDialogMutation(\n  $input: CreateDocumentInput!\n) {\n  createDocument(input: $input) {\n    documentEdge {\n      node {\n        id\n        ...DocumentsPageRowFragment\n      }\n    }\n  }\n}\n\nfragment DocumentsPageRowFragment on Document {\n  id\n  title\n  description\n  documentType\n  updatedAt\n  owner {\n    id\n    fullName\n  }\n  controls(first: 1) {\n    edges {\n      node {\n        id\n        name\n      }\n    }\n  }\n  versions(first: 1) {\n    edges {\n      node {\n        id\n        status\n        signatures(first: 100) {\n          edges {\n            node {\n              id\n              state\n            }\n          }\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
