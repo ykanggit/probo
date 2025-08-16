@@ -268,6 +268,20 @@ type CreateDocumentPayload struct {
 	DocumentVersionEdge *DocumentVersionEdge `json:"documentVersionEdge"`
 }
 
+type CreateDocumentWithFileInput struct {
+	OrganizationID gid.GID               `json:"organizationId"`
+	Title          string                `json:"title"`
+	Content        string                `json:"content"`
+	OwnerID        gid.GID               `json:"ownerId"`
+	DocumentType   coredata.DocumentType `json:"documentType"`
+	File           graphql.Upload        `json:"file"`
+}
+
+type CreateDocumentWithFilePayload struct {
+	DocumentEdge        *DocumentEdge        `json:"documentEdge"`
+	DocumentVersionEdge *DocumentVersionEdge `json:"documentVersionEdge"`
+}
+
 type CreateDraftDocumentVersionInput struct {
 	DocumentID gid.GID `json:"documentID"`
 }
@@ -712,6 +726,11 @@ type DocumentVersion struct {
 	Changelog   string                              `json:"changelog"`
 	Title       string                              `json:"title"`
 	Owner       *People                             `json:"owner"`
+	FileName    *string                             `json:"fileName,omitempty"`
+	FileSize    *int                                `json:"fileSize,omitempty"`
+	FileType    *string                             `json:"fileType,omitempty"`
+	FileInfo    *string                             `json:"fileInfo,omitempty"`
+	FileURL     *string                             `json:"fileUrl,omitempty"`
 	Signatures  *DocumentVersionSignatureConnection `json:"signatures"`
 	PublishedBy *People                             `json:"publishedBy,omitempty"`
 	PublishedAt *time.Time                          `json:"publishedAt,omitempty"`
@@ -764,6 +783,17 @@ type DocumentVersionSignatureEdge struct {
 type DocumentVersionSignatureOrder struct {
 	Field     coredata.DocumentVersionSignatureOrderField `json:"field"`
 	Direction page.OrderDirection                         `json:"direction"`
+}
+
+type DownloadDocumentVersionInput struct {
+	DocumentVersionID gid.GID `json:"documentVersionId"`
+}
+
+type DownloadDocumentVersionPayload struct {
+	DownloadURL string `json:"downloadUrl"`
+	FileName    string `json:"fileName"`
+	FileSize    int    `json:"fileSize"`
+	FileType    string `json:"fileType"`
 }
 
 type Evidence struct {
@@ -852,6 +882,17 @@ type GenerateFrameworkStateOfApplicabilityInput struct {
 
 type GenerateFrameworkStateOfApplicabilityPayload struct {
 	Data string `json:"data"`
+}
+
+type GetFileContentInput struct {
+	DocumentVersionID gid.GID `json:"documentVersionId"`
+}
+
+type GetFileContentPayload struct {
+	Content  string `json:"content"`
+	FileName string `json:"fileName"`
+	FileType string `json:"fileType"`
+	FileSize int    `json:"fileSize"`
 }
 
 type ImportFrameworkInput struct {

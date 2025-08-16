@@ -244,6 +244,11 @@ type ComplexityRoot struct {
 		DocumentVersionEdge func(childComplexity int) int
 	}
 
+	CreateDocumentWithFilePayload struct {
+		DocumentEdge        func(childComplexity int) int
+		DocumentVersionEdge func(childComplexity int) int
+	}
+
 	CreateDraftDocumentVersionPayload struct {
 		DocumentVersionEdge func(childComplexity int) int
 	}
@@ -461,6 +466,11 @@ type ComplexityRoot struct {
 		Content     func(childComplexity int) int
 		CreatedAt   func(childComplexity int) int
 		Document    func(childComplexity int) int
+		FileInfo    func(childComplexity int) int
+		FileName    func(childComplexity int) int
+		FileSize    func(childComplexity int) int
+		FileType    func(childComplexity int) int
+		FileURL     func(childComplexity int) int
 		ID          func(childComplexity int) int
 		Owner       func(childComplexity int) int
 		PublishedAt func(childComplexity int) int
@@ -502,6 +512,13 @@ type ComplexityRoot struct {
 	DocumentVersionSignatureEdge struct {
 		Cursor func(childComplexity int) int
 		Node   func(childComplexity int) int
+	}
+
+	DownloadDocumentVersionPayload struct {
+		DownloadURL func(childComplexity int) int
+		FileName    func(childComplexity int) int
+		FileSize    func(childComplexity int) int
+		FileType    func(childComplexity int) int
 	}
 
 	Evidence struct {
@@ -573,6 +590,13 @@ type ComplexityRoot struct {
 		Data func(childComplexity int) int
 	}
 
+	GetFileContentPayload struct {
+		Content  func(childComplexity int) int
+		FileName func(childComplexity int) int
+		FileSize func(childComplexity int) int
+		FileType func(childComplexity int) int
+	}
+
 	ImportFrameworkPayload struct {
 		FrameworkEdge func(childComplexity int) int
 	}
@@ -631,6 +655,7 @@ type ComplexityRoot struct {
 		CreateControlMeasureMapping            func(childComplexity int, input types.CreateControlMeasureMappingInput) int
 		CreateDatum                            func(childComplexity int, input types.CreateDatumInput) int
 		CreateDocument                         func(childComplexity int, input types.CreateDocumentInput) int
+		CreateDocumentWithFile                 func(childComplexity int, input types.CreateDocumentWithFileInput) int
 		CreateDraftDocumentVersion             func(childComplexity int, input types.CreateDraftDocumentVersionInput) int
 		CreateFramework                        func(childComplexity int, input types.CreateFrameworkInput) int
 		CreateMeasure                          func(childComplexity int, input types.CreateMeasureInput) int
@@ -669,11 +694,13 @@ type ComplexityRoot struct {
 		DeleteVendorComplianceReport           func(childComplexity int, input types.DeleteVendorComplianceReportInput) int
 		DeleteVendorContact                    func(childComplexity int, input types.DeleteVendorContactInput) int
 		DeleteVendorDataPrivacyAgreement       func(childComplexity int, input types.DeleteVendorDataPrivacyAgreementInput) int
+		DownloadDocumentVersion                func(childComplexity int, input types.DownloadDocumentVersionInput) int
 		ExportDocumentVersionPDF               func(childComplexity int, input types.ExportDocumentVersionPDFInput) int
 		ExportMeasures                         func(childComplexity int, input types.ExportMeasuresInput) int
 		FulfillEvidence                        func(childComplexity int, input types.FulfillEvidenceInput) int
 		GenerateDocumentChangelog              func(childComplexity int, input types.GenerateDocumentChangelogInput) int
 		GenerateFrameworkStateOfApplicability  func(childComplexity int, input types.GenerateFrameworkStateOfApplicabilityInput) int
+		GetFileContent                         func(childComplexity int, input types.GetFileContentInput) int
 		ImportFramework                        func(childComplexity int, input types.ImportFrameworkInput) int
 		ImportMeasure                          func(childComplexity int, input types.ImportMeasureInput) int
 		InviteUser                             func(childComplexity int, input types.InviteUserInput) int
@@ -1227,6 +1254,11 @@ type DocumentVersionResolver interface {
 	Document(ctx context.Context, obj *types.DocumentVersion) (*types.Document, error)
 
 	Owner(ctx context.Context, obj *types.DocumentVersion) (*types.People, error)
+	FileName(ctx context.Context, obj *types.DocumentVersion) (*string, error)
+	FileSize(ctx context.Context, obj *types.DocumentVersion) (*int, error)
+	FileType(ctx context.Context, obj *types.DocumentVersion) (*string, error)
+	FileInfo(ctx context.Context, obj *types.DocumentVersion) (*string, error)
+	FileURL(ctx context.Context, obj *types.DocumentVersion) (*string, error)
 	Signatures(ctx context.Context, obj *types.DocumentVersion, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DocumentVersionSignatureOrder) (*types.DocumentVersionSignatureConnection, error)
 	PublishedBy(ctx context.Context, obj *types.DocumentVersion) (*types.People, error)
 }
@@ -1330,6 +1362,7 @@ type MutationResolver interface {
 	UpdateVendorDataPrivacyAgreement(ctx context.Context, input types.UpdateVendorDataPrivacyAgreementInput) (*types.UpdateVendorDataPrivacyAgreementPayload, error)
 	DeleteVendorDataPrivacyAgreement(ctx context.Context, input types.DeleteVendorDataPrivacyAgreementInput) (*types.DeleteVendorDataPrivacyAgreementPayload, error)
 	CreateDocument(ctx context.Context, input types.CreateDocumentInput) (*types.CreateDocumentPayload, error)
+	CreateDocumentWithFile(ctx context.Context, input types.CreateDocumentWithFileInput) (*types.CreateDocumentWithFilePayload, error)
 	UpdateDocument(ctx context.Context, input types.UpdateDocumentInput) (*types.UpdateDocumentPayload, error)
 	DeleteDocument(ctx context.Context, input types.DeleteDocumentInput) (*types.DeleteDocumentPayload, error)
 	PublishDocumentVersion(ctx context.Context, input types.PublishDocumentVersionInput) (*types.PublishDocumentVersionPayload, error)
@@ -1343,6 +1376,8 @@ type MutationResolver interface {
 	SendSigningNotifications(ctx context.Context, input types.SendSigningNotificationsInput) (*types.SendSigningNotificationsPayload, error)
 	CancelSignatureRequest(ctx context.Context, input types.CancelSignatureRequestInput) (*types.CancelSignatureRequestPayload, error)
 	ExportDocumentVersionPDF(ctx context.Context, input types.ExportDocumentVersionPDFInput) (*types.ExportDocumentVersionPDFPayload, error)
+	DownloadDocumentVersion(ctx context.Context, input types.DownloadDocumentVersionInput) (*types.DownloadDocumentVersionPayload, error)
+	GetFileContent(ctx context.Context, input types.GetFileContentInput) (*types.GetFileContentPayload, error)
 	CreateVendorRiskAssessment(ctx context.Context, input types.CreateVendorRiskAssessmentInput) (*types.CreateVendorRiskAssessmentPayload, error)
 	AssessVendor(ctx context.Context, input types.AssessVendorInput) (*types.AssessVendorPayload, error)
 	CreateAsset(ctx context.Context, input types.CreateAssetInput) (*types.CreateAssetPayload, error)
@@ -2051,6 +2086,20 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.CreateDocumentPayload.DocumentVersionEdge(childComplexity), true
 
+	case "CreateDocumentWithFilePayload.documentEdge":
+		if e.complexity.CreateDocumentWithFilePayload.DocumentEdge == nil {
+			break
+		}
+
+		return e.complexity.CreateDocumentWithFilePayload.DocumentEdge(childComplexity), true
+
+	case "CreateDocumentWithFilePayload.documentVersionEdge":
+		if e.complexity.CreateDocumentWithFilePayload.DocumentVersionEdge == nil {
+			break
+		}
+
+		return e.complexity.CreateDocumentWithFilePayload.DocumentVersionEdge(childComplexity), true
+
 	case "CreateDraftDocumentVersionPayload.documentVersionEdge":
 		if e.complexity.CreateDraftDocumentVersionPayload.DocumentVersionEdge == nil {
 			break
@@ -2633,6 +2682,41 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.DocumentVersion.Document(childComplexity), true
 
+	case "DocumentVersion.fileInfo":
+		if e.complexity.DocumentVersion.FileInfo == nil {
+			break
+		}
+
+		return e.complexity.DocumentVersion.FileInfo(childComplexity), true
+
+	case "DocumentVersion.fileName":
+		if e.complexity.DocumentVersion.FileName == nil {
+			break
+		}
+
+		return e.complexity.DocumentVersion.FileName(childComplexity), true
+
+	case "DocumentVersion.fileSize":
+		if e.complexity.DocumentVersion.FileSize == nil {
+			break
+		}
+
+		return e.complexity.DocumentVersion.FileSize(childComplexity), true
+
+	case "DocumentVersion.fileType":
+		if e.complexity.DocumentVersion.FileType == nil {
+			break
+		}
+
+		return e.complexity.DocumentVersion.FileType(childComplexity), true
+
+	case "DocumentVersion.fileUrl":
+		if e.complexity.DocumentVersion.FileURL == nil {
+			break
+		}
+
+		return e.complexity.DocumentVersion.FileURL(childComplexity), true
+
 	case "DocumentVersion.id":
 		if e.complexity.DocumentVersion.ID == nil {
 			break
@@ -2819,6 +2903,34 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.DocumentVersionSignatureEdge.Node(childComplexity), true
+
+	case "DownloadDocumentVersionPayload.downloadUrl":
+		if e.complexity.DownloadDocumentVersionPayload.DownloadURL == nil {
+			break
+		}
+
+		return e.complexity.DownloadDocumentVersionPayload.DownloadURL(childComplexity), true
+
+	case "DownloadDocumentVersionPayload.fileName":
+		if e.complexity.DownloadDocumentVersionPayload.FileName == nil {
+			break
+		}
+
+		return e.complexity.DownloadDocumentVersionPayload.FileName(childComplexity), true
+
+	case "DownloadDocumentVersionPayload.fileSize":
+		if e.complexity.DownloadDocumentVersionPayload.FileSize == nil {
+			break
+		}
+
+		return e.complexity.DownloadDocumentVersionPayload.FileSize(childComplexity), true
+
+	case "DownloadDocumentVersionPayload.fileType":
+		if e.complexity.DownloadDocumentVersionPayload.FileType == nil {
+			break
+		}
+
+		return e.complexity.DownloadDocumentVersionPayload.FileType(childComplexity), true
 
 	case "Evidence.createdAt":
 		if e.complexity.Evidence.CreatedAt == nil {
@@ -3076,6 +3188,34 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.GenerateFrameworkStateOfApplicabilityPayload.Data(childComplexity), true
+
+	case "GetFileContentPayload.content":
+		if e.complexity.GetFileContentPayload.Content == nil {
+			break
+		}
+
+		return e.complexity.GetFileContentPayload.Content(childComplexity), true
+
+	case "GetFileContentPayload.fileName":
+		if e.complexity.GetFileContentPayload.FileName == nil {
+			break
+		}
+
+		return e.complexity.GetFileContentPayload.FileName(childComplexity), true
+
+	case "GetFileContentPayload.fileSize":
+		if e.complexity.GetFileContentPayload.FileSize == nil {
+			break
+		}
+
+		return e.complexity.GetFileContentPayload.FileSize(childComplexity), true
+
+	case "GetFileContentPayload.fileType":
+		if e.complexity.GetFileContentPayload.FileType == nil {
+			break
+		}
+
+		return e.complexity.GetFileContentPayload.FileType(childComplexity), true
 
 	case "ImportFrameworkPayload.frameworkEdge":
 		if e.complexity.ImportFrameworkPayload.FrameworkEdge == nil {
@@ -3439,6 +3579,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.CreateDocument(childComplexity, args["input"].(types.CreateDocumentInput)), true
+
+	case "Mutation.createDocumentWithFile":
+		if e.complexity.Mutation.CreateDocumentWithFile == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createDocumentWithFile_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateDocumentWithFile(childComplexity, args["input"].(types.CreateDocumentWithFileInput)), true
 
 	case "Mutation.createDraftDocumentVersion":
 		if e.complexity.Mutation.CreateDraftDocumentVersion == nil {
@@ -3896,6 +4048,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Mutation.DeleteVendorDataPrivacyAgreement(childComplexity, args["input"].(types.DeleteVendorDataPrivacyAgreementInput)), true
 
+	case "Mutation.downloadDocumentVersion":
+		if e.complexity.Mutation.DownloadDocumentVersion == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_downloadDocumentVersion_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DownloadDocumentVersion(childComplexity, args["input"].(types.DownloadDocumentVersionInput)), true
+
 	case "Mutation.exportDocumentVersionPDF":
 		if e.complexity.Mutation.ExportDocumentVersionPDF == nil {
 			break
@@ -3955,6 +4119,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.GenerateFrameworkStateOfApplicability(childComplexity, args["input"].(types.GenerateFrameworkStateOfApplicabilityInput)), true
+
+	case "Mutation.getFileContent":
+		if e.complexity.Mutation.GetFileContent == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_getFileContent_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.GetFileContent(childComplexity, args["input"].(types.GetFileContentInput)), true
 
 	case "Mutation.importFramework":
 		if e.complexity.Mutation.ImportFramework == nil {
@@ -6298,6 +6474,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputCreateControlMeasureMappingInput,
 		ec.unmarshalInputCreateDatumInput,
 		ec.unmarshalInputCreateDocumentInput,
+		ec.unmarshalInputCreateDocumentWithFileInput,
 		ec.unmarshalInputCreateDraftDocumentVersionInput,
 		ec.unmarshalInputCreateEvidenceInput,
 		ec.unmarshalInputCreateFrameworkInput,
@@ -6343,6 +6520,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputDocumentVersionFilter,
 		ec.unmarshalInputDocumentVersionOrder,
 		ec.unmarshalInputDocumentVersionSignatureOrder,
+		ec.unmarshalInputDownloadDocumentVersionInput,
 		ec.unmarshalInputEvidenceOrder,
 		ec.unmarshalInputExportDocumentVersionPDFInput,
 		ec.unmarshalInputExportMeasuresInput,
@@ -6350,6 +6528,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputFulfillEvidenceInput,
 		ec.unmarshalInputGenerateDocumentChangelogInput,
 		ec.unmarshalInputGenerateFrameworkStateOfApplicabilityInput,
+		ec.unmarshalInputGetFileContentInput,
 		ec.unmarshalInputImportFrameworkInput,
 		ec.unmarshalInputImportMeasureInput,
 		ec.unmarshalInputInviteUserInput,
@@ -8242,6 +8421,7 @@ type Mutation {
 
   # Document mutations
   createDocument(input: CreateDocumentInput!): CreateDocumentPayload!
+  createDocumentWithFile(input: CreateDocumentWithFileInput!): CreateDocumentWithFilePayload!
   updateDocument(input: UpdateDocumentInput!): UpdateDocumentPayload!
   deleteDocument(input: DeleteDocumentInput!): DeleteDocumentPayload!
   publishDocumentVersion(
@@ -8275,6 +8455,12 @@ type Mutation {
   exportDocumentVersionPDF(
     input: ExportDocumentVersionPDFInput!
   ): ExportDocumentVersionPDFPayload!
+  downloadDocumentVersion(
+    input: DownloadDocumentVersionInput!
+  ): DownloadDocumentVersionPayload!
+  getFileContent(
+    input: GetFileContentInput!
+  ): GetFileContentPayload!
 
   createVendorRiskAssessment(
     input: CreateVendorRiskAssessmentInput!
@@ -8675,6 +8861,15 @@ input CreateDocumentInput {
   documentType: DocumentType!
 }
 
+input CreateDocumentWithFileInput {
+  organizationId: ID!
+  title: String!
+  content: String!
+  ownerId: ID!
+  documentType: DocumentType!
+  file: Upload!
+}
+
 input UpdateDocumentInput {
   id: ID!
   title: String
@@ -8686,6 +8881,14 @@ input UpdateDocumentInput {
 }
 
 input ExportDocumentVersionPDFInput {
+  documentVersionId: ID!
+}
+
+input DownloadDocumentVersionInput {
+  documentVersionId: ID!
+}
+
+input GetFileContentInput {
   documentVersionId: ID!
 }
 
@@ -9001,8 +9204,27 @@ type CreateDocumentPayload {
   documentVersionEdge: DocumentVersionEdge!
 }
 
+type CreateDocumentWithFilePayload {
+  documentEdge: DocumentEdge!
+  documentVersionEdge: DocumentVersionEdge!
+}
+
 type ExportDocumentVersionPDFPayload {
   data: String!
+}
+
+type DownloadDocumentVersionPayload {
+  downloadUrl: String!
+  fileName: String!
+  fileSize: Int!
+  fileType: String!
+}
+
+type GetFileContentPayload {
+  content: String!
+  fileName: String!
+  fileType: String!
+  fileSize: Int!
 }
 
 type UpdateDocumentPayload {
@@ -9112,6 +9334,13 @@ type DocumentVersion implements Node {
   changelog: String!
   title: String!
   owner: People! @goField(forceResolver: true)
+  
+  # File information
+  fileName: String @goField(forceResolver: true)
+  fileSize: Int @goField(forceResolver: true)
+  fileType: String @goField(forceResolver: true)
+  fileInfo: String @goField(forceResolver: true)
+  fileUrl: String @goField(forceResolver: true)
 
   signatures(
     first: Int
@@ -11233,6 +11462,29 @@ func (ec *executionContext) field_Mutation_createDatum_argsInput(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Mutation_createDocumentWithFile_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_createDocumentWithFile_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_createDocumentWithFile_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.CreateDocumentWithFileInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNCreateDocumentWithFileInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateDocumentWithFileInput(ctx, tmp)
+	}
+
+	var zeroVal types.CreateDocumentWithFileInput
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Mutation_createDocument_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -12130,6 +12382,29 @@ func (ec *executionContext) field_Mutation_deleteVendor_argsInput(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Mutation_downloadDocumentVersion_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_downloadDocumentVersion_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_downloadDocumentVersion_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.DownloadDocumentVersionInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNDownloadDocumentVersionInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDownloadDocumentVersionInput(ctx, tmp)
+	}
+
+	var zeroVal types.DownloadDocumentVersionInput
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Mutation_exportDocumentVersionPDF_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -12242,6 +12517,29 @@ func (ec *executionContext) field_Mutation_generateFrameworkStateOfApplicability
 	}
 
 	var zeroVal types.GenerateFrameworkStateOfApplicabilityInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_getFileContent_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_getFileContent_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_getFileContent_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (types.GetFileContentInput, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNGetFileContentInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐGetFileContentInput(ctx, tmp)
+	}
+
+	var zeroVal types.GetFileContentInput
 	return zeroVal, nil
 }
 
@@ -19568,6 +19866,106 @@ func (ec *executionContext) fieldContext_CreateDocumentPayload_documentVersionEd
 	return fc, nil
 }
 
+func (ec *executionContext) _CreateDocumentWithFilePayload_documentEdge(ctx context.Context, field graphql.CollectedField, obj *types.CreateDocumentWithFilePayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateDocumentWithFilePayload_documentEdge(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DocumentEdge, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.DocumentEdge)
+	fc.Result = res
+	return ec.marshalNDocumentEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDocumentEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreateDocumentWithFilePayload_documentEdge(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateDocumentWithFilePayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_DocumentEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_DocumentEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DocumentEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateDocumentWithFilePayload_documentVersionEdge(ctx context.Context, field graphql.CollectedField, obj *types.CreateDocumentWithFilePayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateDocumentWithFilePayload_documentVersionEdge(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DocumentVersionEdge, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.DocumentVersionEdge)
+	fc.Result = res
+	return ec.marshalNDocumentVersionEdge2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDocumentVersionEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreateDocumentWithFilePayload_documentVersionEdge(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateDocumentWithFilePayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "cursor":
+				return ec.fieldContext_DocumentVersionEdge_cursor(ctx, field)
+			case "node":
+				return ec.fieldContext_DocumentVersionEdge_node(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DocumentVersionEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _CreateDraftDocumentVersionPayload_documentVersionEdge(ctx context.Context, field graphql.CollectedField, obj *types.CreateDraftDocumentVersionPayload) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_CreateDraftDocumentVersionPayload_documentVersionEdge(ctx, field)
 	if err != nil {
@@ -23756,6 +24154,211 @@ func (ec *executionContext) fieldContext_DocumentVersion_owner(_ context.Context
 	return fc, nil
 }
 
+func (ec *executionContext) _DocumentVersion_fileName(ctx context.Context, field graphql.CollectedField, obj *types.DocumentVersion) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DocumentVersion_fileName(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.DocumentVersion().FileName(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DocumentVersion_fileName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DocumentVersion",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DocumentVersion_fileSize(ctx context.Context, field graphql.CollectedField, obj *types.DocumentVersion) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DocumentVersion_fileSize(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.DocumentVersion().FileSize(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DocumentVersion_fileSize(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DocumentVersion",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DocumentVersion_fileType(ctx context.Context, field graphql.CollectedField, obj *types.DocumentVersion) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DocumentVersion_fileType(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.DocumentVersion().FileType(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DocumentVersion_fileType(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DocumentVersion",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DocumentVersion_fileInfo(ctx context.Context, field graphql.CollectedField, obj *types.DocumentVersion) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DocumentVersion_fileInfo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.DocumentVersion().FileInfo(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DocumentVersion_fileInfo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DocumentVersion",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DocumentVersion_fileUrl(ctx context.Context, field graphql.CollectedField, obj *types.DocumentVersion) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DocumentVersion_fileUrl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.DocumentVersion().FileURL(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DocumentVersion_fileUrl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DocumentVersion",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _DocumentVersion_signatures(ctx context.Context, field graphql.CollectedField, obj *types.DocumentVersion) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_DocumentVersion_signatures(ctx, field)
 	if err != nil {
@@ -24212,6 +24815,16 @@ func (ec *executionContext) fieldContext_DocumentVersionEdge_node(_ context.Cont
 				return ec.fieldContext_DocumentVersion_title(ctx, field)
 			case "owner":
 				return ec.fieldContext_DocumentVersion_owner(ctx, field)
+			case "fileName":
+				return ec.fieldContext_DocumentVersion_fileName(ctx, field)
+			case "fileSize":
+				return ec.fieldContext_DocumentVersion_fileSize(ctx, field)
+			case "fileType":
+				return ec.fieldContext_DocumentVersion_fileType(ctx, field)
+			case "fileInfo":
+				return ec.fieldContext_DocumentVersion_fileInfo(ctx, field)
+			case "fileUrl":
+				return ec.fieldContext_DocumentVersion_fileUrl(ctx, field)
 			case "signatures":
 				return ec.fieldContext_DocumentVersion_signatures(ctx, field)
 			case "publishedBy":
@@ -24328,6 +24941,16 @@ func (ec *executionContext) fieldContext_DocumentVersionSignature_documentVersio
 				return ec.fieldContext_DocumentVersion_title(ctx, field)
 			case "owner":
 				return ec.fieldContext_DocumentVersion_owner(ctx, field)
+			case "fileName":
+				return ec.fieldContext_DocumentVersion_fileName(ctx, field)
+			case "fileSize":
+				return ec.fieldContext_DocumentVersion_fileSize(ctx, field)
+			case "fileType":
+				return ec.fieldContext_DocumentVersion_fileType(ctx, field)
+			case "fileInfo":
+				return ec.fieldContext_DocumentVersion_fileInfo(ctx, field)
+			case "fileUrl":
+				return ec.fieldContext_DocumentVersion_fileUrl(ctx, field)
 			case "signatures":
 				return ec.fieldContext_DocumentVersion_signatures(ctx, field)
 			case "publishedBy":
@@ -24901,6 +25524,182 @@ func (ec *executionContext) fieldContext_DocumentVersionSignatureEdge_node(_ con
 				return ec.fieldContext_DocumentVersionSignature_updatedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type DocumentVersionSignature", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DownloadDocumentVersionPayload_downloadUrl(ctx context.Context, field graphql.CollectedField, obj *types.DownloadDocumentVersionPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DownloadDocumentVersionPayload_downloadUrl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DownloadURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DownloadDocumentVersionPayload_downloadUrl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DownloadDocumentVersionPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DownloadDocumentVersionPayload_fileName(ctx context.Context, field graphql.CollectedField, obj *types.DownloadDocumentVersionPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DownloadDocumentVersionPayload_fileName(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FileName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DownloadDocumentVersionPayload_fileName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DownloadDocumentVersionPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DownloadDocumentVersionPayload_fileSize(ctx context.Context, field graphql.CollectedField, obj *types.DownloadDocumentVersionPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DownloadDocumentVersionPayload_fileSize(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FileSize, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DownloadDocumentVersionPayload_fileSize(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DownloadDocumentVersionPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DownloadDocumentVersionPayload_fileType(ctx context.Context, field graphql.CollectedField, obj *types.DownloadDocumentVersionPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_DownloadDocumentVersionPayload_fileType(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FileType, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_DownloadDocumentVersionPayload_fileType(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DownloadDocumentVersionPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -26685,6 +27484,182 @@ func (ec *executionContext) fieldContext_GenerateFrameworkStateOfApplicabilityPa
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GetFileContentPayload_content(ctx context.Context, field graphql.CollectedField, obj *types.GetFileContentPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GetFileContentPayload_content(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Content, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GetFileContentPayload_content(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GetFileContentPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GetFileContentPayload_fileName(ctx context.Context, field graphql.CollectedField, obj *types.GetFileContentPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GetFileContentPayload_fileName(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FileName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GetFileContentPayload_fileName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GetFileContentPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GetFileContentPayload_fileType(ctx context.Context, field graphql.CollectedField, obj *types.GetFileContentPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GetFileContentPayload_fileType(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FileType, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GetFileContentPayload_fileType(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GetFileContentPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GetFileContentPayload_fileSize(ctx context.Context, field graphql.CollectedField, obj *types.GetFileContentPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GetFileContentPayload_fileSize(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FileSize, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GetFileContentPayload_fileSize(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GetFileContentPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -31673,6 +32648,67 @@ func (ec *executionContext) fieldContext_Mutation_createDocument(ctx context.Con
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_createDocumentWithFile(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createDocumentWithFile(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateDocumentWithFile(rctx, fc.Args["input"].(types.CreateDocumentWithFileInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.CreateDocumentWithFilePayload)
+	fc.Result = res
+	return ec.marshalNCreateDocumentWithFilePayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateDocumentWithFilePayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createDocumentWithFile(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "documentEdge":
+				return ec.fieldContext_CreateDocumentWithFilePayload_documentEdge(ctx, field)
+			case "documentVersionEdge":
+				return ec.fieldContext_CreateDocumentWithFilePayload_documentVersionEdge(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CreateDocumentWithFilePayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createDocumentWithFile_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_updateDocument(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_updateDocument(ctx, field)
 	if err != nil {
@@ -32438,6 +33474,136 @@ func (ec *executionContext) fieldContext_Mutation_exportDocumentVersionPDF(ctx c
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_exportDocumentVersionPDF_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_downloadDocumentVersion(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_downloadDocumentVersion(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DownloadDocumentVersion(rctx, fc.Args["input"].(types.DownloadDocumentVersionInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.DownloadDocumentVersionPayload)
+	fc.Result = res
+	return ec.marshalNDownloadDocumentVersionPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDownloadDocumentVersionPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_downloadDocumentVersion(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "downloadUrl":
+				return ec.fieldContext_DownloadDocumentVersionPayload_downloadUrl(ctx, field)
+			case "fileName":
+				return ec.fieldContext_DownloadDocumentVersionPayload_fileName(ctx, field)
+			case "fileSize":
+				return ec.fieldContext_DownloadDocumentVersionPayload_fileSize(ctx, field)
+			case "fileType":
+				return ec.fieldContext_DownloadDocumentVersionPayload_fileType(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DownloadDocumentVersionPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_downloadDocumentVersion_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_getFileContent(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_getFileContent(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().GetFileContent(rctx, fc.Args["input"].(types.GetFileContentInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*types.GetFileContentPayload)
+	fc.Result = res
+	return ec.marshalNGetFileContentPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐGetFileContentPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_getFileContent(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "content":
+				return ec.fieldContext_GetFileContentPayload_content(ctx, field)
+			case "fileName":
+				return ec.fieldContext_GetFileContentPayload_fileName(ctx, field)
+			case "fileType":
+				return ec.fieldContext_GetFileContentPayload_fileType(ctx, field)
+			case "fileSize":
+				return ec.fieldContext_GetFileContentPayload_fileSize(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type GetFileContentPayload", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_getFileContent_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -35716,6 +36882,16 @@ func (ec *executionContext) fieldContext_PublishDocumentVersionPayload_documentV
 				return ec.fieldContext_DocumentVersion_title(ctx, field)
 			case "owner":
 				return ec.fieldContext_DocumentVersion_owner(ctx, field)
+			case "fileName":
+				return ec.fieldContext_DocumentVersion_fileName(ctx, field)
+			case "fileSize":
+				return ec.fieldContext_DocumentVersion_fileSize(ctx, field)
+			case "fileType":
+				return ec.fieldContext_DocumentVersion_fileType(ctx, field)
+			case "fileInfo":
+				return ec.fieldContext_DocumentVersion_fileInfo(ctx, field)
+			case "fileUrl":
+				return ec.fieldContext_DocumentVersion_fileUrl(ctx, field)
 			case "signatures":
 				return ec.fieldContext_DocumentVersion_signatures(ctx, field)
 			case "publishedBy":
@@ -40484,6 +41660,16 @@ func (ec *executionContext) fieldContext_UpdateDocumentVersionPayload_documentVe
 				return ec.fieldContext_DocumentVersion_title(ctx, field)
 			case "owner":
 				return ec.fieldContext_DocumentVersion_owner(ctx, field)
+			case "fileName":
+				return ec.fieldContext_DocumentVersion_fileName(ctx, field)
+			case "fileSize":
+				return ec.fieldContext_DocumentVersion_fileSize(ctx, field)
+			case "fileType":
+				return ec.fieldContext_DocumentVersion_fileType(ctx, field)
+			case "fileInfo":
+				return ec.fieldContext_DocumentVersion_fileInfo(ctx, field)
+			case "fileUrl":
+				return ec.fieldContext_DocumentVersion_fileUrl(ctx, field)
 			case "signatures":
 				return ec.fieldContext_DocumentVersion_signatures(ctx, field)
 			case "publishedBy":
@@ -49596,6 +50782,68 @@ func (ec *executionContext) unmarshalInputCreateDocumentInput(ctx context.Contex
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCreateDocumentWithFileInput(ctx context.Context, obj any) (types.CreateDocumentWithFileInput, error) {
+	var it types.CreateDocumentWithFileInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"organizationId", "title", "content", "ownerId", "documentType", "file"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "organizationId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("organizationId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OrganizationID = data
+		case "title":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Title = data
+		case "content":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("content"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Content = data
+		case "ownerId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownerId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OwnerID = data
+		case "documentType":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("documentType"))
+			data, err := ec.unmarshalNDocumentType2githubᚗcomᚋgetproboᚋproboᚋpkgᚋcoredataᚐDocumentType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DocumentType = data
+		case "file":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("file"))
+			data, err := ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.File = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreateDraftDocumentVersionInput(ctx context.Context, obj any) (types.CreateDraftDocumentVersionInput, error) {
 	var it types.CreateDraftDocumentVersionInput
 	asMap := map[string]any{}
@@ -51322,6 +52570,33 @@ func (ec *executionContext) unmarshalInputDocumentVersionSignatureOrder(ctx cont
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputDownloadDocumentVersionInput(ctx context.Context, obj any) (types.DownloadDocumentVersionInput, error) {
+	var it types.DownloadDocumentVersionInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"documentVersionId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "documentVersionId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("documentVersionId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DocumentVersionID = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputEvidenceOrder(ctx context.Context, obj any) (types.EvidenceOrderBy, error) {
 	var it types.EvidenceOrderBy
 	asMap := map[string]any{}
@@ -51554,6 +52829,33 @@ func (ec *executionContext) unmarshalInputGenerateFrameworkStateOfApplicabilityI
 				return it, err
 			}
 			it.FrameworkID = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputGetFileContentInput(ctx context.Context, obj any) (types.GetFileContentInput, error) {
+	var it types.GetFileContentInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"documentVersionId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "documentVersionId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("documentVersionId"))
+			data, err := ec.unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DocumentVersionID = data
 		}
 	}
 
@@ -55708,6 +57010,50 @@ func (ec *executionContext) _CreateDocumentPayload(ctx context.Context, sel ast.
 	return out
 }
 
+var createDocumentWithFilePayloadImplementors = []string{"CreateDocumentWithFilePayload"}
+
+func (ec *executionContext) _CreateDocumentWithFilePayload(ctx context.Context, sel ast.SelectionSet, obj *types.CreateDocumentWithFilePayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, createDocumentWithFilePayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CreateDocumentWithFilePayload")
+		case "documentEdge":
+			out.Values[i] = ec._CreateDocumentWithFilePayload_documentEdge(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "documentVersionEdge":
+			out.Values[i] = ec._CreateDocumentWithFilePayload_documentVersionEdge(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var createDraftDocumentVersionPayloadImplementors = []string{"CreateDraftDocumentVersionPayload"}
 
 func (ec *executionContext) _CreateDraftDocumentVersionPayload(ctx context.Context, sel ast.SelectionSet, obj *types.CreateDraftDocumentVersionPayload) graphql.Marshaler {
@@ -58012,6 +59358,171 @@ func (ec *executionContext) _DocumentVersion(ctx context.Context, sel ast.Select
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "fileName":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._DocumentVersion_fileName(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "fileSize":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._DocumentVersion_fileSize(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "fileType":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._DocumentVersion_fileType(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "fileInfo":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._DocumentVersion_fileInfo(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "fileUrl":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._DocumentVersion_fileUrl(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "signatures":
 			field := field
 
@@ -58435,6 +59946,60 @@ func (ec *executionContext) _DocumentVersionSignatureEdge(ctx context.Context, s
 			}
 		case "node":
 			out.Values[i] = ec._DocumentVersionSignatureEdge_node(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var downloadDocumentVersionPayloadImplementors = []string{"DownloadDocumentVersionPayload"}
+
+func (ec *executionContext) _DownloadDocumentVersionPayload(ctx context.Context, sel ast.SelectionSet, obj *types.DownloadDocumentVersionPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, downloadDocumentVersionPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DownloadDocumentVersionPayload")
+		case "downloadUrl":
+			out.Values[i] = ec._DownloadDocumentVersionPayload_downloadUrl(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "fileName":
+			out.Values[i] = ec._DownloadDocumentVersionPayload_fileName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "fileSize":
+			out.Values[i] = ec._DownloadDocumentVersionPayload_fileSize(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "fileType":
+			out.Values[i] = ec._DownloadDocumentVersionPayload_fileType(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -59197,6 +60762,60 @@ func (ec *executionContext) _GenerateFrameworkStateOfApplicabilityPayload(ctx co
 			out.Values[i] = graphql.MarshalString("GenerateFrameworkStateOfApplicabilityPayload")
 		case "data":
 			out.Values[i] = ec._GenerateFrameworkStateOfApplicabilityPayload_data(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var getFileContentPayloadImplementors = []string{"GetFileContentPayload"}
+
+func (ec *executionContext) _GetFileContentPayload(ctx context.Context, sel ast.SelectionSet, obj *types.GetFileContentPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, getFileContentPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("GetFileContentPayload")
+		case "content":
+			out.Values[i] = ec._GetFileContentPayload_content(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "fileName":
+			out.Values[i] = ec._GetFileContentPayload_fileName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "fileType":
+			out.Values[i] = ec._GetFileContentPayload_fileType(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "fileSize":
+			out.Values[i] = ec._GetFileContentPayload_fileSize(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -60291,6 +61910,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "createDocumentWithFile":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createDocumentWithFile(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "updateDocument":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateDocument(ctx, field)
@@ -60378,6 +62004,20 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "exportDocumentVersionPDF":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_exportDocumentVersionPDF(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "downloadDocumentVersion":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_downloadDocumentVersion(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "getFileContent":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_getFileContent(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -66839,6 +68479,25 @@ func (ec *executionContext) marshalNCreateDocumentPayload2ᚖgithubᚗcomᚋgetp
 	return ec._CreateDocumentPayload(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNCreateDocumentWithFileInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateDocumentWithFileInput(ctx context.Context, v any) (types.CreateDocumentWithFileInput, error) {
+	res, err := ec.unmarshalInputCreateDocumentWithFileInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCreateDocumentWithFilePayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateDocumentWithFilePayload(ctx context.Context, sel ast.SelectionSet, v types.CreateDocumentWithFilePayload) graphql.Marshaler {
+	return ec._CreateDocumentWithFilePayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCreateDocumentWithFilePayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateDocumentWithFilePayload(ctx context.Context, sel ast.SelectionSet, v *types.CreateDocumentWithFilePayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CreateDocumentWithFilePayload(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNCreateDraftDocumentVersionInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐCreateDraftDocumentVersionInput(ctx context.Context, v any) (types.CreateDraftDocumentVersionInput, error) {
 	res, err := ec.unmarshalInputCreateDraftDocumentVersionInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -68211,6 +69870,25 @@ var (
 	}
 )
 
+func (ec *executionContext) unmarshalNDownloadDocumentVersionInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDownloadDocumentVersionInput(ctx context.Context, v any) (types.DownloadDocumentVersionInput, error) {
+	res, err := ec.unmarshalInputDownloadDocumentVersionInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNDownloadDocumentVersionPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDownloadDocumentVersionPayload(ctx context.Context, sel ast.SelectionSet, v types.DownloadDocumentVersionPayload) graphql.Marshaler {
+	return ec._DownloadDocumentVersionPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDownloadDocumentVersionPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐDownloadDocumentVersionPayload(ctx context.Context, sel ast.SelectionSet, v *types.DownloadDocumentVersionPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._DownloadDocumentVersionPayload(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNEvidence2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐEvidence(ctx context.Context, sel ast.SelectionSet, v *types.Evidence) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -68583,6 +70261,25 @@ func (ec *executionContext) marshalNGenerateFrameworkStateOfApplicabilityPayload
 		return graphql.Null
 	}
 	return ec._GenerateFrameworkStateOfApplicabilityPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNGetFileContentInput2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐGetFileContentInput(ctx context.Context, v any) (types.GetFileContentInput, error) {
+	res, err := ec.unmarshalInputGetFileContentInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNGetFileContentPayload2githubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐGetFileContentPayload(ctx context.Context, sel ast.SelectionSet, v types.GetFileContentPayload) graphql.Marshaler {
+	return ec._GetFileContentPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNGetFileContentPayload2ᚖgithubᚗcomᚋgetproboᚋproboᚋpkgᚋserverᚋapiᚋconsoleᚋv1ᚋtypesᚐGetFileContentPayload(ctx context.Context, sel ast.SelectionSet, v *types.GetFileContentPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._GetFileContentPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNID2githubᚗcomᚋgetproboᚋproboᚋpkgᚋgidᚐGID(ctx context.Context, v any) (gid.GID, error) {

@@ -2,11 +2,14 @@ package probo
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/url"
 	"time"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/getprobo/probo/pkg/coredata"
 	"github.com/getprobo/probo/pkg/docgen"
 	"github.com/getprobo/probo/pkg/gid"
@@ -35,6 +38,16 @@ type (
 		OwnerID        gid.GID
 		CreatedBy      gid.GID
 		DocumentType   coredata.DocumentType
+	}
+
+	CreateDocumentWithFileRequest struct {
+		OrganizationID gid.GID
+		DocumentType   coredata.DocumentType
+		Title          string
+		OwnerID        gid.GID
+		Content        string
+		CreatedBy      gid.GID
+		File           graphql.Upload
 	}
 
 	UpdateDocumentVersionRequest struct {
@@ -349,6 +362,134 @@ func (s *DocumentService) Create(
 	}
 
 	return document, documentVersion, nil
+}
+
+func (s *DocumentService) CreateWithFile(
+	ctx context.Context,
+	req CreateDocumentWithFileRequest,
+) (*coredata.Document, *coredata.DocumentVersion, error) {
+	now := time.Now()
+	documentID := gid.New(s.svc.scope.GetTenantID(), coredata.DocumentEntityType)
+	documentVersionID := gid.New(s.svc.scope.GetTenantID(), coredata.DocumentVersionEntityType)
+
+	organization := &coredata.Organization{}
+	people := &coredata.People{}
+
+	document := &coredata.Document{
+		ID:                documentID,
+		Title:             req.Title,
+		DocumentType:      req.DocumentType,
+		ShowOnTrustCenter: false,
+		CreatedAt:         now,
+		UpdatedAt:         now,
+	}
+
+	// Read file content
+	fileContent, err := io.ReadAll(req.File.File)
+	if err != nil {
+		return nil, nil, fmt.Errorf("cannot read file: %w", err)
+	}
+
+	// Store file info separately from description
+	fileInfo := map[string]interface{}{
+		"fileName": req.File.Filename,
+		"fileSize": len(fileContent),
+		"fileType": req.File.ContentType,
+		"fileData": base64.StdEncoding.EncodeToString(fileContent), // Store actual file content as base64
+	}
+
+	// Convert to JSON string for storage
+	fileInfoJSON, err := json.Marshal(fileInfo)
+	if err != nil {
+		return nil, nil, fmt.Errorf("cannot marshal file info: %w", err)
+	}
+	fileInfoStr := string(fileInfoJSON)
+
+	documentVersion := &coredata.DocumentVersion{
+		ID:            documentVersionID,
+		DocumentID:    documentID,
+		Title:         req.Title,
+		OwnerID:       req.OwnerID,
+		VersionNumber: 1,
+		Content:       req.Content,  // Store the actual description content
+		FileInfo:      &fileInfoStr, // Store file metadata separately
+		Status:        coredata.DocumentStatusDraft,
+		CreatedBy:     req.CreatedBy,
+		CreatedAt:     now,
+		UpdatedAt:     now,
+	}
+
+	err = s.svc.pg.WithTx(
+		ctx,
+		func(conn pg.Conn) error {
+			if err := organization.LoadByID(ctx, conn, s.svc.scope, req.OrganizationID); err != nil {
+				return fmt.Errorf("cannot load organization: %w", err)
+			}
+
+			if err := people.LoadByID(ctx, conn, s.svc.scope, req.OwnerID); err != nil {
+				return fmt.Errorf("cannot load people: %w", err)
+			}
+
+			document.OrganizationID = organization.ID
+			document.OwnerID = people.ID
+
+			if err := document.Insert(ctx, conn, s.svc.scope); err != nil {
+				return fmt.Errorf("cannot insert document: %w", err)
+			}
+
+			if err := documentVersion.Insert(ctx, conn, s.svc.scope); err != nil {
+				return fmt.Errorf("cannot create document version: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return document, documentVersion, nil
+}
+
+// GetFileContent retrieves the file content for a document version
+func (s *DocumentService) GetFileContent(
+	ctx context.Context,
+	documentVersionID gid.GID,
+) ([]byte, string, string, error) {
+	documentVersion, err := s.GetVersion(ctx, documentVersionID)
+	if err != nil {
+		return nil, "", "", fmt.Errorf("cannot get document version: %w", err)
+	}
+
+	// Check if file info exists
+	if documentVersion.FileInfo == nil || *documentVersion.FileInfo == "" {
+		return nil, "", "", fmt.Errorf("document version does not contain file data")
+	}
+
+	// Try to parse the file info as JSON to extract file information
+	var fileInfo map[string]interface{}
+	if err := json.Unmarshal([]byte(*documentVersion.FileInfo), &fileInfo); err != nil {
+		return nil, "", "", fmt.Errorf("cannot parse file info: %w", err)
+	}
+
+	// Extract file information
+	fileName, _ := fileInfo["fileName"].(string)
+	fileType, _ := fileInfo["fileType"].(string)
+
+	// Extract file data (base64 encoded)
+	fileDataStr, ok := fileInfo["fileData"].(string)
+	if !ok {
+		return nil, "", "", fmt.Errorf("file data not found in document version")
+	}
+
+	// Decode base64 data
+	fileData, err := base64.StdEncoding.DecodeString(fileDataStr)
+	if err != nil {
+		return nil, "", "", fmt.Errorf("cannot decode file data: %w", err)
+	}
+
+	return fileData, fileName, fileType, nil
 }
 
 func (s *DocumentService) ListSigningRequests(

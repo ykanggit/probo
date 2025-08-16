@@ -19,6 +19,7 @@ import {
   IconCrossLargeX,
   IconSignature,
   IconCheckmark1,
+  IconUpload,
 } from "@probo/ui";
 import {
   useFragment,
@@ -36,7 +37,7 @@ import {
 import type { DocumentsPageListFragment$key } from "./__generated__/DocumentsPageListFragment.graphql";
 import { useList, usePageTitle } from "@probo/hooks";
 import { sprintf, getDocumentTypeLabel } from "@probo/helpers";
-import { CreateDocumentDialog } from "./dialogs/CreateDocumentDialog";
+import { CreateDocumentWithFileDialog } from "./dialogs/CreateDocumentWithFileDialog";
 import type { DocumentsPageRowFragment$key } from "./__generated__/DocumentsPageRowFragment.graphql";
 import { SortableTable, SortableTh } from "/components/SortableTable";
 import { PublishDocumentsDialog } from "./dialogs/PublishDocumentsDialog.tsx";
@@ -120,7 +121,7 @@ export default function DocumentsPage(props: Props) {
           >
             {__("Send signing notifications")}
           </Button>
-          <CreateDocumentDialog
+          <CreateDocumentWithFileDialog
             connection={connectionId}
             trigger={<Button icon={IconPlusLarge}>{__("New document")}</Button>}
           />
@@ -139,6 +140,7 @@ export default function DocumentsPage(props: Props) {
               <SortableTh field="TITLE">{__("Name")}</SortableTh>
               <Th>{__("Status")}</Th>
               <SortableTh field="DOCUMENT_TYPE">{__("Type")}</SortableTh>
+              <Th>{__("File")}</Th>
               <Th>{__("Owner")}</Th>
               <Th>{__("Last update")}</Th>
               <Th>{__("Signatures")}</Th>
@@ -319,6 +321,18 @@ function DocumentRow({
       </Td>
       <Td>{getDocumentTypeLabel(__, document.documentType)}</Td>
       <Td>
+        {lastVersion.fileName ? (
+          <div className="flex flex-col gap-1">
+            <div className="text-sm font-medium">{lastVersion.fileName}</div>
+            <div className="text-xs text-gray-500">
+              {lastVersion.fileSize ? `${(lastVersion.fileSize / 1024).toFixed(1)} KB` : ''} • {lastVersion.fileType}
+            </div>
+          </div>
+        ) : (
+          <span className="text-gray-400">{__("No file")}</span>
+        )}
+      </Td>
+      <Td>
         <div className="flex gap-2 items-center">
           <Avatar name={document.owner.fullName} />
           {document.owner.fullName}
@@ -337,6 +351,20 @@ function DocumentRow({
       </Td>
       <Td noLink width={50} className="text-end">
         <ActionDropdown>
+          {lastVersion.fileName && (
+            <DropdownItem
+              variant="tertiary"
+              icon={IconUpload}
+              onClick={() => {
+                // For now, show an alert with file info
+                // In the future, this could trigger the download mutation
+                const fileSize = lastVersion.fileSize ? (lastVersion.fileSize / 1024).toFixed(1) : '0';
+                alert(`${__("File")}: ${lastVersion.fileName}\n${__("Size")}: ${fileSize} KB\n${__("Type")}: ${lastVersion.fileType || 'Unknown'}`);
+              }}
+            >
+              {__("Download")}
+            </DropdownItem>
+          )}
           <DropdownItem
             variant="danger"
             icon={IconTrashCan}

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<3a075704a4ce06d2324fc29c86f9a8a8>>
+ * @generated SignedSource<<6a0ed9be92b341ece3824f7468df2670>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -264,6 +264,27 @@ return {
                               },
                               {
                                 "alias": null,
+                                "args": null,
+                                "kind": "ScalarField",
+                                "name": "fileName",
+                                "storageKey": null
+                              },
+                              {
+                                "alias": null,
+                                "args": null,
+                                "kind": "ScalarField",
+                                "name": "fileSize",
+                                "storageKey": null
+                              },
+                              {
+                                "alias": null,
+                                "args": null,
+                                "kind": "ScalarField",
+                                "name": "fileType",
+                                "storageKey": null
+                              },
+                              {
+                                "alias": null,
                                 "args": [
                                   {
                                     "kind": "Literal",
@@ -330,12 +351,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "92d5a84b2b8fbde9538ee68fc1afd2ac",
+    "cacheID": "c5a0c79721da527715e419fe786788dc",
     "id": null,
     "metadata": {},
     "name": "PublishDocumentsDialogMutation",
     "operationKind": "mutation",
-    "text": "mutation PublishDocumentsDialogMutation(\n  $input: BulkPublishDocumentVersionsInput!\n) {\n  bulkPublishDocumentVersions(input: $input) {\n    documentEdges {\n      node {\n        id\n        ...DocumentsPageRowFragment\n      }\n    }\n  }\n}\n\nfragment DocumentsPageRowFragment on Document {\n  id\n  title\n  description\n  documentType\n  updatedAt\n  owner {\n    id\n    fullName\n  }\n  controls(first: 1) {\n    edges {\n      node {\n        id\n        name\n      }\n    }\n  }\n  versions(first: 1) {\n    edges {\n      node {\n        id\n        status\n        signatures(first: 100) {\n          edges {\n            node {\n              id\n              state\n            }\n          }\n        }\n      }\n    }\n  }\n}\n"
+    "text": "mutation PublishDocumentsDialogMutation(\n  $input: BulkPublishDocumentVersionsInput!\n) {\n  bulkPublishDocumentVersions(input: $input) {\n    documentEdges {\n      node {\n        id\n        ...DocumentsPageRowFragment\n      }\n    }\n  }\n}\n\nfragment DocumentsPageRowFragment on Document {\n  id\n  title\n  description\n  documentType\n  updatedAt\n  owner {\n    id\n    fullName\n  }\n  controls(first: 1) {\n    edges {\n      node {\n        id\n        name\n      }\n    }\n  }\n  versions(first: 1) {\n    edges {\n      node {\n        id\n        status\n        fileName\n        fileSize\n        fileType\n        signatures(first: 100) {\n          edges {\n            node {\n              id\n              state\n            }\n          }\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
