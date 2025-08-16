@@ -1745,6 +1745,7 @@ type Mutation {
 
   # Document mutations
   createDocument(input: CreateDocumentInput!): CreateDocumentPayload!
+  createDocumentWithFile(input: CreateDocumentWithFileInput!): CreateDocumentWithFilePayload!
   updateDocument(input: UpdateDocumentInput!): UpdateDocumentPayload!
   deleteDocument(input: DeleteDocumentInput!): DeleteDocumentPayload!
   publishDocumentVersion(
@@ -1778,6 +1779,12 @@ type Mutation {
   exportDocumentVersionPDF(
     input: ExportDocumentVersionPDFInput!
   ): ExportDocumentVersionPDFPayload!
+  downloadDocumentVersion(
+    input: DownloadDocumentVersionInput!
+  ): DownloadDocumentVersionPayload!
+  getFileContent(
+    input: GetFileContentInput!
+  ): GetFileContentPayload!
 
   createVendorRiskAssessment(
     input: CreateVendorRiskAssessmentInput!
@@ -2178,6 +2185,15 @@ input CreateDocumentInput {
   documentType: DocumentType!
 }
 
+input CreateDocumentWithFileInput {
+  organizationId: ID!
+  title: String!
+  content: String!
+  ownerId: ID!
+  documentType: DocumentType!
+  file: Upload!
+}
+
 input UpdateDocumentInput {
   id: ID!
   title: String
@@ -2189,6 +2205,14 @@ input UpdateDocumentInput {
 }
 
 input ExportDocumentVersionPDFInput {
+  documentVersionId: ID!
+}
+
+input DownloadDocumentVersionInput {
+  documentVersionId: ID!
+}
+
+input GetFileContentInput {
   documentVersionId: ID!
 }
 
@@ -2504,8 +2528,27 @@ type CreateDocumentPayload {
   documentVersionEdge: DocumentVersionEdge!
 }
 
+type CreateDocumentWithFilePayload {
+  documentEdge: DocumentEdge!
+  documentVersionEdge: DocumentVersionEdge!
+}
+
 type ExportDocumentVersionPDFPayload {
   data: String!
+}
+
+type DownloadDocumentVersionPayload {
+  downloadUrl: String!
+  fileName: String!
+  fileSize: Int!
+  fileType: String!
+}
+
+type GetFileContentPayload {
+  content: String!
+  fileName: String!
+  fileType: String!
+  fileSize: Int!
 }
 
 type UpdateDocumentPayload {
@@ -2615,6 +2658,13 @@ type DocumentVersion implements Node {
   changelog: String!
   title: String!
   owner: People! @goField(forceResolver: true)
+  
+  # File information
+  fileName: String @goField(forceResolver: true)
+  fileSize: Int @goField(forceResolver: true)
+  fileType: String @goField(forceResolver: true)
+  fileInfo: String @goField(forceResolver: true)
+  fileUrl: String @goField(forceResolver: true)
 
   signatures(
     first: Int

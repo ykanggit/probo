@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<ae79068f6dffafd5d13dd3d9a032b35e>>
+ * @generated SignedSource<<350806f3df3bdf582f9c54dca74cb6f2>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -11,19 +11,20 @@
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
 export type DocumentType = "ISMS" | "OTHER" | "POLICY";
-export type CreateDocumentInput = {
+export type CreateDocumentWithFileInput = {
   content: string;
   documentType: DocumentType;
+  file: any;
   organizationId: string;
   ownerId: string;
   title: string;
 };
-export type CreateDocumentDialogMutation$variables = {
+export type CreateDocumentWithFileDialogMutation$variables = {
   connections: ReadonlyArray<string>;
-  input: CreateDocumentInput;
+  input: CreateDocumentWithFileInput;
 };
-export type CreateDocumentDialogMutation$data = {
-  readonly createDocument: {
+export type CreateDocumentWithFileDialogMutation$data = {
+  readonly createDocumentWithFile: {
     readonly documentEdge: {
       readonly node: {
         readonly id: string;
@@ -32,9 +33,9 @@ export type CreateDocumentDialogMutation$data = {
     };
   };
 };
-export type CreateDocumentDialogMutation = {
-  response: CreateDocumentDialogMutation$data;
-  variables: CreateDocumentDialogMutation$variables;
+export type CreateDocumentWithFileDialogMutation = {
+  response: CreateDocumentWithFileDialogMutation$data;
+  variables: CreateDocumentWithFileDialogMutation$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -77,14 +78,14 @@ return {
     ],
     "kind": "Fragment",
     "metadata": null,
-    "name": "CreateDocumentDialogMutation",
+    "name": "CreateDocumentWithFileDialogMutation",
     "selections": [
       {
         "alias": null,
         "args": (v2/*: any*/),
-        "concreteType": "CreateDocumentPayload",
+        "concreteType": "CreateDocumentWithFilePayload",
         "kind": "LinkedField",
-        "name": "createDocument",
+        "name": "createDocumentWithFile",
         "plural": false,
         "selections": [
           {
@@ -129,14 +130,14 @@ return {
       (v0/*: any*/)
     ],
     "kind": "Operation",
-    "name": "CreateDocumentDialogMutation",
+    "name": "CreateDocumentWithFileDialogMutation",
     "selections": [
       {
         "alias": null,
         "args": (v2/*: any*/),
-        "concreteType": "CreateDocumentPayload",
+        "concreteType": "CreateDocumentWithFilePayload",
         "kind": "LinkedField",
-        "name": "createDocument",
+        "name": "createDocumentWithFile",
         "plural": false,
         "selections": [
           {
@@ -278,6 +279,27 @@ return {
                               },
                               {
                                 "alias": null,
+                                "args": null,
+                                "kind": "ScalarField",
+                                "name": "fileName",
+                                "storageKey": null
+                              },
+                              {
+                                "alias": null,
+                                "args": null,
+                                "kind": "ScalarField",
+                                "name": "fileSize",
+                                "storageKey": null
+                              },
+                              {
+                                "alias": null,
+                                "args": null,
+                                "kind": "ScalarField",
+                                "name": "fileType",
+                                "storageKey": null
+                              },
+                              {
+                                "alias": null,
                                 "args": [
                                   {
                                     "kind": "Literal",
@@ -360,16 +382,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "78db97da4ac57ae7ea89af26f78172d3",
+    "cacheID": "cc0c8e7d1a9dd5d10313719be6c6a320",
     "id": null,
     "metadata": {},
-    "name": "CreateDocumentDialogMutation",
+    "name": "CreateDocumentWithFileDialogMutation",
     "operationKind": "mutation",
-    "text": "mutation CreateDocumentDialogMutation(\n  $input: CreateDocumentInput!\n) {\n  createDocument(input: $input) {\n    documentEdge {\n      node {\n        id\n        ...DocumentsPageRowFragment\n      }\n    }\n  }\n}\n\nfragment DocumentsPageRowFragment on Document {\n  id\n  title\n  description\n  documentType\n  updatedAt\n  owner {\n    id\n    fullName\n  }\n  controls(first: 1) {\n    edges {\n      node {\n        id\n        name\n      }\n    }\n  }\n  versions(first: 1) {\n    edges {\n      node {\n        id\n        status\n        signatures(first: 100) {\n          edges {\n            node {\n              id\n              state\n            }\n          }\n        }\n      }\n    }\n  }\n}\n"
+    "text": "mutation CreateDocumentWithFileDialogMutation(\n  $input: CreateDocumentWithFileInput!\n) {\n  createDocumentWithFile(input: $input) {\n    documentEdge {\n      node {\n        id\n        ...DocumentsPageRowFragment\n      }\n    }\n  }\n}\n\nfragment DocumentsPageRowFragment on Document {\n  id\n  title\n  description\n  documentType\n  updatedAt\n  owner {\n    id\n    fullName\n  }\n  controls(first: 1) {\n    edges {\n      node {\n        id\n        name\n      }\n    }\n  }\n  versions(first: 1) {\n    edges {\n      node {\n        id\n        status\n        fileName\n        fileSize\n        fileType\n        signatures(first: 100) {\n          edges {\n            node {\n              id\n              state\n            }\n          }\n        }\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "19d6bd18594154b918c529d15f7ee8d7";
+(node as any).hash = "2131565e389fa57d99ae2d9a6319c092";
 
 export default node;

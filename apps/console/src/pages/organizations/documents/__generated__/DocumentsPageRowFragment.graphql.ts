@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<0e9889a7c30efd94243ec845dd12d693>>
+ * @generated SignedSource<<278673da57896f19d08870b0e3c8c26f>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -34,6 +34,9 @@ export type DocumentsPageRowFragment$data = {
   readonly versions: {
     readonly edges: ReadonlyArray<{
       readonly node: {
+        readonly fileName: string | null | undefined;
+        readonly fileSize: number | null | undefined;
+        readonly fileType: string | null | undefined;
         readonly id: string;
         readonly signatures: {
           readonly edges: ReadonlyArray<{
@@ -198,6 +201,27 @@ return {
                 },
                 {
                   "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
+                  "name": "fileName",
+                  "storageKey": null
+                },
+                {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
+                  "name": "fileSize",
+                  "storageKey": null
+                },
+                {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
+                  "name": "fileType",
+                  "storageKey": null
+                },
+                {
+                  "alias": null,
                   "args": [
                     {
                       "kind": "Literal",
@@ -258,6 +282,6 @@ return {
 };
 })();
 
-(node as any).hash = "9663dbeb1b5c584b6b7c1462a6fbb9b3";
+(node as any).hash = "339afb093af7831ce566ebcf42df82b9";
 
 export default node;

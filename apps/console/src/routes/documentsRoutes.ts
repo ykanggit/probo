@@ -33,6 +33,14 @@ const documentTabs = (prefix: string) => {
       ),
     },
     {
+      path: `${prefix}file`,
+      fallback: LinkCardSkeleton,
+      Component: lazy(
+        () =>
+          import("../pages/organizations/documents/tabs/FileTab"),
+      ),
+    },
+    {
       path: `${prefix}controls`,
       fallback: LinkCardSkeleton,
       Component: lazy(

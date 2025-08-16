@@ -34,6 +34,7 @@ type (
 		OwnerID       gid.GID        `db:"owner_id"`
 		VersionNumber int            `db:"version_number"`
 		Content       string         `db:"content"`
+		FileInfo      *string        `db:"file_info"`
 		Changelog     string         `db:"changelog"`
 		CreatedBy     gid.GID        `db:"created_by"`
 		Status        DocumentStatus `db:"status"`
@@ -61,6 +62,7 @@ SELECT
 	owner_id,
 	version_number,
 	content,
+	file_info,
 	changelog,
 	created_by,
 	status,
@@ -88,7 +90,7 @@ WHERE
 		return fmt.Errorf("cannot query document versions: %w", err)
 	}
 
-	documentVersions, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[DocumentVersion])
+		documentVersions, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[DocumentVersion])
 	if err != nil {
 		return fmt.Errorf("cannot collect document versions: %w", err)
 	}
@@ -121,6 +123,7 @@ SELECT
 	owner_id,
 	version_number,
 	content,
+	file_info,
 	changelog,
 	created_by,
 	status,
@@ -172,6 +175,7 @@ INSERT INTO document_versions (
 	owner_id,
 	version_number,
 	content,
+	file_info,
 	changelog,
 	created_by,
 	status,
@@ -186,6 +190,7 @@ VALUES (
 	@owner_id,
 	@version_number,
 	@content,
+	@file_info,
 	@changelog,
 	@created_by,
 	@status,
@@ -201,6 +206,7 @@ VALUES (
 		"owner_id":       p.OwnerID,
 		"version_number": p.VersionNumber,
 		"content":        p.Content,
+		"file_info":      p.FileInfo,
 		"changelog":      p.Changelog,
 		"created_by":     p.CreatedBy,
 		"status":         p.Status,
@@ -231,6 +237,7 @@ SELECT
 	owner_id,
 	version_number,
 	content,
+	file_info,
 	changelog,
 	created_by,
 	status,
@@ -284,6 +291,7 @@ SELECT
 	owner_id,
 	version_number,
 	content,
+	file_info,
 	changelog,
 	created_by,
 	status,
@@ -335,6 +343,7 @@ SELECT
 	owner_id,
 	version_number,
 	content,
+	file_info,
 	changelog,
 	created_by,
 	status,
@@ -386,6 +395,7 @@ UPDATE document_versions SET
 	changelog = @changelog,
 	status = @status,
 	content = @content,
+	file_info = @file_info,
 	published_by = @published_by,
 	published_at = @published_at,
 	updated_at = @updated_at
@@ -402,6 +412,7 @@ WHERE %s
 		"changelog":           p.Changelog,
 		"status":              p.Status,
 		"content":             p.Content,
+		"file_info":           p.FileInfo,
 		"published_by":        p.PublishedBy,
 		"published_at":        p.PublishedAt,
 		"updated_at":          p.UpdatedAt,

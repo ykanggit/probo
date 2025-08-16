@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/getprobo/probo/pkg/coredata"
@@ -582,6 +583,181 @@ func (r *documentVersionResolver) Owner(ctx context.Context, obj *types.Document
 	}
 
 	return types.NewPeople(owner), nil
+}
+
+// FileName is the resolver for the fileName field.
+func (r *documentVersionResolver) FileName(ctx context.Context, obj *types.DocumentVersion) (*string, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	documentVersion, err := prb.Documents.GetVersion(ctx, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get document version: %w", err))
+	}
+
+	if documentVersion.FileInfo == nil || *documentVersion.FileInfo == "" {
+		return nil, nil
+	}
+
+	// Use a more efficient approach - only extract the fileName without parsing the full JSON
+	// Look for "fileName":"value" pattern in the JSON string
+	fileInfoStr := *documentVersion.FileInfo
+	fileNameStart := `"fileName":"`
+	startIdx := 0
+	for {
+		idx := startIdx + len(fileNameStart)
+		if idx >= len(fileInfoStr) {
+			break
+		}
+		if fileInfoStr[startIdx:idx] == fileNameStart {
+			// Found fileName, extract the value
+			endIdx := idx
+			for endIdx < len(fileInfoStr) && fileInfoStr[endIdx] != '"' {
+				endIdx++
+			}
+			if endIdx < len(fileInfoStr) {
+				fileName := fileInfoStr[idx:endIdx]
+				return &fileName, nil
+			}
+		}
+		startIdx++
+		if startIdx >= len(fileInfoStr) {
+			break
+		}
+	}
+
+	return nil, nil
+}
+
+// FileSize is the resolver for the fileSize field.
+func (r *documentVersionResolver) FileSize(ctx context.Context, obj *types.DocumentVersion) (*int, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	documentVersion, err := prb.Documents.GetVersion(ctx, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get document version: %w", err))
+	}
+
+	if documentVersion.FileInfo == nil || *documentVersion.FileInfo == "" {
+		return nil, nil
+	}
+
+	// Use a more efficient approach - only extract the fileSize without parsing the full JSON
+	// Look for "fileSize":value pattern in the JSON string
+	fileInfoStr := *documentVersion.FileInfo
+	fileSizeStart := `"fileSize":`
+	startIdx := 0
+	for {
+		idx := startIdx + len(fileSizeStart)
+		if idx >= len(fileInfoStr) {
+			break
+		}
+		if fileInfoStr[startIdx:idx] == fileSizeStart {
+			// Found fileSize, extract the numeric value
+			endIdx := idx
+			for endIdx < len(fileInfoStr) && (fileInfoStr[endIdx] >= '0' && fileInfoStr[endIdx] <= '9' || fileInfoStr[endIdx] == '.') {
+				endIdx++
+			}
+			if endIdx > idx {
+				fileSizeStr := fileInfoStr[idx:endIdx]
+				if fileSize, err := strconv.ParseFloat(fileSizeStr, 64); err == nil {
+					size := int(fileSize)
+					return &size, nil
+				}
+			}
+		}
+		startIdx++
+		if startIdx >= len(fileInfoStr) {
+			break
+		}
+	}
+
+	return nil, nil
+}
+
+// FileType is the resolver for the fileType field.
+func (r *documentVersionResolver) FileType(ctx context.Context, obj *types.DocumentVersion) (*string, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	documentVersion, err := prb.Documents.GetVersion(ctx, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get document version: %w", err))
+	}
+
+	if documentVersion.FileInfo == nil || *documentVersion.FileInfo == "" {
+		return nil, nil
+	}
+
+	// Use a more efficient approach - only extract the fileType without parsing the full JSON
+	// Look for "fileType":"value" pattern in the JSON string
+	fileInfoStr := *documentVersion.FileInfo
+	fileTypeStart := `"fileType":"`
+	startIdx := 0
+	for {
+		idx := startIdx + len(fileTypeStart)
+		if idx >= len(fileInfoStr) {
+			break
+		}
+		if fileInfoStr[startIdx:idx] == fileTypeStart {
+			// Found fileType, extract the value
+			endIdx := idx
+			for endIdx < len(fileInfoStr) && fileInfoStr[endIdx] != '"' {
+				endIdx++
+			}
+			if endIdx < len(fileInfoStr) {
+				fileType := fileInfoStr[idx:endIdx]
+				return &fileType, nil
+			}
+		}
+		startIdx++
+		if startIdx >= len(fileInfoStr) {
+			break
+		}
+	}
+
+	return nil, nil
+}
+
+// FileInfo is the resolver for the fileInfo field.
+func (r *documentVersionResolver) FileInfo(ctx context.Context, obj *types.DocumentVersion) (*string, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	documentVersion, err := prb.Documents.GetVersion(ctx, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get document version: %w", err))
+	}
+
+	if documentVersion.FileInfo == nil || *documentVersion.FileInfo == "" {
+		return nil, nil
+	}
+
+	// Parse the file_info JSON to extract metadata only (exclude fileData)
+	var fileInfo map[string]interface{}
+	if err := json.Unmarshal([]byte(*documentVersion.FileInfo), &fileInfo); err != nil {
+		return nil, nil
+	}
+
+	// Create a new map with only metadata (exclude the large fileData)
+	metadataOnly := map[string]interface{}{
+		"fileName": fileInfo["fileName"],
+		"fileSize": fileInfo["fileSize"],
+		"fileType": fileInfo["fileType"],
+		// Note: fileData is intentionally excluded to prevent slow loading
+	}
+
+	// Convert back to JSON string
+	metadataJSON, err := json.Marshal(metadataOnly)
+	if err != nil {
+		return nil, nil
+	}
+
+	metadataStr := string(metadataJSON)
+
+	return &metadataStr, nil
+}
+
+// FileURL is the resolver for the fileUrl field.
+func (r *documentVersionResolver) FileURL(ctx context.Context, obj *types.DocumentVersion) (*string, error) {
+	panic(fmt.Errorf("not implemented: FileURL - fileUrl"))
 }
 
 // Signatures is the resolver for the signatures field.
@@ -2288,6 +2464,38 @@ func (r *mutationResolver) CreateDocument(ctx context.Context, input types.Creat
 	}, nil
 }
 
+// CreateDocumentWithFile is the resolver for the createDocumentWithFile field.
+func (r *mutationResolver) CreateDocumentWithFile(ctx context.Context, input types.CreateDocumentWithFileInput) (*types.CreateDocumentWithFilePayload, error) {
+	prb := r.ProboService(ctx, input.OrganizationID.TenantID())
+
+	user := UserFromContext(ctx)
+	people, err := prb.Peoples.GetByUserID(ctx, user.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get people: %w", err))
+	}
+
+	document, documentVersion, err := prb.Documents.CreateWithFile(
+		ctx,
+		probo.CreateDocumentWithFileRequest{
+			OrganizationID: input.OrganizationID,
+			DocumentType:   input.DocumentType,
+			Title:          input.Title,
+			OwnerID:        input.OwnerID,
+			Content:        input.Content,
+			CreatedBy:      people.ID,
+			File:           input.File,
+		},
+	)
+	if err != nil {
+		panic(fmt.Errorf("cannot create document with file: %w", err))
+	}
+
+	return &types.CreateDocumentWithFilePayload{
+		DocumentEdge:        types.NewDocumentEdge(document, coredata.DocumentOrderFieldTitle),
+		DocumentVersionEdge: types.NewDocumentVersionEdge(documentVersion, coredata.DocumentVersionOrderFieldCreatedAt),
+	}, nil
+}
+
 // UpdateDocument is the resolver for the updateDocument field.
 func (r *mutationResolver) UpdateDocument(ctx context.Context, input types.UpdateDocumentInput) (*types.UpdateDocumentPayload, error) {
 	prb := r.ProboService(ctx, input.ID.TenantID())
@@ -2547,6 +2755,71 @@ func (r *mutationResolver) ExportDocumentVersionPDF(ctx context.Context, input t
 
 	return &types.ExportDocumentVersionPDFPayload{
 		Data: fmt.Sprintf("data:application/pdf;base64,%s", base64.StdEncoding.EncodeToString(pdf)),
+	}, nil
+}
+
+// DownloadDocumentVersion is the resolver for the downloadDocumentVersion field.
+func (r *mutationResolver) DownloadDocumentVersion(ctx context.Context, input types.DownloadDocumentVersionInput) (*types.DownloadDocumentVersionPayload, error) {
+	prb := r.ProboService(ctx, input.DocumentVersionID.TenantID())
+
+	documentVersion, err := prb.Documents.GetVersion(ctx, input.DocumentVersionID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get document version: %w", err)
+	}
+
+	// Try to parse the content as JSON to extract file information
+	var fileInfo map[string]interface{}
+	if err := json.Unmarshal([]byte(documentVersion.Content), &fileInfo); err != nil {
+		// If content is not JSON, treat it as a regular document
+		return &types.DownloadDocumentVersionPayload{
+			DownloadURL: fmt.Sprintf("/api/documents/%s/download", input.DocumentVersionID),
+			FileName:    fmt.Sprintf("%s.txt", documentVersion.Title),
+			FileSize:    len(documentVersion.Content),
+			FileType:    "text/plain",
+		}, nil
+	}
+
+	// Extract file information from JSON
+	fileName, _ := fileInfo["fileName"].(string)
+	fileSize, _ := fileInfo["fileSize"].(float64)
+	fileType, _ := fileInfo["fileType"].(string)
+
+	if fileName == "" {
+		fileName = fmt.Sprintf("%s.pdf", documentVersion.Title)
+	}
+	if fileType == "" {
+		fileType = "application/octet-stream"
+	}
+
+	// For now, return a placeholder download URL
+	// In the future, this could generate a signed S3 URL or serve the file directly
+	downloadURL := fmt.Sprintf("/api/documents/%s/download", input.DocumentVersionID)
+
+	return &types.DownloadDocumentVersionPayload{
+		DownloadURL: downloadURL,
+		FileName:    fileName,
+		FileSize:    int(fileSize),
+		FileType:    fileType,
+	}, nil
+}
+
+// GetFileContent is the resolver for the getFileContent field.
+func (r *mutationResolver) GetFileContent(ctx context.Context, input types.GetFileContentInput) (*types.GetFileContentPayload, error) {
+	prb := r.ProboService(ctx, input.DocumentVersionID.TenantID())
+
+	fileData, fileName, fileType, err := prb.Documents.GetFileContent(ctx, input.DocumentVersionID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get file content: %w", err)
+	}
+
+	// Convert file data to base64 for GraphQL transmission
+	content := base64.StdEncoding.EncodeToString(fileData)
+
+	return &types.GetFileContentPayload{
+		Content:  content,
+		FileName: fileName,
+		FileType: fileType,
+		FileSize: len(fileData),
 	}, nil
 }
 

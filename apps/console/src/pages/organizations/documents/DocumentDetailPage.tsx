@@ -63,6 +63,7 @@ import { DocumentTypeOptions } from "/components/form/DocumentTypeOptions";
 import { z } from "zod";
 import { useFormWithSchema } from "/hooks/useFormWithSchema";
 
+
 type Props = {
   queryRef: PreloadedQuery<DocumentGraphNodeQuery>;
 };
@@ -90,6 +91,9 @@ const documentFragment = graphql`
           publishedAt
           version
           updatedAt
+          fileName
+          fileSize
+          fileType
           publishedBy {
             fullName
           }
@@ -506,6 +510,9 @@ export default function DocumentDetailPage(props: Props) {
 
         <Tabs>
           <TabLink to={`${urlPrefix}/description`}>{__("Description")}</TabLink>
+          {currentVersion.fileName && (
+            <TabLink to={`${urlPrefix}/file`}>{__("File")}</TabLink>
+          )}
           <TabLink to={`${urlPrefix}/controls`}>
             {__("Controls")}
             <TabBadge>{controlsCount}</TabBadge>
