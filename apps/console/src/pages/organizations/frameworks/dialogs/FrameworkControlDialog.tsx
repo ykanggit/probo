@@ -13,6 +13,7 @@ import type { ReactNode } from "react";
 import { useTranslate } from "@probo/i18n";
 import { graphql } from "relay-runtime";
 import { useFragment } from "react-relay";
+import { useEffect } from "react";
 import type { FrameworkControlDialogFragment$key } from "./__generated__/FrameworkControlDialogFragment.graphql";
 import { useFormWithSchema } from "/hooks/useFormWithSchema";
 import { z } from "zod";
@@ -100,6 +101,19 @@ export function FrameworkControlDialog(props: Props) {
       exclusionJustification: frameworkControl?.exclusionJustification ?? "",
     },
   });
+
+  // Reset form values when frameworkControl changes
+  useEffect(() => {
+    if (frameworkControl) {
+      reset({
+        name: frameworkControl.name ?? "",
+        description: frameworkControl.description ?? "",
+        sectionTitle: frameworkControl.sectionTitle ?? "",
+        status: frameworkControl.status ?? "INCLUDED",
+        exclusionJustification: frameworkControl.exclusionJustification ?? "",
+      });
+    }
+  }, [frameworkControl, reset]);
 
   const statusValue = watch("status");
   const showExclusionJustification = statusValue === "EXCLUDED";
