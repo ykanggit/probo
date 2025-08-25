@@ -35,7 +35,7 @@ export function Layout({ header, sidebar, children }: Props) {
         <LayoutContext value={layoutContext}>
             <div className="text-txt-primary bg-level-0">
                 <header className="absolute z-2 left-0 right-0 px-4 flex items-center border-b border-border-solid h-12 bg-level-0">
-                    <Logo className="w-12 h-5" />
+                    <Logo className="w-9 h-9" />
                     <svg
                         className="mx-3 text-txt-tertiary"
                         width="8"
