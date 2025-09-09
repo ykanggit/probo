@@ -1,5 +1,15 @@
 # Probo Configuration Template
 # contains configuration options with some default values.
+unit:
+  metrics:
+    addr: "localhost:8081"
+  tracing:
+    addr: "localhost:4318"
+    max-batch-size: 512
+    batch-timeout: 5
+    export-timeout: 30
+    max-queue-size: 2048
+
 probod:
   hostname: "8vlq3we8mbakad4k.app.eng.kaamel.com"
   api:

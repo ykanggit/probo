@@ -71,6 +71,7 @@ services:
       - "-config.file=/etc/tempo.yaml"
     ports:
       - "4317:4317"
+      - "4318:4318"
     volumes:
       - "./compose/tempo/tempo.yaml:/etc/tempo.yaml:ro"
       - "tempo-data:/var/tempo:rw"
