@@ -941,7 +941,7 @@ func (s *DocumentService) DeleteDraft(
 	)
 }
 
-func (s *DocumentService) Delete(
+func (s *DocumentService) SoftDelete(
 	ctx context.Context,
 	documentID gid.GID,
 ) error {
@@ -950,7 +950,7 @@ func (s *DocumentService) Delete(
 	return s.svc.pg.WithConn(
 		ctx,
 		func(conn pg.Conn) error {
-			return document.Delete(ctx, conn, s.svc.scope)
+			return document.SoftDelete(ctx, conn, s.svc.scope)
 		},
 	)
 }
@@ -1238,65 +1238,14 @@ func (s *DocumentService) ExportPDF(
 	ctx context.Context,
 	documentVersionID gid.GID,
 ) ([]byte, error) {
-	document := &coredata.Document{}
-	version := &coredata.DocumentVersion{}
-	owner := &coredata.People{}
-	publishedBy := &coredata.People{}
-	signatures := coredata.DocumentVersionSignatures{}
-	peopleMap := make(map[gid.GID]*coredata.People)
+	var data []byte
 
-	err := s.svc.pg.WithConn(
+	err := s.svc.pg.WithTx(
 		ctx,
-		func(conn pg.Conn) error {
-			if err := version.LoadByID(ctx, conn, s.svc.scope, documentVersionID); err != nil {
-				return fmt.Errorf("cannot load document version: %w", err)
-			}
-
-			if err := document.LoadByID(ctx, conn, s.svc.scope, version.DocumentID); err != nil {
-				return fmt.Errorf("cannot load document: %w", err)
-			}
-
-			if version.PublishedBy != nil {
-				if err := publishedBy.LoadByID(ctx, conn, s.svc.scope, *version.PublishedBy); err != nil {
-					return fmt.Errorf("cannot load published by person: %w", err)
-				}
-			}
-
-			cursor := page.NewCursor(
-				100,
-				nil,
-				page.Head,
-				page.OrderBy[coredata.DocumentVersionSignatureOrderField]{
-					Field:     coredata.DocumentVersionSignatureOrderFieldCreatedAt,
-					Direction: page.OrderDirectionAsc,
-				},
-			)
-
-			if err := signatures.LoadByDocumentVersionID(ctx, conn, s.svc.scope, documentVersionID, cursor); err != nil {
-				return fmt.Errorf("cannot load document version signatures: %w", err)
-			}
-
-			if err := owner.LoadByID(ctx, conn, s.svc.scope, document.OwnerID); err != nil {
-				return fmt.Errorf("cannot load document owner: %w", err)
-			}
-
-			// TODO: refactor this to use a single query
-			for _, sig := range signatures {
-				if _, ok := peopleMap[sig.SignedBy]; !ok {
-					people := &coredata.People{}
-					if err := people.LoadByID(ctx, conn, s.svc.scope, sig.SignedBy); err != nil {
-						return fmt.Errorf("cannot load people %q: %w", sig.SignedBy, err)
-					}
-					peopleMap[sig.SignedBy] = people
-				}
-
-				if _, ok := peopleMap[sig.RequestedBy]; !ok {
-					people := &coredata.People{}
-					if err := people.LoadByID(ctx, conn, s.svc.scope, sig.RequestedBy); err != nil {
-						return fmt.Errorf("cannot load people %q: %w", sig.RequestedBy, err)
-					}
-					peopleMap[sig.RequestedBy] = people
-				}
+		func(conn pg.Conn) (err error) {
+			data, err = exportDocumentPDF(ctx, s.html2pdfConverter, conn, s.svc.scope, documentVersionID)
+			if err != nil {
+				return fmt.Errorf("cannot export document PDF: %w", err)
 			}
 
 			return nil
@@ -1305,6 +1254,74 @@ func (s *DocumentService) ExportPDF(
 
 	if err != nil {
 		return nil, err
+	}
+
+	return data, nil
+}
+
+func exportDocumentPDF(
+	ctx context.Context,
+	html2pdfConverter *html2pdf.Converter,
+	conn pg.Conn,
+	scope coredata.Scoper,
+	documentVersionID gid.GID,
+) ([]byte, error) {
+	document := &coredata.Document{}
+	version := &coredata.DocumentVersion{}
+	owner := &coredata.People{}
+	publishedBy := &coredata.People{}
+	signatures := coredata.DocumentVersionSignatures{}
+	peopleMap := make(map[gid.GID]*coredata.People)
+
+	if err := version.LoadByID(ctx, conn, scope, documentVersionID); err != nil {
+		return nil, fmt.Errorf("cannot load document version: %w", err)
+	}
+
+	if err := document.LoadByID(ctx, conn, scope, version.DocumentID); err != nil {
+		return nil, fmt.Errorf("cannot load document: %w", err)
+	}
+
+	if version.PublishedBy != nil {
+		if err := publishedBy.LoadByID(ctx, conn, scope, *version.PublishedBy); err != nil {
+			return nil, fmt.Errorf("cannot load published by person: %w", err)
+		}
+	}
+
+	cursor := page.NewCursor(
+		100,
+		nil,
+		page.Head,
+		page.OrderBy[coredata.DocumentVersionSignatureOrderField]{
+			Field:     coredata.DocumentVersionSignatureOrderFieldCreatedAt,
+			Direction: page.OrderDirectionAsc,
+		},
+	)
+
+	if err := signatures.LoadByDocumentVersionID(ctx, conn, scope, documentVersionID, cursor); err != nil {
+		return nil, fmt.Errorf("cannot load document version signatures: %w", err)
+	}
+
+	if err := owner.LoadByID(ctx, conn, scope, document.OwnerID); err != nil {
+		return nil, fmt.Errorf("cannot load document owner: %w", err)
+	}
+
+	// TODO: refactor this to use a single query
+	for _, sig := range signatures {
+		if _, ok := peopleMap[sig.SignedBy]; !ok {
+			people := &coredata.People{}
+			if err := people.LoadByID(ctx, conn, scope, sig.SignedBy); err != nil {
+				return nil, fmt.Errorf("cannot load people %q: %w", sig.SignedBy, err)
+			}
+			peopleMap[sig.SignedBy] = people
+		}
+
+		if _, ok := peopleMap[sig.RequestedBy]; !ok {
+			people := &coredata.People{}
+			if err := people.LoadByID(ctx, conn, scope, sig.RequestedBy); err != nil {
+				return nil, fmt.Errorf("cannot load people %q: %w", sig.RequestedBy, err)
+			}
+			peopleMap[sig.RequestedBy] = people
+		}
 	}
 
 	classification := docgen.ClassificationInternal
@@ -1353,7 +1370,7 @@ func (s *DocumentService) ExportPDF(
 		Scale:           1.0,
 	}
 
-	pdfReader, err := s.html2pdfConverter.GeneratePDF(ctx, htmlContent, cfg)
+	pdfReader, err := html2pdfConverter.GeneratePDF(ctx, htmlContent, cfg)
 	if err != nil {
 		return nil, fmt.Errorf("cannot generate PDF: %w", err)
 	}

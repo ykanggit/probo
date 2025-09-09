@@ -10,14 +10,29 @@ import { Button } from "../Button/Button";
 
 const sidebarContext = createContext({ open: true });
 
+function useSidebarState() {
+    const [open, setOpenState] = useState(() => {
+        const stored = localStorage.getItem("sidebar-open");
+        return stored !== null ? JSON.parse(stored) : true;
+    });
+
+    const setOpen = (value: boolean) => {
+        setOpenState(value);
+
+        localStorage.setItem("sidebar-open", JSON.stringify(value));
+    };
+
+    return [open, setOpen] as const;
+}
+
 export function Sidebar({ children }: PropsWithChildren) {
-    const [open, setOpen] = useState(true);
+    const [open, setOpen] = useSidebarState();
     return (
         <sidebarContext.Provider value={{ open }}>
             <aside
                 className={clsx(
                     "border-r border-border-solid relative pt-16 flex-none",
-                    open ? "px-4 w-[260px]" : "px-2",
+                    open ? "px-4 w-[330px]" : "px-2",
                 )}
             >
                 {children}

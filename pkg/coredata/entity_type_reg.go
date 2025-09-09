@@ -43,4 +43,11 @@ const (
 	FileEntityType
 	VendorContactEntityType
 	VendorDataPrivacyAgreementEntityType
+	NonconformityRegistryEntityType
+	ComplianceRegistryEntityType
+	VendorServiceEntityType
+	SnapshotEntityType
+	ContinualImprovementRegistryEntityType
+	ProcessingActivityRegistryEntityType
+	FrameworkExportEntityType
 )

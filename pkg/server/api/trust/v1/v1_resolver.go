@@ -16,6 +16,7 @@ import (
 	"github.com/getprobo/probo/pkg/server/api/trust/v1/auth"
 	"github.com/getprobo/probo/pkg/server/api/trust/v1/schema"
 	"github.com/getprobo/probo/pkg/server/api/trust/v1/types"
+	"github.com/getprobo/probo/pkg/trust"
 )
 
 // Framework is the resolver for the framework field.
@@ -24,12 +25,12 @@ func (r *auditResolver) Framework(ctx context.Context, obj *types.Audit) (*types
 
 	audit, err := trust.Audits.Get(ctx, obj.ID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot load audit: %w", err)
+		panic(fmt.Errorf("cannot load audit: %w", err))
 	}
 
 	framework, err := trust.Frameworks.Get(ctx, audit.FrameworkID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot load framework: %w", err)
+		panic(fmt.Errorf("cannot load framework: %w", err))
 	}
 
 	return types.NewFramework(framework), nil
@@ -41,7 +42,7 @@ func (r *auditResolver) Report(ctx context.Context, obj *types.Audit) (*types.Re
 
 	audit, err := trust.Audits.Get(ctx, obj.ID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot load audit: %w", err)
+		panic(fmt.Errorf("cannot load audit: %w", err))
 	}
 
 	if audit.ReportID == nil {
@@ -50,35 +51,34 @@ func (r *auditResolver) Report(ctx context.Context, obj *types.Audit) (*types.Re
 
 	report, err := trust.Reports.Get(ctx, *audit.ReportID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot load report: %w", err)
+		panic(fmt.Errorf("cannot load report: %w", err))
 	}
 
 	return types.NewReport(report), nil
 }
 
-// ReportURL is the resolver for the reportUrl field.
-func (r *auditResolver) ReportURL(ctx context.Context, obj *types.Audit) (*string, error) {
-	if err := auth.ValidateTenantAccess(ctx, r, userTenantContextKey, obj.ID.TenantID()); err != nil {
-		return nil, err
-	}
+// CreateTrustCenterAccess is the resolver for the createTrustCenterAccess field.
+func (r *mutationResolver) CreateTrustCenterAccess(ctx context.Context, input types.CreateTrustCenterAccessInput) (*types.CreateTrustCenterAccessPayload, error) {
+	trustSvc := r.trustCenterSvc.WithTenant(input.TrustCenterID.TenantID())
 
-	trust := r.TrustService(ctx, obj.ID.TenantID())
-
-	audit, err := trust.Audits.Get(ctx, obj.ID)
+	access, err := trustSvc.TrustCenterAccesses.Create(ctx, &trust.CreateTrustCenterAccessRequest{
+		TrustCenterID: input.TrustCenterID,
+		Email:         input.Email,
+		Name:          input.Name,
+	})
 	if err != nil {
-		return nil, fmt.Errorf("cannot load audit: %w", err)
+		panic(fmt.Errorf("cannot create trust center access: %w", err))
 	}
 
-	if audit.ReportID == nil {
-		return nil, nil
-	}
-
-	url, err := trust.Audits.GenerateReportURL(ctx, obj.ID, r.trustAuthCfg.ReportURLDuration)
-	if err != nil {
-		return nil, fmt.Errorf("cannot generate report URL: %w", err)
-	}
-
-	return url, nil
+	return &types.CreateTrustCenterAccessPayload{
+		TrustCenterAccess: &types.TrustCenterAccess{
+			ID:        access.ID,
+			Email:     access.Email,
+			Name:      access.Name,
+			CreatedAt: access.CreatedAt,
+			UpdatedAt: access.UpdatedAt,
+		},
+	}, nil
 }
 
 // ExportDocumentPDF is the resolver for the exportDocumentPDF field.
@@ -124,7 +124,7 @@ func (r *queryResolver) TrustCenterBySlug(ctx context.Context, slug string) (*ty
 	orgTrust := r.trustCenterSvc.WithTenant(trustCenter.TenantID)
 	org, err := orgTrust.Organizations.Get(ctx, trustCenter.OrganizationID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot get organization: %w", err)
+		panic(fmt.Errorf("cannot get organization: %w", err))
 	}
 
 	result.Organization = types.NewOrganization(org)
@@ -140,9 +140,9 @@ func (r *reportResolver) DownloadURL(ctx context.Context, obj *types.Report) (*s
 
 	trust := r.TrustService(ctx, obj.ID.TenantID())
 
-	url, err := trust.Reports.GenerateDownloadURL(ctx, obj.ID, 5*time.Minute)
+	url, err := trust.Reports.GenerateDownloadURL(ctx, obj.ID, r.trustAuthCfg.ReportURLDuration)
 	if err != nil {
-		return nil, fmt.Errorf("cannot generate download URL: %w", err)
+		panic(fmt.Errorf("cannot generate download URL: %w", err))
 	}
 
 	return url, nil
@@ -151,6 +151,14 @@ func (r *reportResolver) DownloadURL(ctx context.Context, obj *types.Report) (*s
 // Organization is the resolver for the organization field.
 func (r *trustCenterResolver) Organization(ctx context.Context, obj *types.TrustCenter) (*types.Organization, error) {
 	return obj.Organization, nil
+}
+
+// IsUserAuthenticated is the resolver for the isUserAuthenticated field.
+func (r *trustCenterResolver) IsUserAuthenticated(ctx context.Context, obj *types.TrustCenter) (bool, error) {
+	if err := auth.ValidateTenantAccess(ctx, r, userTenantContextKey, obj.Organization.ID.TenantID()); err != nil {
+		return false, nil
+	}
+	return true, nil
 }
 
 // Documents is the resolver for the documents field.
@@ -165,7 +173,7 @@ func (r *trustCenterResolver) Documents(ctx context.Context, obj *types.TrustCen
 
 	documentPage, err := trust.Documents.ListForOrganizationId(ctx, obj.Organization.ID, cursor)
 	if err != nil {
-		return nil, fmt.Errorf("cannot list public documents: %w", err)
+		panic(fmt.Errorf("cannot list public documents: %w", err))
 	}
 
 	return types.NewDocumentConnection(documentPage), nil
@@ -183,7 +191,7 @@ func (r *trustCenterResolver) Audits(ctx context.Context, obj *types.TrustCenter
 
 	auditPage, err := trust.Audits.ListForOrganizationId(ctx, obj.Organization.ID, cursor)
 	if err != nil {
-		return nil, fmt.Errorf("cannot list public audits: %w", err)
+		panic(fmt.Errorf("cannot list public audits: %w", err))
 	}
 
 	return types.NewAuditConnection(auditPage), nil
@@ -201,7 +209,7 @@ func (r *trustCenterResolver) Vendors(ctx context.Context, obj *types.TrustCente
 
 	vendorPage, err := trust.Vendors.ListForOrganizationId(ctx, obj.Organization.ID, cursor)
 	if err != nil {
-		return nil, fmt.Errorf("cannot list public vendors: %w", err)
+		panic(fmt.Errorf("cannot list public vendors: %w", err))
 	}
 
 	return types.NewVendorConnection(vendorPage), nil

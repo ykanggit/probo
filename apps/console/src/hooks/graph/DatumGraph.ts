@@ -5,10 +5,10 @@ import { useTranslate } from "@probo/i18n";
 import { promisifyMutation, sprintf } from "@probo/helpers";
 
 export const dataQuery = graphql`
-  query DatumGraphListQuery($organizationId: ID!) {
+  query DatumGraphListQuery($organizationId: ID!, $snapshotId: ID = null) {
     node(id: $organizationId) {
       ... on Organization {
-        ...DataPageFragment
+        ...DataPageFragment @arguments(snapshotId: $snapshotId)
       }
     }
   }
@@ -19,6 +19,7 @@ export const datumNodeQuery = graphql`
     node(id: $dataId) {
       ... on Datum {
         id
+        snapshotId
         name
         dataClassification
         owner {
@@ -60,7 +61,7 @@ export const createDatumMutation = graphql`
             id
             fullName
           }
-          vendors(first: 10) {
+          vendors(first: 50) {
             edges {
               node {
                 id
