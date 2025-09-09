@@ -2,13 +2,107 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.48.1]
+## [0.58.0] - 2025-09-08
+
+### Added
+- Soft delete documents
+- Store sidebar state
+
+## [0.57.1] - 2025-09-04
+
+### Fixed
+- Fix framework export for evidence link
+
+## [0.57.0] - 2025-09-04
+
+### Added
+- Add framework exports
+
+## [0.56.0] - 2025-09-03
+
+### Added
+- Add risks snapshots
+
+### Fixed
+
+- Fix tabs counter
+- Fix password page redirection
+
+## [0.55.0] - 2025-09-01
+
+### Added
+- Add vendor snapshots
+
+### Fixed
+
+- Fix document deletion and update errors
+- Remove signature block from trust center documents
+- Fix non mandatory fields on vendor
+
+## [0.54.0] - 2025-09-01
+
+### Added
+- Add compliance registry snapshots
+- Add continual improvement snapshots
+- Add processing activity registry snapshots
+- Add assets snapshots
+
+## [0.53.0] - 2025-08-29
+
+### Added
+- Add processing activity registries
+- Add continual improvement registries
+- Add noncoformity registry snapshots
+
+### Fixed
+
+- Probo instance allow crawling bot to index.
+
+## [0.52.0] - 2025-08-27
+
+### Added
+- Add data snapshot
+
+## [0.51.1] - 2025-08-23
+
+### Fixed
+- Fix query loops in public trust center
+- Fix button display when disconected in public trust center
+
+## [0.51.0] - 2025-08-22
+
+### Added
+- Add trust center access requests
+
+## [0.50.1] - 2025-08-21
+
+### Fixed
+- Fix authentification token error
+
+## [0.50.0] - 2025-08-21
+
+### Added
+- Add compliance registries
+- Add vendor services
+
+### Chore
+- Replace mailhog
+
+## [0.49.0] - 2025-08-20
+
+### Added
+- Add nonconformity registries
+
+### Fixed
+- Fix trust center dark mode
+
+## [0.48.1] - 2025-08-14
 
 ### Fixed
 
 - Fix display of download buttons in the public trust center
 
-## [0.48.0]
+## [0.48.0] - 2025-08-14
 
 ### Added
 - Add baa to vendors
@@ -17,7 +111,7 @@ All notable changes to this project will be documented in this file.
 - Add name to audits
 - Add audits to controls
 
-## [0.47.0]
+## [0.47.0] - 2025-08-13
 
 ### Added
 - Add document draft deletion

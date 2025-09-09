@@ -17,6 +17,7 @@ package probo
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -27,7 +28,9 @@ import (
 	"github.com/getprobo/probo/pkg/gid"
 	"github.com/getprobo/probo/pkg/html2pdf"
 	"github.com/getprobo/probo/pkg/usrmgr"
+	"go.gearno.de/crypto/uuid"
 	"go.gearno.de/kit/pg"
+	"go.gearno.de/x/ref"
 )
 
 type (
@@ -74,6 +77,7 @@ type (
 		VendorBusinessAssociateAgreements *VendorBusinessAssociateAgreementService
 		VendorContacts                    *VendorContactService
 		VendorDataPrivacyAgreements       *VendorDataPrivacyAgreementService
+		VendorServices                    *VendorServiceService
 		Connectors                        *ConnectorService
 		Assets                            *AssetService
 		Data                              *DatumService
@@ -81,6 +85,11 @@ type (
 		Reports                           *ReportService
 		TrustCenters                      *TrustCenterService
 		TrustCenterAccesses               *TrustCenterAccessService
+		NonconformityRegistries           *NonconformityRegistryService
+		ComplianceRegistries              *ComplianceRegistryService
+		Snapshots                         *SnapshotService
+		ContinualImprovementRegistries    *ContinualImprovementRegistriesService
+		ProcessingActivityRegistries      *ProcessingActivityRegistryService
 	}
 )
 
@@ -130,7 +139,10 @@ func (s *Service) WithTenant(tenantID gid.TenantID) *TenantService {
 		agent:         agents.NewAgent(nil, s.agentConfig),
 	}
 
-	tenantService.Frameworks = &FrameworkService{svc: tenantService}
+	tenantService.Frameworks = &FrameworkService{
+		svc:               tenantService,
+		html2pdfConverter: s.html2pdfConverter,
+	}
 	tenantService.Measures = &MeasureService{svc: tenantService}
 	tenantService.Tasks = &TaskService{svc: tenantService}
 	tenantService.Evidences = &EvidenceService{
@@ -163,15 +175,174 @@ func (s *Service) WithTenant(tenantID gid.TenantID) *TenantService {
 	tenantService.VendorBusinessAssociateAgreements = &VendorBusinessAssociateAgreementService{svc: tenantService}
 	tenantService.VendorContacts = &VendorContactService{svc: tenantService}
 	tenantService.VendorDataPrivacyAgreements = &VendorDataPrivacyAgreementService{svc: tenantService}
+	tenantService.VendorServices = &VendorServiceService{svc: tenantService}
 	tenantService.Connectors = &ConnectorService{svc: tenantService}
 	tenantService.Assets = &AssetService{svc: tenantService}
 	tenantService.Data = &DatumService{svc: tenantService}
 	tenantService.Audits = &AuditService{svc: tenantService}
 	tenantService.Reports = &ReportService{svc: tenantService}
 	tenantService.TrustCenters = &TrustCenterService{svc: tenantService}
-	tenantService.TrustCenterAccesses = &TrustCenterAccessService{
-		svc:    tenantService,
-		usrmgr: s.usrmgr,
-	}
+	tenantService.TrustCenterAccesses = &TrustCenterAccessService{svc: tenantService, usrmgr: s.usrmgr}
+	tenantService.NonconformityRegistries = &NonconformityRegistryService{svc: tenantService}
+	tenantService.ComplianceRegistries = &ComplianceRegistryService{svc: tenantService}
+	tenantService.Snapshots = &SnapshotService{svc: tenantService}
+	tenantService.ContinualImprovementRegistries = &ContinualImprovementRegistriesService{svc: tenantService}
+	tenantService.ProcessingActivityRegistries = &ProcessingActivityRegistryService{svc: tenantService}
 	return tenantService
+}
+
+func (s *Service) ExportFrameworkJob(ctx context.Context) error {
+	fe, scope, err := s.lockExport(ctx)
+	if err != nil {
+		return fmt.Errorf("cannot lock framework export: %w", err)
+	}
+
+	fe, buildErr := s.buildAndUploadExport(ctx, scope, fe)
+	if buildErr != nil {
+		if err := s.commitFailedExport(ctx, scope, fe); err != nil {
+			return fmt.Errorf(
+				"cannot build and upload framework export: %w, and cannot commit failed export: %w",
+				buildErr,
+				err,
+			)
+		}
+
+		return fmt.Errorf("cannot build and upload framework export: %w", buildErr)
+	}
+
+	return nil
+}
+
+func (s *Service) lockExport(ctx context.Context) (*coredata.FrameworkExport, coredata.Scoper, error) {
+	fe := &coredata.FrameworkExport{}
+	var scope coredata.Scoper
+
+	err := s.pg.WithTx(ctx,
+		func(tx pg.Conn) error {
+			if err := fe.LoadNextPendingForUpdateSkipLocked(ctx, tx); err != nil {
+				return fmt.Errorf("cannot load next pending framework export: %w", err)
+			}
+
+			scope = coredata.NewScope(fe.ID.TenantID())
+
+			fe.Status = coredata.FrameworkExportStatusProcessing
+			fe.StartedAt = ref.Ref(time.Now())
+			if err := fe.Update(ctx, tx, scope); err != nil {
+				return fmt.Errorf("cannot update framework export: %w", err)
+			}
+
+			return nil
+		},
+	)
+	if err != nil {
+		return nil, nil, fmt.Errorf("cannot lock framework export: %w", err)
+	}
+
+	return fe, scope, nil
+}
+
+func (s *Service) buildAndUploadExport(ctx context.Context, scope coredata.Scoper, fe *coredata.FrameworkExport) (*coredata.FrameworkExport, error) {
+	err := s.pg.WithTx(
+		ctx,
+		func(tx pg.Conn) error {
+			framework := &coredata.Framework{}
+			if err := framework.LoadByID(ctx, tx, scope, fe.FrameworkID); err != nil {
+				return fmt.Errorf("cannot load framework: %w", err)
+			}
+
+			tempDir := os.TempDir()
+			tempFile, err := os.CreateTemp(tempDir, "probo-framework-export-*.zip")
+			if err != nil {
+				return fmt.Errorf("cannot create temp file: %w", err)
+			}
+			defer tempFile.Close()
+			defer os.Remove(tempFile.Name())
+
+			tenantService := s.WithTenant(scope.GetTenantID())
+			err = tenantService.Frameworks.Export(ctx, fe.FrameworkID, tempFile)
+			if err != nil {
+				return fmt.Errorf("cannot export framework: %w", err)
+			}
+
+			uuid, err := uuid.NewV4()
+			if err != nil {
+				return fmt.Errorf("cannot generate uuid: %w", err)
+			}
+
+			if _, err := tempFile.Seek(0, 0); err != nil {
+				return fmt.Errorf("cannot seek temp file: %w", err)
+			}
+
+			fileInfo, err := tempFile.Stat()
+			if err != nil {
+				return fmt.Errorf("cannot stat temp file: %w", err)
+			}
+
+			_, err = s.s3.PutObject(
+				ctx,
+				&s3.PutObjectInput{
+					Bucket:        ref.Ref(s.bucket),
+					Key:           ref.Ref(uuid.String()),
+					Body:          tempFile,
+					ContentLength: ref.Ref(fileInfo.Size()),
+					ContentType:   ref.Ref("application/zip"),
+					Metadata: map[string]string{
+						"framework-id":        framework.ID.String(),
+						"framework-export-id": fe.ID.String(),
+					},
+				},
+			)
+			if err != nil {
+				return fmt.Errorf("cannot upload file to S3: %w", err)
+			}
+
+			now := time.Now()
+
+			file := coredata.File{
+				ID:         gid.New(fe.ID.TenantID(), coredata.FileEntityType),
+				BucketName: s.bucket,
+				MimeType:   "application/zip",
+				FileName:   fmt.Sprintf("%s Archive %s.zip", framework.Name, now.Format("2006-01-02")),
+				FileKey:    uuid.String(),
+				FileSize:   int(fileInfo.Size()),
+				CreatedAt:  now,
+				UpdatedAt:  now,
+			}
+
+			if err := file.Insert(ctx, tx, scope); err != nil {
+				return fmt.Errorf("cannot insert file: %w", err)
+			}
+
+			fe.FileID = &file.ID
+			fe.CompletedAt = ref.Ref(time.Now())
+			fe.Status = coredata.FrameworkExportStatusCompleted
+			if err := fe.Update(ctx, tx, scope); err != nil {
+				return fmt.Errorf("cannot update framework export: %w", err)
+			}
+
+			return nil
+		},
+	)
+
+	if err != nil {
+		return fe, fmt.Errorf("cannot build and upload export: %w", err)
+	}
+
+	return fe, nil
+}
+
+func (s *Service) commitFailedExport(ctx context.Context, scope coredata.Scoper, fe *coredata.FrameworkExport) error {
+	fe.CompletedAt = ref.Ref(time.Now())
+	fe.Status = coredata.FrameworkExportStatusFailed
+
+	return s.pg.WithConn(
+		ctx,
+		func(conn pg.Conn) error {
+			if err := fe.Update(ctx, conn, scope); err != nil {
+				return fmt.Errorf("cannot update framework export: %w", err)
+			}
+
+			return nil
+		},
+	)
 }

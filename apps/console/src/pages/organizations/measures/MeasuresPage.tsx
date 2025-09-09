@@ -20,7 +20,6 @@ import {
   IconListStack,
   IconDotGrid1x3Horizontal,
   IconUpload,
-  MeasureBadge,
   MeasureImplementation,
   PageHeader,
   Table,
@@ -33,6 +32,7 @@ import {
   useDialogRef,
   InfiniteScrollTrigger,
 } from "@probo/ui";
+import { MeasureBadge } from "@probo/ui/src/Molecules/Badge/MeasureBadge";
 import {
   measuresQuery,
   useDeleteMeasureMutation,

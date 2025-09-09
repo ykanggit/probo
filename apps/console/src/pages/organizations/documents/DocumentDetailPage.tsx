@@ -117,6 +117,36 @@ const documentFragment = graphql`
   }
 `;
 
+graphql`
+  fragment DocumentDetailPageRowFragment on Document {
+    id
+    title
+    description
+    documentType
+    updatedAt
+    owner {
+      id
+      fullName
+    }
+    versions(first: 1) {
+      edges {
+        node {
+          id
+          status
+          signatures(first: 100) {
+            edges {
+              node {
+                id
+                state
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 const publishDocumentVersionMutation = graphql`
   mutation DocumentDetailPagePublishMutation(
     $input: PublishDocumentVersionInput!
@@ -124,6 +154,7 @@ const publishDocumentVersionMutation = graphql`
     publishDocumentVersion(input: $input) {
       document {
         id
+        ...DocumentDetailPageRowFragment
       }
     }
   }
@@ -270,15 +301,6 @@ export default function DocumentDetailPage(props: Props) {
     publishDocumentVersion({
       variables: {
         input: { documentId: document.id },
-      },
-      onSuccess: () => {
-        // Refresh the whole query to get the new version
-        loadQuery(
-          props.queryRef.environment,
-          documentNodeQuery,
-          props.queryRef.variables,
-          { fetchPolicy: "network-only" }
-        );
       },
     });
   };

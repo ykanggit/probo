@@ -25,6 +25,7 @@ export const trustCenterAccessesQuery = graphql`
               id
               email
               name
+              active
               createdAt
             }
           }
@@ -46,8 +47,26 @@ export const createTrustCenterAccessMutation = graphql`
           id
           email
           name
+          active
           createdAt
         }
+      }
+    }
+  }
+`;
+
+export const updateTrustCenterAccessMutation = graphql`
+  mutation TrustCenterAccessGraphUpdateMutation(
+    $input: UpdateTrustCenterAccessInput!
+  ) {
+    updateTrustCenterAccess(input: $input) {
+      trustCenterAccess {
+        id
+        email
+        name
+        active
+        createdAt
+        updatedAt
       }
     }
   }
@@ -70,7 +89,7 @@ export function useTrustCenterAccesses(trustCenterId: string): TrustCenterAccess
   const data = useLazyLoadQuery<TrustCenterAccessGraphQuery>(
     trustCenterAccessesQuery,
     { trustCenterId: trustCenterId || "" },
-    { fetchPolicy: 'store-and-network' }
+    { fetchPolicy: 'network-only' }
   );
 
   // Return null if trustCenterId was empty, otherwise return the data

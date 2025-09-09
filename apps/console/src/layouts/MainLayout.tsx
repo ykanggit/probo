@@ -3,7 +3,10 @@ import {
   DropdownSeparator,
   IconArrowBoxLeft,
   IconBank,
+  IconBook,
   IconCircleQuestionmark,
+  IconClock,
+  IconCrossLargeX,
   IconFire3,
   IconGroup1,
   IconInboxEmpty,
@@ -15,6 +18,8 @@ import {
   IconListStack,
   IconBox,
   IconShield,
+  IconRotateCw,
+  IconCircleProgress,
   Layout,
   SidebarItem,
   UserDropdown as UserDropdownRoot,
@@ -137,6 +142,31 @@ export function MainLayout() {
             label={__("Audits")}
             icon={IconCheckmark1}
             to={`${prefix}/audits`}
+          />
+          <SidebarItem
+            label={__("Nonconformity Registries")}
+            icon={IconCrossLargeX}
+            to={`${prefix}/nonconformity-registries`}
+          />
+          <SidebarItem
+            label={__("Compliance Registries")}
+            icon={IconBook}
+            to={`${prefix}/compliance-registries`}
+          />
+           <SidebarItem
+            label={__("Continual Improvement Registries")}
+            icon={IconRotateCw}
+            to={`${prefix}/continual-improvement-registries`}
+          />
+          <SidebarItem
+            label={__("Processing Activity Registries")}
+            icon={IconCircleProgress}
+            to={`${prefix}/processing-activity-registries`}
+          />
+          <SidebarItem
+            label={__("Snapshots")}
+            icon={IconClock}
+            to={`${prefix}/snapshots`}
           />
           <SidebarItem
             label={__("Trust Center")}

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<0eb94f0da29f50445248a3d133714be2>>
+ * @generated SignedSource<<9619ee8f74aea67be931f8c40a8815c8>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -88,7 +88,12 @@ return {
     {
       "defaultValue": null,
       "kind": "LocalArgument",
-      "name": "orderBy"
+      "name": "order"
+    },
+    {
+      "defaultValue": null,
+      "kind": "LocalArgument",
+      "name": "snapshotId"
     }
   ],
   "kind": "Fragment",
@@ -129,9 +134,15 @@ return {
       "alias": "data",
       "args": [
         {
-          "kind": "Variable",
-          "name": "orderBy",
-          "variableName": "orderBy"
+          "fields": [
+            {
+              "kind": "Variable",
+              "name": "snapshotId",
+              "variableName": "snapshotId"
+            }
+          ],
+          "kind": "ObjectValue",
+          "name": "filter"
         }
       ],
       "concreteType": "DatumConnection",
@@ -318,6 +329,6 @@ return {
 };
 })();
 
-(node as any).hash = "a797d00b7f2cac2876322b23aa781efa";
+(node as any).hash = "5d3069a0d856613ccb854033b5b1f14e";
 
 export default node;

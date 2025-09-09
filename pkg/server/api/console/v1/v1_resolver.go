@@ -82,12 +82,12 @@ func (r *assetResolver) Organization(ctx context.Context, obj *types.Asset) (*ty
 	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	if obj.Organization == nil {
-		return nil, fmt.Errorf("cannot get organization")
+		panic(fmt.Errorf("cannot get organization"))
 	}
 
 	org, err := prb.Organizations.Get(ctx, obj.Organization.ID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot get organization: %w", err)
+		panic(fmt.Errorf("cannot get organization: %w", err))
 	}
 
 	return types.NewOrganization(org), nil
@@ -99,9 +99,14 @@ func (r *assetConnectionResolver) TotalCount(ctx context.Context, obj *types.Ass
 
 	switch obj.Resolver.(type) {
 	case *organizationResolver:
-		count, err := prb.Assets.CountForOrganizationID(ctx, obj.ParentID)
+		assetFilter := coredata.NewAssetFilter(nil)
+		if obj.Filter != nil {
+			assetFilter = coredata.NewAssetFilter(&obj.Filter.SnapshotID)
+		}
+
+		count, err := prb.Assets.CountForOrganizationID(ctx, obj.ParentID, assetFilter)
 		if err != nil {
-			return 0, fmt.Errorf("cannot count assets: %w", err)
+			panic(fmt.Errorf("cannot count assets: %w", err))
 		}
 		return count, nil
 	}
@@ -115,12 +120,12 @@ func (r *auditResolver) Organization(ctx context.Context, obj *types.Audit) (*ty
 
 	audit, err := prb.Audits.Get(ctx, obj.ID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot load audit: %w", err)
+		panic(fmt.Errorf("cannot load audit: %w", err))
 	}
 
 	organization, err := prb.Organizations.Get(ctx, audit.OrganizationID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot load organization: %w", err)
+		panic(fmt.Errorf("cannot load organization: %w", err))
 	}
 
 	return types.NewOrganization(organization), nil
@@ -132,12 +137,12 @@ func (r *auditResolver) Framework(ctx context.Context, obj *types.Audit) (*types
 
 	audit, err := prb.Audits.Get(ctx, obj.ID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot load audit: %w", err)
+		panic(fmt.Errorf("cannot load audit: %w", err))
 	}
 
 	framework, err := prb.Frameworks.Get(ctx, audit.FrameworkID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot load framework: %w", err)
+		panic(fmt.Errorf("cannot load framework: %w", err))
 	}
 
 	return types.NewFramework(framework), nil
@@ -149,7 +154,7 @@ func (r *auditResolver) Report(ctx context.Context, obj *types.Audit) (*types.Re
 
 	audit, err := prb.Audits.Get(ctx, obj.ID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot load audit: %w", err)
+		panic(fmt.Errorf("cannot load audit: %w", err))
 	}
 
 	if audit.ReportID == nil {
@@ -158,7 +163,7 @@ func (r *auditResolver) Report(ctx context.Context, obj *types.Audit) (*types.Re
 
 	report, err := prb.Reports.Get(ctx, *audit.ReportID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot load report: %w", err)
+		panic(fmt.Errorf("cannot load report: %w", err))
 	}
 
 	return types.NewReport(report), nil
@@ -174,7 +179,7 @@ func (r *auditResolver) ReportURL(ctx context.Context, obj *types.Audit) (*strin
 
 	url, err := prb.Audits.GenerateReportURL(ctx, obj.ID, 15*time.Minute)
 	if err != nil {
-		return nil, fmt.Errorf("cannot generate report URL: %w", err)
+		panic(fmt.Errorf("cannot generate report URL: %w", err))
 	}
 
 	return url, nil
@@ -204,7 +209,7 @@ func (r *auditResolver) Controls(ctx context.Context, obj *types.Audit, first *i
 
 	page, err := prb.Controls.ListForAuditID(ctx, obj.ID, cursor, controlFilter)
 	if err != nil {
-		return nil, fmt.Errorf("cannot list audit controls: %w", err)
+		panic(fmt.Errorf("cannot list audit controls: %w", err))
 	}
 
 	return types.NewControlConnection(page, r, obj.ID, controlFilter), nil
@@ -216,9 +221,119 @@ func (r *auditConnectionResolver) TotalCount(ctx context.Context, obj *types.Aud
 
 	count, err := prb.Audits.CountForOrganizationID(ctx, obj.ParentID)
 	if err != nil {
-		return 0, fmt.Errorf("cannot count audits: %w", err)
+		panic(fmt.Errorf("cannot count audits: %w", err))
 	}
 	return count, nil
+}
+
+// Organization is the resolver for the organization field.
+func (r *complianceRegistryResolver) Organization(ctx context.Context, obj *types.ComplianceRegistry) (*types.Organization, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	registry, err := prb.ComplianceRegistries.Get(ctx, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get compliance registry: %w", err))
+	}
+
+	organization, err := prb.Organizations.Get(ctx, registry.OrganizationID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get compliance registry organization: %w", err))
+	}
+
+	return types.NewOrganization(organization), nil
+}
+
+// Owner is the resolver for the owner field.
+func (r *complianceRegistryResolver) Owner(ctx context.Context, obj *types.ComplianceRegistry) (*types.People, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	registry, err := prb.ComplianceRegistries.Get(ctx, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get compliance registry: %w", err))
+	}
+
+	people, err := prb.Peoples.Get(ctx, registry.OwnerID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get compliance registry owner: %w", err))
+	}
+
+	return types.NewPeople(people), nil
+}
+
+// TotalCount is the resolver for the totalCount field.
+func (r *complianceRegistryConnectionResolver) TotalCount(ctx context.Context, obj *types.ComplianceRegistryConnection) (int, error) {
+	prb := r.ProboService(ctx, obj.ParentID.TenantID())
+
+	switch obj.Resolver.(type) {
+	case *organizationResolver:
+		complianceRegistryFilter := coredata.NewComplianceRegistryFilter(nil)
+		if obj.Filter != nil {
+			complianceRegistryFilter = coredata.NewComplianceRegistryFilter(&obj.Filter.SnapshotID)
+		}
+
+		count, err := prb.ComplianceRegistries.CountForOrganizationID(ctx, obj.ParentID, complianceRegistryFilter)
+		if err != nil {
+			panic(fmt.Errorf("cannot count compliance registries: %w", err))
+		}
+		return count, nil
+	}
+
+	panic(fmt.Errorf("unsupported resolver: %T", obj.Resolver))
+}
+
+// Organization is the resolver for the organization field.
+func (r *continualImprovementRegistryResolver) Organization(ctx context.Context, obj *types.ContinualImprovementRegistry) (*types.Organization, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	registry, err := prb.ContinualImprovementRegistries.Get(ctx, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get continual improvement registry: %w", err))
+	}
+
+	organization, err := prb.Organizations.Get(ctx, registry.OrganizationID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get continual improvement registry organization: %w", err))
+	}
+
+	return types.NewOrganization(organization), nil
+}
+
+// Owner is the resolver for the owner field.
+func (r *continualImprovementRegistryResolver) Owner(ctx context.Context, obj *types.ContinualImprovementRegistry) (*types.People, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	registry, err := prb.ContinualImprovementRegistries.Get(ctx, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get continual improvement registry: %w", err))
+	}
+
+	people, err := prb.Peoples.Get(ctx, registry.OwnerID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get continual improvement registry owner: %w", err))
+	}
+
+	return types.NewPeople(people), nil
+}
+
+// TotalCount is the resolver for the totalCount field.
+func (r *continualImprovementRegistryConnectionResolver) TotalCount(ctx context.Context, obj *types.ContinualImprovementRegistryConnection) (int, error) {
+	prb := r.ProboService(ctx, obj.ParentID.TenantID())
+
+	switch obj.Resolver.(type) {
+	case *organizationResolver:
+		continualImprovementRegistryFilter := coredata.NewContinualImprovementRegistryFilter(nil)
+		if obj.Filter != nil {
+			continualImprovementRegistryFilter = coredata.NewContinualImprovementRegistryFilter(&obj.Filter.SnapshotID)
+		}
+
+		count, err := prb.ContinualImprovementRegistries.CountByOrganizationID(ctx, obj.ParentID, continualImprovementRegistryFilter)
+		if err != nil {
+			panic(fmt.Errorf("cannot count continual improvement registries: %w", err))
+		}
+		return count, nil
+	}
+
+	panic(fmt.Errorf("unsupported resolver: %T", obj.Resolver))
 }
 
 // Framework is the resolver for the framework field.
@@ -323,6 +438,32 @@ func (r *controlResolver) Audits(ctx context.Context, obj *types.Control, first 
 	return types.NewAuditConnection(page, r, obj.ID), nil
 }
 
+// Snapshots is the resolver for the snapshots field.
+func (r *controlResolver) Snapshots(ctx context.Context, obj *types.Control, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.SnapshotOrderBy) (*types.SnapshotConnection, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.SnapshotOrderField]{
+		Field:     coredata.SnapshotOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.SnapshotOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	page, err := prb.Snapshots.ListForControlID(ctx, obj.ID, cursor)
+	if err != nil {
+		panic(fmt.Errorf("cannot list control snapshots: %w", err))
+	}
+
+	return types.NewSnapshotConnection(page, r, obj.ID), nil
+}
+
 // TotalCount is the resolver for the totalCount field.
 func (r *controlConnectionResolver) TotalCount(ctx context.Context, obj *types.ControlConnection) (int, error) {
 	prb := r.ProboService(ctx, obj.ParentID.TenantID())
@@ -423,7 +564,12 @@ func (r *datumConnectionResolver) TotalCount(ctx context.Context, obj *types.Dat
 
 	switch obj.Resolver.(type) {
 	case *organizationResolver:
-		count, err := prb.Data.CountForOrganizationID(ctx, obj.ParentID)
+		datumFilter := coredata.NewDatumFilter(nil)
+		if obj.Filter != nil {
+			datumFilter = coredata.NewDatumFilter(&obj.Filter.SnapshotID)
+		}
+
+		count, err := prb.Data.CountForOrganizationID(ctx, obj.ParentID, datumFilter)
 		if err != nil {
 			return 0, fmt.Errorf("cannot count data: %w", err)
 		}
@@ -1064,9 +1210,9 @@ func (r *measureResolver) Risks(ctx context.Context, obj *types.Measure, first *
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	var riskFilter = coredata.NewRiskFilter(nil)
+	var riskFilter = coredata.NewRiskFilter(nil, nil)
 	if filter != nil {
-		riskFilter = coredata.NewRiskFilter(filter.Query)
+		riskFilter = coredata.NewRiskFilter(filter.Query, &filter.SnapshotID)
 	}
 
 	page, err := prb.Risks.ListForMeasureID(ctx, obj.ID, cursor, riskFilter)
@@ -1324,6 +1470,7 @@ func (r *mutationResolver) CreateTrustCenterAccess(ctx context.Context, input ty
 		TrustCenterID: input.TrustCenterID,
 		Email:         input.Email,
 		Name:          input.Name,
+		Active:        input.Active,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("cannot create trust center access: %w", err)
@@ -1334,19 +1481,37 @@ func (r *mutationResolver) CreateTrustCenterAccess(ctx context.Context, input ty
 	}, nil
 }
 
+// UpdateTrustCenterAccess is the resolver for the updateTrustCenterAccess field.
+func (r *mutationResolver) UpdateTrustCenterAccess(ctx context.Context, input types.UpdateTrustCenterAccessInput) (*types.UpdateTrustCenterAccessPayload, error) {
+	prb := r.ProboService(ctx, input.ID.TenantID())
+
+	access, err := prb.TrustCenterAccesses.Update(ctx, &probo.UpdateTrustCenterAccessRequest{
+		ID:     input.ID,
+		Name:   input.Name,
+		Active: input.Active,
+	})
+	if err != nil {
+		panic(fmt.Errorf("cannot update trust center access: %w", err))
+	}
+
+	return &types.UpdateTrustCenterAccessPayload{
+		TrustCenterAccess: types.NewTrustCenterAccess(access),
+	}, nil
+}
+
 // DeleteTrustCenterAccess is the resolver for the deleteTrustCenterAccess field.
 func (r *mutationResolver) DeleteTrustCenterAccess(ctx context.Context, input types.DeleteTrustCenterAccessInput) (*types.DeleteTrustCenterAccessPayload, error) {
-	prb := r.ProboService(ctx, input.AccessID.TenantID())
+	prb := r.ProboService(ctx, input.ID.TenantID())
 
 	err := prb.TrustCenterAccesses.Delete(ctx, &probo.DeleteTrustCenterAccessRequest{
-		AccessID: input.AccessID,
+		ID: input.ID,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("cannot delete trust center access: %w", err)
 	}
 
 	return &types.DeleteTrustCenterAccessPayload{
-		DeletedTrustCenterAccessID: input.AccessID,
+		DeletedTrustCenterAccessID: input.ID,
 	}, nil
 }
 
@@ -1526,8 +1691,8 @@ func (r *mutationResolver) UpdateVendor(ctx context.Context, input types.UpdateV
 		WebsiteURL:                    input.WebsiteURL,
 		Category:                      input.Category,
 		Certifications:                input.Certifications,
-		BusinessOwnerID:               input.BusinessOwnerID,
-		SecurityOwnerID:               input.SecurityOwnerID,
+		BusinessOwnerID:               &input.BusinessOwnerID,
+		SecurityOwnerID:               &input.SecurityOwnerID,
 		ShowOnTrustCenter:             input.ShowOnTrustCenter,
 	})
 	if err != nil {
@@ -1608,6 +1773,60 @@ func (r *mutationResolver) DeleteVendorContact(ctx context.Context, input types.
 
 	return &types.DeleteVendorContactPayload{
 		DeletedVendorContactID: input.VendorContactID,
+	}, nil
+}
+
+// CreateVendorService is the resolver for the createVendorService field.
+func (r *mutationResolver) CreateVendorService(ctx context.Context, input types.CreateVendorServiceInput) (*types.CreateVendorServicePayload, error) {
+	prb := r.ProboService(ctx, input.VendorID.TenantID())
+
+	req := probo.CreateVendorServiceRequest{
+		VendorID:    input.VendorID,
+		Name:        input.Name,
+		Description: input.Description,
+	}
+
+	vendorService, err := prb.VendorServices.Create(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create vendor service: %w", err)
+	}
+
+	return &types.CreateVendorServicePayload{
+		VendorServiceEdge: types.NewVendorServiceEdge(vendorService, coredata.VendorServiceOrderFieldCreatedAt),
+	}, nil
+}
+
+// UpdateVendorService is the resolver for the updateVendorService field.
+func (r *mutationResolver) UpdateVendorService(ctx context.Context, input types.UpdateVendorServiceInput) (*types.UpdateVendorServicePayload, error) {
+	prb := r.ProboService(ctx, input.ID.TenantID())
+
+	req := probo.UpdateVendorServiceRequest{
+		ID:          input.ID,
+		Name:        input.Name,
+		Description: &input.Description,
+	}
+
+	vendorService, err := prb.VendorServices.Update(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to update vendor service: %w", err)
+	}
+
+	return &types.UpdateVendorServicePayload{
+		VendorService: types.NewVendorService(vendorService),
+	}, nil
+}
+
+// DeleteVendorService is the resolver for the deleteVendorService field.
+func (r *mutationResolver) DeleteVendorService(ctx context.Context, input types.DeleteVendorServiceInput) (*types.DeleteVendorServicePayload, error) {
+	prb := r.ProboService(ctx, input.VendorServiceID.TenantID())
+
+	err := prb.VendorServices.Delete(ctx, input.VendorServiceID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to delete vendor service: %w", err)
+	}
+
+	return &types.DeleteVendorServicePayload{
+		DeletedVendorServiceID: input.VendorServiceID,
 	}, nil
 }
 
@@ -1704,6 +1923,19 @@ func (r *mutationResolver) GenerateFrameworkStateOfApplicability(ctx context.Con
 			"data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,%s",
 			base64.StdEncoding.EncodeToString(soa),
 		),
+	}, nil
+}
+
+// ExportFramework is the resolver for the exportFramework field.
+func (r *mutationResolver) ExportFramework(ctx context.Context, input types.ExportFrameworkInput) (*types.ExportFrameworkPayload, error) {
+	prb := r.ProboService(ctx, input.FrameworkID.TenantID())
+	err, exportJobID := prb.Frameworks.RequestExport(ctx, input.FrameworkID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot export framework: %w", err)
+	}
+
+	return &types.ExportFrameworkPayload{
+		ExportJobID: exportJobID.ID,
 	}, nil
 }
 
@@ -1948,6 +2180,36 @@ func (r *mutationResolver) DeleteControlAuditMapping(ctx context.Context, input 
 	return &types.DeleteControlAuditMappingPayload{
 		DeletedControlID: control.ID,
 		DeletedAuditID:   audit.ID,
+	}, nil
+}
+
+// CreateControlSnapshotMapping is the resolver for the createControlSnapshotMapping field.
+func (r *mutationResolver) CreateControlSnapshotMapping(ctx context.Context, input types.CreateControlSnapshotMappingInput) (*types.CreateControlSnapshotMappingPayload, error) {
+	prb := r.ProboService(ctx, input.SnapshotID.TenantID())
+
+	control, snapshot, err := prb.Controls.CreateSnapshotMapping(ctx, input.ControlID, input.SnapshotID)
+	if err != nil {
+		panic(fmt.Errorf("cannot create control snapshot mapping: %w", err))
+	}
+
+	return &types.CreateControlSnapshotMappingPayload{
+		ControlEdge:  types.NewControlEdge(control, coredata.ControlOrderFieldCreatedAt),
+		SnapshotEdge: types.NewSnapshotEdge(snapshot, coredata.SnapshotOrderFieldCreatedAt),
+	}, nil
+}
+
+// DeleteControlSnapshotMapping is the resolver for the deleteControlSnapshotMapping field.
+func (r *mutationResolver) DeleteControlSnapshotMapping(ctx context.Context, input types.DeleteControlSnapshotMappingInput) (*types.DeleteControlSnapshotMappingPayload, error) {
+	prb := r.ProboService(ctx, input.SnapshotID.TenantID())
+
+	control, snapshot, err := prb.Controls.DeleteSnapshotMapping(ctx, input.ControlID, input.SnapshotID)
+	if err != nil {
+		panic(fmt.Errorf("cannot delete control snapshot mapping: %w", err))
+	}
+
+	return &types.DeleteControlSnapshotMappingPayload{
+		DeletedControlID:  control.ID,
+		DeletedSnapshotID: snapshot.ID,
 	}, nil
 }
 
@@ -2522,9 +2784,9 @@ func (r *mutationResolver) UpdateDocument(ctx context.Context, input types.Updat
 func (r *mutationResolver) DeleteDocument(ctx context.Context, input types.DeleteDocumentInput) (*types.DeleteDocumentPayload, error) {
 	prb := r.ProboService(ctx, input.DocumentID.TenantID())
 
-	err := prb.Documents.Delete(ctx, input.DocumentID)
+	err := prb.Documents.SoftDelete(ctx, input.DocumentID)
 	if err != nil {
-		panic(fmt.Errorf("cannot delete document: %w", err))
+		panic(fmt.Errorf("cannot soft delete document: %w", err))
 	}
 
 	return &types.DeleteDocumentPayload{
@@ -3078,6 +3340,392 @@ func (r *mutationResolver) DeleteAuditReport(ctx context.Context, input types.De
 	}, nil
 }
 
+// CreateNonconformityRegistry is the resolver for the createNonconformityRegistry field.
+func (r *mutationResolver) CreateNonconformityRegistry(ctx context.Context, input types.CreateNonconformityRegistryInput) (*types.CreateNonconformityRegistryPayload, error) {
+	prb := r.ProboService(ctx, input.OrganizationID.TenantID())
+
+	req := probo.CreateNonconformityRegistryRequest{
+		OrganizationID:     input.OrganizationID,
+		ReferenceID:        input.ReferenceID,
+		Description:        input.Description,
+		AuditID:            input.AuditID,
+		DateIdentified:     input.DateIdentified,
+		RootCause:          input.RootCause,
+		CorrectiveAction:   input.CorrectiveAction,
+		OwnerID:            input.OwnerID,
+		DueDate:            input.DueDate,
+		Status:             &input.Status,
+		EffectivenessCheck: input.EffectivenessCheck,
+	}
+
+	registry, err := prb.NonconformityRegistries.Create(ctx, &req)
+	if err != nil {
+		return nil, fmt.Errorf("cannot create nonconformity registry: %w", err)
+	}
+
+	return &types.CreateNonconformityRegistryPayload{
+		NonconformityRegistryEdge: types.NewNonconformityRegistryEdge(registry, coredata.NonconformityRegistryOrderFieldCreatedAt),
+	}, nil
+}
+
+// UpdateNonconformityRegistry is the resolver for the updateNonconformityRegistry field.
+func (r *mutationResolver) UpdateNonconformityRegistry(ctx context.Context, input types.UpdateNonconformityRegistryInput) (*types.UpdateNonconformityRegistryPayload, error) {
+	prb := r.ProboService(ctx, input.ID.TenantID())
+
+	req := probo.UpdateNonconformityRegistryRequest{
+		ID:                 input.ID,
+		ReferenceID:        input.ReferenceID,
+		Description:        &input.Description,
+		DateIdentified:     &input.DateIdentified,
+		RootCause:          input.RootCause,
+		CorrectiveAction:   &input.CorrectiveAction,
+		OwnerID:            input.OwnerID,
+		AuditID:            input.AuditID,
+		DueDate:            &input.DueDate,
+		Status:             input.Status,
+		EffectivenessCheck: &input.EffectivenessCheck,
+	}
+
+	registry, err := prb.NonconformityRegistries.Update(ctx, &req)
+	if err != nil {
+		return nil, fmt.Errorf("cannot update nonconformity registry: %w", err)
+	}
+
+	return &types.UpdateNonconformityRegistryPayload{
+		NonconformityRegistry: types.NewNonconformityRegistry(registry),
+	}, nil
+}
+
+// DeleteNonconformityRegistry is the resolver for the deleteNonconformityRegistry field.
+func (r *mutationResolver) DeleteNonconformityRegistry(ctx context.Context, input types.DeleteNonconformityRegistryInput) (*types.DeleteNonconformityRegistryPayload, error) {
+	prb := r.ProboService(ctx, input.NonconformityRegistryID.TenantID())
+
+	err := prb.NonconformityRegistries.Delete(ctx, input.NonconformityRegistryID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot delete nonconformity registry: %w", err)
+	}
+
+	return &types.DeleteNonconformityRegistryPayload{
+		DeletedNonconformityRegistryID: input.NonconformityRegistryID,
+	}, nil
+}
+
+// CreateComplianceRegistry is the resolver for the createComplianceRegistry field.
+func (r *mutationResolver) CreateComplianceRegistry(ctx context.Context, input types.CreateComplianceRegistryInput) (*types.CreateComplianceRegistryPayload, error) {
+	prb := r.ProboService(ctx, input.OrganizationID.TenantID())
+
+	req := probo.CreateComplianceRegistryRequest{
+		OrganizationID:         input.OrganizationID,
+		ReferenceID:            input.ReferenceID,
+		Area:                   input.Area,
+		Source:                 input.Source,
+		Requirement:            input.Requirement,
+		ActionsToBeImplemented: input.ActionsToBeImplemented,
+		Regulator:              input.Regulator,
+		OwnerID:                input.OwnerID,
+		LastReviewDate:         input.LastReviewDate,
+		DueDate:                input.DueDate,
+		Status:                 &input.Status,
+	}
+
+	registry, err := prb.ComplianceRegistries.Create(ctx, &req)
+	if err != nil {
+		panic(fmt.Errorf("cannot create compliance registry: %w", err))
+	}
+
+	return &types.CreateComplianceRegistryPayload{
+		ComplianceRegistryEdge: types.NewComplianceRegistryEdge(registry, coredata.ComplianceRegistryOrderFieldCreatedAt),
+	}, nil
+}
+
+// UpdateComplianceRegistry is the resolver for the updateComplianceRegistry field.
+func (r *mutationResolver) UpdateComplianceRegistry(ctx context.Context, input types.UpdateComplianceRegistryInput) (*types.UpdateComplianceRegistryPayload, error) {
+	prb := r.ProboService(ctx, input.ID.TenantID())
+
+	req := probo.UpdateComplianceRegistryRequest{
+		ID:                     input.ID,
+		ReferenceID:            input.ReferenceID,
+		Area:                   &input.Area,
+		Source:                 &input.Source,
+		Requirement:            &input.Requirement,
+		ActionsToBeImplemented: &input.ActionsToBeImplemented,
+		Regulator:              &input.Regulator,
+		OwnerID:                input.OwnerID,
+		LastReviewDate:         &input.LastReviewDate,
+		DueDate:                &input.DueDate,
+		Status:                 input.Status,
+	}
+
+	registry, err := prb.ComplianceRegistries.Update(ctx, &req)
+	if err != nil {
+		panic(fmt.Errorf("cannot update compliance registry: %w", err))
+	}
+
+	return &types.UpdateComplianceRegistryPayload{
+		ComplianceRegistry: types.NewComplianceRegistry(registry),
+	}, nil
+}
+
+// DeleteComplianceRegistry is the resolver for the deleteComplianceRegistry field.
+func (r *mutationResolver) DeleteComplianceRegistry(ctx context.Context, input types.DeleteComplianceRegistryInput) (*types.DeleteComplianceRegistryPayload, error) {
+	prb := r.ProboService(ctx, input.ComplianceRegistryID.TenantID())
+
+	err := prb.ComplianceRegistries.Delete(ctx, input.ComplianceRegistryID)
+	if err != nil {
+		panic(fmt.Errorf("cannot delete compliance registry: %w", err))
+	}
+
+	return &types.DeleteComplianceRegistryPayload{
+		DeletedComplianceRegistryID: input.ComplianceRegistryID,
+	}, nil
+}
+
+// CreateContinualImprovementRegistry is the resolver for the createContinualImprovementRegistry field.
+func (r *mutationResolver) CreateContinualImprovementRegistry(ctx context.Context, input types.CreateContinualImprovementRegistryInput) (*types.CreateContinualImprovementRegistryPayload, error) {
+	prb := r.ProboService(ctx, input.OrganizationID.TenantID())
+
+	req := probo.CreateContinualImprovementRegistryRequest{
+		OrganizationID: input.OrganizationID,
+		ReferenceID:    input.ReferenceID,
+		Description:    input.Description,
+		Source:         input.Source,
+		OwnerID:        input.OwnerID,
+		TargetDate:     input.TargetDate,
+		Status:         &input.Status,
+		Priority:       &input.Priority,
+	}
+
+	registry, err := prb.ContinualImprovementRegistries.Create(ctx, &req)
+	if err != nil {
+		panic(fmt.Errorf("cannot create continual improvement registry: %w", err))
+	}
+
+	return &types.CreateContinualImprovementRegistryPayload{
+		ContinualImprovementRegistryEdge: types.NewContinualImprovementRegistryEdge(registry, coredata.ContinualImprovementRegistriesOrderFieldCreatedAt),
+	}, nil
+}
+
+// UpdateContinualImprovementRegistry is the resolver for the updateContinualImprovementRegistry field.
+func (r *mutationResolver) UpdateContinualImprovementRegistry(ctx context.Context, input types.UpdateContinualImprovementRegistryInput) (*types.UpdateContinualImprovementRegistryPayload, error) {
+	prb := r.ProboService(ctx, input.ID.TenantID())
+
+	req := probo.UpdateContinualImprovementRegistryRequest{
+		ID:          input.ID,
+		ReferenceID: input.ReferenceID,
+		Description: &input.Description,
+		Source:      &input.Source,
+		OwnerID:     input.OwnerID,
+		TargetDate:  &input.TargetDate,
+		Status:      input.Status,
+		Priority:    input.Priority,
+	}
+
+	registry, err := prb.ContinualImprovementRegistries.Update(ctx, &req)
+	if err != nil {
+		panic(fmt.Errorf("cannot update continual improvement registry: %w", err))
+	}
+
+	return &types.UpdateContinualImprovementRegistryPayload{
+		ContinualImprovementRegistry: types.NewContinualImprovementRegistry(registry),
+	}, nil
+}
+
+// DeleteContinualImprovementRegistry is the resolver for the deleteContinualImprovementRegistry field.
+func (r *mutationResolver) DeleteContinualImprovementRegistry(ctx context.Context, input types.DeleteContinualImprovementRegistryInput) (*types.DeleteContinualImprovementRegistryPayload, error) {
+	prb := r.ProboService(ctx, input.ContinualImprovementRegistryID.TenantID())
+
+	err := prb.ContinualImprovementRegistries.Delete(ctx, input.ContinualImprovementRegistryID)
+	if err != nil {
+		panic(fmt.Errorf("cannot delete continual improvement registry: %w", err))
+	}
+
+	return &types.DeleteContinualImprovementRegistryPayload{
+		DeletedContinualImprovementRegistryID: input.ContinualImprovementRegistryID,
+	}, nil
+}
+
+// CreateProcessingActivityRegistry is the resolver for the createProcessingActivityRegistry field.
+func (r *mutationResolver) CreateProcessingActivityRegistry(ctx context.Context, input types.CreateProcessingActivityRegistryInput) (*types.CreateProcessingActivityRegistryPayload, error) {
+	prb := r.ProboService(ctx, input.OrganizationID.TenantID())
+
+	req := probo.CreateProcessingActivityRegistryRequest{
+		OrganizationID:                 input.OrganizationID,
+		Name:                           input.Name,
+		Purpose:                        input.Purpose,
+		DataSubjectCategory:            input.DataSubjectCategory,
+		PersonalDataCategory:           input.PersonalDataCategory,
+		SpecialOrCriminalData:          input.SpecialOrCriminalData,
+		LawfulBasis:                    input.LawfulBasis,
+		Recipients:                     input.Recipients,
+		Location:                       input.Location,
+		InternationalTransfers:         input.InternationalTransfers,
+		TransferSafeguards:             input.TransferSafeguards,
+		RetentionPeriod:                input.RetentionPeriod,
+		SecurityMeasures:               input.SecurityMeasures,
+		DataProtectionImpactAssessment: input.DataProtectionImpactAssessment,
+		TransferImpactAssessment:       input.TransferImpactAssessment,
+	}
+
+	registry, err := prb.ProcessingActivityRegistries.Create(ctx, &req)
+	if err != nil {
+		panic(fmt.Errorf("cannot create processing activity registry: %w", err))
+	}
+
+	return &types.CreateProcessingActivityRegistryPayload{
+		ProcessingActivityRegistryEdge: types.NewProcessingActivityRegistryEdge(registry, coredata.ProcessingActivityRegistryOrderFieldCreatedAt),
+	}, nil
+}
+
+// UpdateProcessingActivityRegistry is the resolver for the updateProcessingActivityRegistry field.
+func (r *mutationResolver) UpdateProcessingActivityRegistry(ctx context.Context, input types.UpdateProcessingActivityRegistryInput) (*types.UpdateProcessingActivityRegistryPayload, error) {
+	prb := r.ProboService(ctx, input.ID.TenantID())
+
+	req := probo.UpdateProcessingActivityRegistryRequest{
+		ID:                             input.ID,
+		Name:                           input.Name,
+		Purpose:                        &input.Purpose,
+		DataSubjectCategory:            &input.DataSubjectCategory,
+		PersonalDataCategory:           &input.PersonalDataCategory,
+		SpecialOrCriminalData:          input.SpecialOrCriminalData,
+		LawfulBasis:                    input.LawfulBasis,
+		Recipients:                     &input.Recipients,
+		Location:                       &input.Location,
+		InternationalTransfers:         input.InternationalTransfers,
+		TransferSafeguards:             &input.TransferSafeguards,
+		RetentionPeriod:                &input.RetentionPeriod,
+		SecurityMeasures:               &input.SecurityMeasures,
+		DataProtectionImpactAssessment: input.DataProtectionImpactAssessment,
+		TransferImpactAssessment:       input.TransferImpactAssessment,
+	}
+
+	registry, err := prb.ProcessingActivityRegistries.Update(ctx, &req)
+	if err != nil {
+		panic(fmt.Errorf("cannot update processing activity registry: %w", err))
+	}
+
+	return &types.UpdateProcessingActivityRegistryPayload{
+		ProcessingActivityRegistry: types.NewProcessingActivityRegistry(registry),
+	}, nil
+}
+
+// DeleteProcessingActivityRegistry is the resolver for the deleteProcessingActivityRegistry field.
+func (r *mutationResolver) DeleteProcessingActivityRegistry(ctx context.Context, input types.DeleteProcessingActivityRegistryInput) (*types.DeleteProcessingActivityRegistryPayload, error) {
+	prb := r.ProboService(ctx, input.ProcessingActivityRegistryID.TenantID())
+
+	err := prb.ProcessingActivityRegistries.Delete(ctx, input.ProcessingActivityRegistryID)
+	if err != nil {
+		panic(fmt.Errorf("cannot delete processing activity registry: %w", err))
+	}
+
+	return &types.DeleteProcessingActivityRegistryPayload{
+		DeletedProcessingActivityRegistryID: input.ProcessingActivityRegistryID,
+	}, nil
+}
+
+// CreateSnapshot is the resolver for the createSnapshot field.
+func (r *mutationResolver) CreateSnapshot(ctx context.Context, input types.CreateSnapshotInput) (*types.CreateSnapshotPayload, error) {
+	prb := r.ProboService(ctx, input.OrganizationID.TenantID())
+
+	snapshot, err := prb.Snapshots.Create(ctx, &probo.CreateSnapshotRequest{
+		OrganizationID: input.OrganizationID,
+		Name:           input.Name,
+		Description:    input.Description,
+		Type:           input.Type,
+	})
+	if err != nil {
+		panic(fmt.Errorf("cannot create snapshot: %w", err))
+	}
+
+	return &types.CreateSnapshotPayload{
+		SnapshotEdge: types.NewSnapshotEdge(snapshot, coredata.SnapshotOrderFieldCreatedAt),
+	}, nil
+}
+
+// DeleteSnapshot is the resolver for the deleteSnapshot field.
+func (r *mutationResolver) DeleteSnapshot(ctx context.Context, input types.DeleteSnapshotInput) (*types.DeleteSnapshotPayload, error) {
+	prb := r.ProboService(ctx, input.SnapshotID.TenantID())
+
+	if err := prb.Snapshots.Delete(ctx, input.SnapshotID); err != nil {
+		panic(fmt.Errorf("cannot delete snapshot: %w", err))
+	}
+
+	return &types.DeleteSnapshotPayload{
+		DeletedSnapshotID: input.SnapshotID,
+	}, nil
+}
+
+// Organization is the resolver for the organization field.
+func (r *nonconformityRegistryResolver) Organization(ctx context.Context, obj *types.NonconformityRegistry) (*types.Organization, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	registry, err := prb.NonconformityRegistries.Get(ctx, obj.ID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get nonconformity registry: %w", err)
+	}
+
+	organization, err := prb.Organizations.Get(ctx, registry.OrganizationID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get nonconformity registry organization: %w", err)
+	}
+
+	return types.NewOrganization(organization), nil
+}
+
+// Audit is the resolver for the audit field.
+func (r *nonconformityRegistryResolver) Audit(ctx context.Context, obj *types.NonconformityRegistry) (*types.Audit, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	registry, err := prb.NonconformityRegistries.Get(ctx, obj.ID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get nonconformity registry: %w", err)
+	}
+
+	audit, err := prb.Audits.Get(ctx, registry.AuditID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get nonconformity registry audit: %w", err)
+	}
+
+	return types.NewAudit(audit), nil
+}
+
+// Owner is the resolver for the owner field.
+func (r *nonconformityRegistryResolver) Owner(ctx context.Context, obj *types.NonconformityRegistry) (*types.People, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	registry, err := prb.NonconformityRegistries.Get(ctx, obj.ID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get nonconformity registry: %w", err)
+	}
+
+	people, err := prb.Peoples.Get(ctx, registry.OwnerID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get nonconformity registry owner: %w", err)
+	}
+
+	return types.NewPeople(people), nil
+}
+
+// TotalCount is the resolver for the totalCount field.
+func (r *nonconformityRegistryConnectionResolver) TotalCount(ctx context.Context, obj *types.NonconformityRegistryConnection) (int, error) {
+	prb := r.ProboService(ctx, obj.ParentID.TenantID())
+
+	switch obj.Resolver.(type) {
+	case *organizationResolver:
+		nonconformityRegistryFilter := coredata.NewNonconformityRegistryFilter(nil)
+		if obj.Filter != nil {
+			nonconformityRegistryFilter = coredata.NewNonconformityRegistryFilter(&obj.Filter.SnapshotID)
+		}
+
+		count, err := prb.NonconformityRegistries.CountForOrganizationID(ctx, obj.ParentID, nonconformityRegistryFilter)
+		if err != nil {
+			return 0, fmt.Errorf("cannot count nonconformity registries: %w", err)
+		}
+		return count, nil
+	}
+
+	return 0, fmt.Errorf("unsupported resolver: %T", obj.Resolver)
+}
+
 // LogoURL is the resolver for the logoUrl field.
 func (r *organizationResolver) LogoURL(ctx context.Context, obj *types.Organization) (*string, error) {
 	prb := r.ProboService(ctx, obj.ID.TenantID())
@@ -3189,7 +3837,7 @@ func (r *organizationResolver) Controls(ctx context.Context, obj *types.Organiza
 }
 
 // Vendors is the resolver for the vendors field.
-func (r *organizationResolver) Vendors(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorOrderBy) (*types.VendorConnection, error) {
+func (r *organizationResolver) Vendors(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorOrderBy, filter *types.VendorFilter) (*types.VendorConnection, error) {
 	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.VendorOrderField]{
@@ -3205,7 +3853,12 @@ func (r *organizationResolver) Vendors(ctx context.Context, obj *types.Organizat
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := prb.Vendors.ListForOrganizationID(ctx, obj.ID, cursor)
+	var vendorFilter = coredata.NewVendorFilter(nil, nil)
+	if filter != nil {
+		vendorFilter = coredata.NewVendorFilter(&filter.SnapshotID, nil)
+	}
+
+	page, err := prb.Vendors.ListForOrganizationID(ctx, obj.ID, cursor, vendorFilter)
 	if err != nil {
 		panic(fmt.Errorf("cannot list organization vendors: %w", err))
 	}
@@ -3320,9 +3973,9 @@ func (r *organizationResolver) Risks(ctx context.Context, obj *types.Organizatio
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	var riskFilter = coredata.NewRiskFilter(nil)
+	var riskFilter = coredata.NewRiskFilter(nil, nil)
 	if filter != nil {
-		riskFilter = coredata.NewRiskFilter(filter.Query)
+		riskFilter = coredata.NewRiskFilter(filter.Query, &filter.SnapshotID)
 	}
 
 	page, err := prb.Risks.ListForOrganizationID(ctx, obj.ID, cursor, riskFilter)
@@ -3359,7 +4012,7 @@ func (r *organizationResolver) Tasks(ctx context.Context, obj *types.Organizatio
 }
 
 // Assets is the resolver for the assets field.
-func (r *organizationResolver) Assets(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.AssetOrderBy) (*types.AssetConnection, error) {
+func (r *organizationResolver) Assets(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.AssetOrderBy, filter *types.AssetFilter) (*types.AssetConnection, error) {
 	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.AssetOrderField]{
@@ -3375,16 +4028,21 @@ func (r *organizationResolver) Assets(ctx context.Context, obj *types.Organizati
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := prb.Assets.ListForOrganizationID(ctx, obj.ID, cursor)
+	assetFilter := coredata.NewAssetFilter(nil)
+	if filter != nil {
+		assetFilter = coredata.NewAssetFilter(&filter.SnapshotID)
+	}
+
+	page, err := prb.Assets.ListForOrganizationID(ctx, obj.ID, cursor, assetFilter)
 	if err != nil {
 		panic(fmt.Errorf("cannot list organization assets: %w", err))
 	}
 
-	return types.NewAssetConnection(page, r, obj.ID), nil
+	return types.NewAssetConnection(page, r, obj.ID, filter), nil
 }
 
 // Assets is the resolver for the assets field.
-func (r *organizationResolver) Data(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DatumOrderBy) (*types.DatumConnection, error) {
+func (r *organizationResolver) Data(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.DatumOrderBy, filter *types.DatumFilter) (*types.DatumConnection, error) {
 	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	pageOrderBy := page.OrderBy[coredata.DatumOrderField]{
@@ -3400,12 +4058,17 @@ func (r *organizationResolver) Data(ctx context.Context, obj *types.Organization
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
 
-	page, err := prb.Data.ListForOrganizationID(ctx, obj.ID, cursor)
+	datumFilter := coredata.NewDatumFilter(nil)
+	if filter != nil {
+		datumFilter = coredata.NewDatumFilter(&filter.SnapshotID)
+	}
+
+	page, err := prb.Data.ListForOrganizationID(ctx, obj.ID, cursor, datumFilter)
 	if err != nil {
 		panic(fmt.Errorf("cannot list organization data: %w", err))
 	}
 
-	return types.NewDataConnection(page, r, obj.ID), nil
+	return types.NewDataConnection(page, r, obj.ID, filter), nil
 }
 
 // Audits is the resolver for the audits field.
@@ -3433,6 +4096,153 @@ func (r *organizationResolver) Audits(ctx context.Context, obj *types.Organizati
 	return types.NewAuditConnection(page, r, obj.ID), nil
 }
 
+// NonconformityRegistries is the resolver for the nonconformityRegistries field.
+func (r *organizationResolver) NonconformityRegistries(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.NonconformityRegistryOrderBy, filter *types.NonconformityRegistryFilter) (*types.NonconformityRegistryConnection, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.NonconformityRegistryOrderField]{
+		Field:     coredata.NonconformityRegistryOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.NonconformityRegistryOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	nonconformityRegistryFilter := coredata.NewNonconformityRegistryFilter(nil)
+	if filter != nil {
+		nonconformityRegistryFilter = coredata.NewNonconformityRegistryFilter(&filter.SnapshotID)
+	}
+
+	page, err := prb.NonconformityRegistries.ListForOrganizationID(ctx, obj.ID, cursor, nonconformityRegistryFilter)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list organization nonconformity registries: %w", err)
+	}
+
+	return types.NewNonconformityRegistryConnection(page, r, obj.ID, filter), nil
+}
+
+// ComplianceRegistries is the resolver for the complianceRegistries field.
+func (r *organizationResolver) ComplianceRegistries(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ComplianceRegistryOrderBy, filter *types.ComplianceRegistryFilter) (*types.ComplianceRegistryConnection, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.ComplianceRegistryOrderField]{
+		Field:     coredata.ComplianceRegistryOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.ComplianceRegistryOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	complianceRegistryFilter := coredata.NewComplianceRegistryFilter(nil)
+	if filter != nil {
+		complianceRegistryFilter = coredata.NewComplianceRegistryFilter(&filter.SnapshotID)
+	}
+
+	page, err := prb.ComplianceRegistries.ListForOrganizationID(ctx, obj.ID, cursor, complianceRegistryFilter)
+	if err != nil {
+		panic(fmt.Errorf("cannot list organization compliance registries: %w", err))
+	}
+
+	return types.NewComplianceRegistryConnection(page, r, obj.ID, filter), nil
+}
+
+// ContinualImprovementRegistries is the resolver for the continualImprovementRegistries field.
+func (r *organizationResolver) ContinualImprovementRegistries(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ContinualImprovementRegistriesOrderBy, filter *types.ContinualImprovementRegistryFilter) (*types.ContinualImprovementRegistryConnection, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.ContinualImprovementRegistriesOrderField]{
+		Field:     coredata.ContinualImprovementRegistriesOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.ContinualImprovementRegistriesOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	continualImprovementRegistryFilter := coredata.NewContinualImprovementRegistryFilter(nil)
+	if filter != nil {
+		continualImprovementRegistryFilter = coredata.NewContinualImprovementRegistryFilter(&filter.SnapshotID)
+	}
+
+	page, err := prb.ContinualImprovementRegistries.ListForOrganizationID(ctx, obj.ID, cursor, continualImprovementRegistryFilter)
+	if err != nil {
+		panic(fmt.Errorf("cannot list organization continual improvement registries: %w", err))
+	}
+
+	return types.NewContinualImprovementRegistryConnection(page, r, obj.ID, filter), nil
+}
+
+// ProcessingActivityRegistries is the resolver for the processingActivityRegistries field.
+func (r *organizationResolver) ProcessingActivityRegistries(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ProcessingActivityRegistryOrderBy, filter *types.ProcessingActivityRegistryFilter) (*types.ProcessingActivityRegistryConnection, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.ProcessingActivityRegistryOrderField]{
+		Field:     coredata.ProcessingActivityRegistryOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.ProcessingActivityRegistryOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	processingActivityRegistryFilter := coredata.NewProcessingActivityRegistryFilter(nil)
+	if filter != nil {
+		processingActivityRegistryFilter = coredata.NewProcessingActivityRegistryFilter(&filter.SnapshotID)
+	}
+
+	page, err := prb.ProcessingActivityRegistries.ListForOrganizationID(ctx, obj.ID, cursor, processingActivityRegistryFilter)
+	if err != nil {
+		panic(fmt.Errorf("cannot list organization processing activity registries: %w", err))
+	}
+
+	return types.NewProcessingActivityRegistryConnection(page, r, obj.ID, filter), nil
+}
+
+// Snapshots is the resolver for the snapshots field.
+func (r *organizationResolver) Snapshots(ctx context.Context, obj *types.Organization, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.SnapshotOrderBy) (*types.SnapshotConnection, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.SnapshotOrderField]{
+		Field:     coredata.SnapshotOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.SnapshotOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	page, err := prb.Snapshots.ListForOrganizationID(ctx, obj.ID, cursor)
+	if err != nil {
+		panic(fmt.Errorf("cannot list organization snapshots: %w", err))
+	}
+
+	return types.NewSnapshotConnection(page, r, obj.ID), nil
+}
+
 // TrustCenter is the resolver for the trustCenter field.
 func (r *organizationResolver) TrustCenter(ctx context.Context, obj *types.Organization) (*types.TrustCenter, error) {
 	prb := r.ProboService(ctx, obj.ID.TenantID())
@@ -3453,7 +4263,45 @@ func (r *peopleConnectionResolver) TotalCount(ctx context.Context, obj *types.Pe
 	case *organizationResolver:
 		count, err := prb.Peoples.CountForOrganizationID(ctx, obj.ParentID, obj.Filters)
 		if err != nil {
-			return 0, fmt.Errorf("cannot count peoples: %w", err)
+			panic(fmt.Errorf("cannot count peoples: %w", err))
+		}
+		return count, nil
+	}
+
+	panic(fmt.Errorf("unsupported resolver: %T", obj.Resolver))
+}
+
+// Organization is the resolver for the organization field.
+func (r *processingActivityRegistryResolver) Organization(ctx context.Context, obj *types.ProcessingActivityRegistry) (*types.Organization, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	processingActivityRegistry, err := prb.ProcessingActivityRegistries.Get(ctx, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get processing activity registry: %w", err))
+	}
+
+	organization, err := prb.Organizations.Get(ctx, processingActivityRegistry.OrganizationID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get organization: %w", err))
+	}
+
+	return types.NewOrganization(organization), nil
+}
+
+// TotalCount is the resolver for the totalCount field.
+func (r *processingActivityRegistryConnectionResolver) TotalCount(ctx context.Context, obj *types.ProcessingActivityRegistryConnection) (int, error) {
+	prb := r.ProboService(ctx, obj.ParentID.TenantID())
+
+	switch obj.Resolver.(type) {
+	case *organizationResolver:
+		processingActivityRegistryFilter := coredata.NewProcessingActivityRegistryFilter(nil)
+		if obj.Filter != nil {
+			processingActivityRegistryFilter = coredata.NewProcessingActivityRegistryFilter(&obj.Filter.SnapshotID)
+		}
+
+		count, err := prb.ProcessingActivityRegistries.CountForOrganizationID(ctx, obj.ParentID, processingActivityRegistryFilter)
+		if err != nil {
+			panic(fmt.Errorf("cannot count organization processing activity registries: %w", err))
 		}
 		return count, nil
 	}
@@ -3546,6 +4394,12 @@ func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error
 			panic(fmt.Errorf("cannot get vendor contact: %w", err))
 		}
 		return types.NewVendorContact(vendorContact), nil
+	case coredata.VendorServiceEntityType:
+		vendorService, err := prb.VendorServices.Get(ctx, id)
+		if err != nil {
+			panic(fmt.Errorf("cannot get vendor service: %w", err))
+		}
+		return types.NewVendorService(vendorService), nil
 	case coredata.DocumentVersionEntityType:
 		documentVersion, err := prb.Documents.GetVersion(ctx, id)
 		if err != nil {
@@ -3576,12 +4430,42 @@ func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error
 			panic(fmt.Errorf("cannot get audit: %w", err))
 		}
 		return types.NewAudit(audit), nil
+	case coredata.NonconformityRegistryEntityType:
+		nonconformityRegistry, err := prb.NonconformityRegistries.Get(ctx, id)
+		if err != nil {
+			panic(fmt.Errorf("cannot get nonconformity registry: %w", err))
+		}
+		return types.NewNonconformityRegistry(nonconformityRegistry), nil
+	case coredata.ComplianceRegistryEntityType:
+		complianceRegistry, err := prb.ComplianceRegistries.Get(ctx, id)
+		if err != nil {
+			panic(fmt.Errorf("cannot get compliance registry: %w", err))
+		}
+		return types.NewComplianceRegistry(complianceRegistry), nil
+	case coredata.ContinualImprovementRegistryEntityType:
+		continualImprovementRegistry, err := prb.ContinualImprovementRegistries.Get(ctx, id)
+		if err != nil {
+			panic(fmt.Errorf("cannot get continual improvement registry: %w", err))
+		}
+		return types.NewContinualImprovementRegistry(continualImprovementRegistry), nil
 	case coredata.ReportEntityType:
 		report, err := prb.Reports.Get(ctx, id)
 		if err != nil {
 			panic(fmt.Errorf("cannot get report: %w", err))
 		}
 		return types.NewReport(report), nil
+	case coredata.ProcessingActivityRegistryEntityType:
+		processingActivityRegistry, err := prb.ProcessingActivityRegistries.Get(ctx, id)
+		if err != nil {
+			panic(fmt.Errorf("cannot get processing activity registry: %w", err))
+		}
+		return types.NewProcessingActivityRegistry(processingActivityRegistry), nil
+	case coredata.SnapshotEntityType:
+		snapshot, err := prb.Snapshots.Get(ctx, id)
+		if err != nil {
+			panic(fmt.Errorf("cannot get snapshot: %w", err))
+		}
+		return types.NewSnapshot(snapshot), nil
 	case coredata.TrustCenterEntityType:
 		trustCenter, err := prb.TrustCenters.Get(ctx, id)
 		if err != nil {
@@ -3605,18 +4489,13 @@ func (r *queryResolver) Viewer(ctx context.Context) (*types.Viewer, error) {
 	}, nil
 }
 
-// TrustCenters is the resolver for the trustCenters field.
-func (r *queryResolver) TrustCenters(ctx context.Context, first *int, after *page.CursorKey, last *int, before *page.CursorKey, filter *types.TrustCenterFilter) (*types.TrustCenterConnection, error) {
-	return nil, fmt.Errorf("not implemented: TrustCenters - trustCenters")
-}
-
 // DownloadURL is the resolver for the downloadUrl field.
 func (r *reportResolver) DownloadURL(ctx context.Context, obj *types.Report) (*string, error) {
 	prb := r.ProboService(ctx, obj.ID.TenantID())
 
 	url, err := prb.Reports.GenerateDownloadURL(ctx, obj.ID, 15*time.Minute)
 	if err != nil {
-		return nil, fmt.Errorf("cannot generate download URL: %w", err)
+		panic(fmt.Errorf("cannot generate download URL: %w", err))
 	}
 
 	return url, nil
@@ -3771,6 +4650,69 @@ func (r *riskConnectionResolver) TotalCount(ctx context.Context, obj *types.Risk
 	panic(fmt.Errorf("unsupported resolver: %T", obj.Resolver))
 }
 
+// Organization is the resolver for the organization field.
+func (r *snapshotResolver) Organization(ctx context.Context, obj *types.Snapshot) (*types.Organization, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	snapshot, err := prb.Snapshots.Get(ctx, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get snapshot: %w", err))
+	}
+
+	organization, err := prb.Organizations.Get(ctx, snapshot.OrganizationID)
+	if err != nil {
+		panic(fmt.Errorf("cannot get organization: %w", err))
+	}
+
+	return types.NewOrganization(organization), nil
+}
+
+// Controls is the resolver for the controls field.
+func (r *snapshotResolver) Controls(ctx context.Context, obj *types.Snapshot, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.ControlOrderBy, filter *types.ControlFilter) (*types.ControlConnection, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.ControlOrderField]{
+		Field:     coredata.ControlOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.ControlOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	var controlFilter = coredata.NewControlFilter(nil)
+	if filter != nil {
+		controlFilter = coredata.NewControlFilter(filter.Query)
+	}
+
+	page, err := prb.Controls.ListForSnapshotID(ctx, obj.ID, cursor, controlFilter)
+	if err != nil {
+		panic(fmt.Errorf("cannot list snapshot controls: %w", err))
+	}
+
+	return types.NewControlConnection(page, r, obj.ID, controlFilter), nil
+}
+
+// TotalCount is the resolver for the totalCount field.
+func (r *snapshotConnectionResolver) TotalCount(ctx context.Context, obj *types.SnapshotConnection) (int, error) {
+	prb := r.ProboService(ctx, obj.ParentID.TenantID())
+
+	switch obj.Resolver.(type) {
+	case *organizationResolver:
+		count, err := prb.Snapshots.CountForOrganizationID(ctx, obj.ParentID)
+		if err != nil {
+			panic(fmt.Errorf("cannot count snapshots: %w", err))
+		}
+		return count, nil
+	}
+
+	panic(fmt.Errorf("unsupported resolver: %T", obj.Resolver))
+}
+
 // AssignedTo is the resolver for the assignedTo field.
 func (r *taskResolver) AssignedTo(ctx context.Context, obj *types.Task) (*types.People, error) {
 	prb := r.ProboService(ctx, obj.ID.TenantID())
@@ -3858,13 +4800,13 @@ func (r *taskConnectionResolver) TotalCount(ctx context.Context, obj *types.Task
 	case *measureResolver:
 		count, err := prb.Tasks.CountForMeasureID(ctx, obj.ParentID)
 		if err != nil {
-			return 0, fmt.Errorf("cannot count tasks: %w", err)
+			panic(fmt.Errorf("cannot count tasks: %w", err))
 		}
 		return count, nil
 	case *organizationResolver:
 		count, err := prb.Tasks.CountForOrganizationID(ctx, obj.ParentID)
 		if err != nil {
-			return 0, fmt.Errorf("cannot count tasks: %w", err)
+			panic(fmt.Errorf("cannot count tasks: %w", err))
 		}
 		return count, nil
 	}
@@ -3910,7 +4852,7 @@ func (r *trustCenterResolver) Organization(ctx context.Context, obj *types.Trust
 
 	organization, err := prb.Organizations.Get(ctx, obj.Organization.ID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot get organization: %w", err)
+		panic(fmt.Errorf("cannot get organization: %w", err))
 	}
 
 	return types.NewOrganization(organization), nil
@@ -4005,7 +4947,7 @@ func (r *vendorResolver) BusinessAssociateAgreement(ctx context.Context, obj *ty
 			return nil, nil
 		}
 
-		return nil, fmt.Errorf("failed to get vendor business associate agreement: %w", err)
+		panic(fmt.Errorf("failed to get vendor business associate agreement: %w", err))
 	}
 
 	return types.NewVendorBusinessAssociateAgreement(vendorBusinessAssociateAgreement, file), nil
@@ -4021,7 +4963,7 @@ func (r *vendorResolver) DataPrivacyAgreement(ctx context.Context, obj *types.Ve
 			return nil, nil
 		}
 
-		return nil, fmt.Errorf("failed to get vendor data privacy agreement: %w", err)
+		panic(fmt.Errorf("failed to get vendor data privacy agreement: %w", err))
 	}
 
 	return types.NewVendorDataPrivacyAgreement(vendorDataPrivacyAgreement, file), nil
@@ -4050,6 +4992,31 @@ func (r *vendorResolver) Contacts(ctx context.Context, obj *types.Vendor, first 
 	}
 
 	return types.NewVendorContactConnection(page), nil
+}
+
+// Services is the resolver for the services field.
+func (r *vendorResolver) Services(ctx context.Context, obj *types.Vendor, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.VendorServiceOrderBy) (*types.VendorServiceConnection, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	pageOrderBy := page.OrderBy[coredata.VendorServiceOrderField]{
+		Field:     coredata.VendorServiceOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+	if orderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.VendorServiceOrderField]{
+			Field:     orderBy.Field,
+			Direction: orderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
+	page, err := prb.VendorServices.List(ctx, obj.ID, cursor)
+	if err != nil {
+		panic(fmt.Errorf("failed to list vendor services: %w", err))
+	}
+
+	return types.NewVendorServiceConnection(page), nil
 }
 
 // RiskAssessments is the resolver for the riskAssessments field.
@@ -4174,19 +5141,19 @@ func (r *vendorConnectionResolver) TotalCount(ctx context.Context, obj *types.Ve
 	case *organizationResolver:
 		count, err := prb.Vendors.CountForOrganizationID(ctx, obj.ParentID)
 		if err != nil {
-			return 0, fmt.Errorf("cannot count vendors: %w", err)
+			panic(fmt.Errorf("cannot count vendors: %w", err))
 		}
 		return count, nil
 	case *assetResolver:
 		count, err := prb.Vendors.CountForAssetID(ctx, obj.ParentID)
 		if err != nil {
-			return 0, fmt.Errorf("cannot count vendors: %w", err)
+			panic(fmt.Errorf("cannot count vendors: %w", err))
 		}
 		return count, nil
 	case *datumResolver:
 		count, err := prb.Vendors.CountForDatumID(ctx, obj.ParentID)
 		if err != nil {
-			return 0, fmt.Errorf("cannot count vendors: %w", err)
+			panic(fmt.Errorf("cannot count vendors: %w", err))
 		}
 		return count, nil
 	}
@@ -4218,7 +5185,7 @@ func (r *vendorDataPrivacyAgreementResolver) Vendor(ctx context.Context, obj *ty
 
 	vendor, err := prb.Vendors.Get(ctx, obj.ID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get vendor: %w", err)
+		panic(fmt.Errorf("failed to get vendor: %w", err))
 	}
 
 	return types.NewVendor(vendor), nil
@@ -4230,7 +5197,7 @@ func (r *vendorDataPrivacyAgreementResolver) FileURL(ctx context.Context, obj *t
 
 	fileURL, err := prb.VendorDataPrivacyAgreements.GenerateFileURL(ctx, obj.ID, 1*time.Hour)
 	if err != nil {
-		return "", fmt.Errorf("failed to generate file URL: %w", err)
+		panic(fmt.Errorf("failed to generate file URL: %w", err))
 	}
 
 	return fileURL, nil
@@ -4263,6 +5230,24 @@ func (r *vendorRiskAssessmentResolver) AssessedBy(ctx context.Context, obj *type
 	}
 
 	return types.NewPeople(people), nil
+}
+
+// Vendor is the resolver for the vendor field.
+func (r *vendorServiceResolver) Vendor(ctx context.Context, obj *types.VendorService) (*types.Vendor, error) {
+	prb := r.ProboService(ctx, obj.ID.TenantID())
+
+	// Get the vendor service to access the VendorID
+	vendorService, err := prb.VendorServices.Get(ctx, obj.ID)
+	if err != nil {
+		panic(fmt.Errorf("failed to get vendor service: %w", err))
+	}
+
+	vendor, err := prb.Vendors.Get(ctx, vendorService.VendorID)
+	if err != nil {
+		panic(fmt.Errorf("failed to get vendor: %w", err))
+	}
+
+	return types.NewVendor(vendor), nil
 }
 
 // Organizations is the resolver for the organizations field.
@@ -4304,6 +5289,26 @@ func (r *Resolver) Audit() schema.AuditResolver { return &auditResolver{r} }
 // AuditConnection returns schema.AuditConnectionResolver implementation.
 func (r *Resolver) AuditConnection() schema.AuditConnectionResolver {
 	return &auditConnectionResolver{r}
+}
+
+// ComplianceRegistry returns schema.ComplianceRegistryResolver implementation.
+func (r *Resolver) ComplianceRegistry() schema.ComplianceRegistryResolver {
+	return &complianceRegistryResolver{r}
+}
+
+// ComplianceRegistryConnection returns schema.ComplianceRegistryConnectionResolver implementation.
+func (r *Resolver) ComplianceRegistryConnection() schema.ComplianceRegistryConnectionResolver {
+	return &complianceRegistryConnectionResolver{r}
+}
+
+// ContinualImprovementRegistry returns schema.ContinualImprovementRegistryResolver implementation.
+func (r *Resolver) ContinualImprovementRegistry() schema.ContinualImprovementRegistryResolver {
+	return &continualImprovementRegistryResolver{r}
+}
+
+// ContinualImprovementRegistryConnection returns schema.ContinualImprovementRegistryConnectionResolver implementation.
+func (r *Resolver) ContinualImprovementRegistryConnection() schema.ContinualImprovementRegistryConnectionResolver {
+	return &continualImprovementRegistryConnectionResolver{r}
 }
 
 // Control returns schema.ControlResolver implementation.
@@ -4367,12 +5372,32 @@ func (r *Resolver) MeasureConnection() schema.MeasureConnectionResolver {
 // Mutation returns schema.MutationResolver implementation.
 func (r *Resolver) Mutation() schema.MutationResolver { return &mutationResolver{r} }
 
+// NonconformityRegistry returns schema.NonconformityRegistryResolver implementation.
+func (r *Resolver) NonconformityRegistry() schema.NonconformityRegistryResolver {
+	return &nonconformityRegistryResolver{r}
+}
+
+// NonconformityRegistryConnection returns schema.NonconformityRegistryConnectionResolver implementation.
+func (r *Resolver) NonconformityRegistryConnection() schema.NonconformityRegistryConnectionResolver {
+	return &nonconformityRegistryConnectionResolver{r}
+}
+
 // Organization returns schema.OrganizationResolver implementation.
 func (r *Resolver) Organization() schema.OrganizationResolver { return &organizationResolver{r} }
 
 // PeopleConnection returns schema.PeopleConnectionResolver implementation.
 func (r *Resolver) PeopleConnection() schema.PeopleConnectionResolver {
 	return &peopleConnectionResolver{r}
+}
+
+// ProcessingActivityRegistry returns schema.ProcessingActivityRegistryResolver implementation.
+func (r *Resolver) ProcessingActivityRegistry() schema.ProcessingActivityRegistryResolver {
+	return &processingActivityRegistryResolver{r}
+}
+
+// ProcessingActivityRegistryConnection returns schema.ProcessingActivityRegistryConnectionResolver implementation.
+func (r *Resolver) ProcessingActivityRegistryConnection() schema.ProcessingActivityRegistryConnectionResolver {
+	return &processingActivityRegistryConnectionResolver{r}
 }
 
 // Query returns schema.QueryResolver implementation.
@@ -4386,6 +5411,14 @@ func (r *Resolver) Risk() schema.RiskResolver { return &riskResolver{r} }
 
 // RiskConnection returns schema.RiskConnectionResolver implementation.
 func (r *Resolver) RiskConnection() schema.RiskConnectionResolver { return &riskConnectionResolver{r} }
+
+// Snapshot returns schema.SnapshotResolver implementation.
+func (r *Resolver) Snapshot() schema.SnapshotResolver { return &snapshotResolver{r} }
+
+// SnapshotConnection returns schema.SnapshotConnectionResolver implementation.
+func (r *Resolver) SnapshotConnection() schema.SnapshotConnectionResolver {
+	return &snapshotConnectionResolver{r}
+}
 
 // Task returns schema.TaskResolver implementation.
 func (r *Resolver) Task() schema.TaskResolver { return &taskResolver{r} }
@@ -4430,6 +5463,9 @@ func (r *Resolver) VendorRiskAssessment() schema.VendorRiskAssessmentResolver {
 	return &vendorRiskAssessmentResolver{r}
 }
 
+// VendorService returns schema.VendorServiceResolver implementation.
+func (r *Resolver) VendorService() schema.VendorServiceResolver { return &vendorServiceResolver{r} }
+
 // Viewer returns schema.ViewerResolver implementation.
 func (r *Resolver) Viewer() schema.ViewerResolver { return &viewerResolver{r} }
 
@@ -4437,6 +5473,10 @@ type assetResolver struct{ *Resolver }
 type assetConnectionResolver struct{ *Resolver }
 type auditResolver struct{ *Resolver }
 type auditConnectionResolver struct{ *Resolver }
+type complianceRegistryResolver struct{ *Resolver }
+type complianceRegistryConnectionResolver struct{ *Resolver }
+type continualImprovementRegistryResolver struct{ *Resolver }
+type continualImprovementRegistryConnectionResolver struct{ *Resolver }
 type controlResolver struct{ *Resolver }
 type controlConnectionResolver struct{ *Resolver }
 type datumResolver struct{ *Resolver }
@@ -4452,12 +5492,18 @@ type frameworkConnectionResolver struct{ *Resolver }
 type measureResolver struct{ *Resolver }
 type measureConnectionResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
+type nonconformityRegistryResolver struct{ *Resolver }
+type nonconformityRegistryConnectionResolver struct{ *Resolver }
 type organizationResolver struct{ *Resolver }
 type peopleConnectionResolver struct{ *Resolver }
+type processingActivityRegistryResolver struct{ *Resolver }
+type processingActivityRegistryConnectionResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type reportResolver struct{ *Resolver }
 type riskResolver struct{ *Resolver }
 type riskConnectionResolver struct{ *Resolver }
+type snapshotResolver struct{ *Resolver }
+type snapshotConnectionResolver struct{ *Resolver }
 type taskResolver struct{ *Resolver }
 type taskConnectionResolver struct{ *Resolver }
 type trustCenterResolver struct{ *Resolver }
@@ -4469,4 +5515,5 @@ type vendorConnectionResolver struct{ *Resolver }
 type vendorContactResolver struct{ *Resolver }
 type vendorDataPrivacyAgreementResolver struct{ *Resolver }
 type vendorRiskAssessmentResolver struct{ *Resolver }
+type vendorServiceResolver struct{ *Resolver }
 type viewerResolver struct{ *Resolver }

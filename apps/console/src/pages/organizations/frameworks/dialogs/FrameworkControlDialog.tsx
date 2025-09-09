@@ -13,7 +13,7 @@ import type { ReactNode } from "react";
 import { useTranslate } from "@probo/i18n";
 import { graphql } from "relay-runtime";
 import { useFragment } from "react-relay";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import type { FrameworkControlDialogFragment$key } from "./__generated__/FrameworkControlDialogFragment.graphql";
 import { useFormWithSchema } from "/hooks/useFormWithSchema";
 import { z } from "zod";
@@ -92,28 +92,22 @@ export function FrameworkControlDialog(props: Props) {
         successMessage: __("Control created successfully."),
         errorMessage: __("Failed to create control. Please try again."),
       });
+
+  const defaultValues = useMemo(() => ({
+    name: frameworkControl?.name ?? "",
+    description: frameworkControl?.description ?? "",
+    sectionTitle: frameworkControl?.sectionTitle ?? "",
+    status: frameworkControl?.status ?? "INCLUDED",
+    exclusionJustification: frameworkControl?.exclusionJustification ?? "",
+  }), [frameworkControl]);
+
   const { control, handleSubmit, register, reset, watch } = useFormWithSchema(schema, {
-    defaultValues: {
-      name: frameworkControl?.name ?? "",
-      description: frameworkControl?.description ?? "",
-      sectionTitle: frameworkControl?.sectionTitle ?? "",
-      status: frameworkControl?.status ?? "INCLUDED",
-      exclusionJustification: frameworkControl?.exclusionJustification ?? "",
-    },
+    defaultValues,
   });
 
-  // Reset form values when frameworkControl changes
   useEffect(() => {
-    if (frameworkControl) {
-      reset({
-        name: frameworkControl.name ?? "",
-        description: frameworkControl.description ?? "",
-        sectionTitle: frameworkControl.sectionTitle ?? "",
-        status: frameworkControl.status ?? "INCLUDED",
-        exclusionJustification: frameworkControl.exclusionJustification ?? "",
-      });
-    }
-  }, [frameworkControl, reset]);
+    reset(defaultValues);
+  }, [defaultValues, reset]);
 
   const statusValue = watch("status");
   const showExclusionJustification = statusValue === "EXCLUDED";
@@ -161,7 +155,7 @@ export function FrameworkControlDialog(props: Props) {
         <Breadcrumb
           items={[
             __("Controls"),
-            control ? __("Edit Control") : __("New Control"),
+            frameworkControl ? __("Edit Control") : __("New Control"),
           ]}
         />
       }
@@ -198,7 +192,8 @@ export function FrameworkControlDialog(props: Props) {
             <Option value="EXCLUDED">{__("Excluded")}</Option>
           </ControlledSelect>
           {showExclusionJustification && (
-            <Input
+            <Textarea
+              required
               id="exclusionJustification"
               variant="bordered"
               placeholder={__("Reason for exclusion")}
